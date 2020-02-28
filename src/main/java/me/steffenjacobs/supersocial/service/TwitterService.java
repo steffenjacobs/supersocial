@@ -44,7 +44,6 @@ public class TwitterService {
 		try {
 			if (!credentialService.hasCredentials()) {
 				throw new TwitterException("Please provide credentials!");
-				// establishConnection();
 			}
 			attemptTweet(tweetText, credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN), credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN_SECRET));
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
@@ -66,7 +65,7 @@ public class TwitterService {
 		oAuthConsumer.sign(httpPost);
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
-			System.out.println(IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8")));
+			LOG.info(IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8")));
 		}
 	}
 }

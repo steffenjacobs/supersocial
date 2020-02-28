@@ -17,7 +17,7 @@ public class CredentialService {
 
 	enum Credential {
 		TWITTER_API_KEY("twitter.api.key"), TWITTER_API_KEY_SECRET("twitter.api.secret"), TWITTER_ACCESS_TOKEN("twitter.api.accesstoken"), TWITTER_ACCESS_TOKEN_SECRET(
-				"twitter.api.accesstoken.secret");
+				"twitter.api.accesstoken.secret"), FACEBOOK_PAGE_ID("facebook.page.id"), FACEBOOK_PAGE_ACCESSTOKEN("facebook.page.accesstoken");
 
 		private final String key;
 
