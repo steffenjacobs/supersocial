@@ -18,7 +18,7 @@ public class PublishingController {
 	private TwitterService twitterService;
 
 	@Autowired
-	FacebookService facebookService;
+	private FacebookService facebookService;
 
 	@PostMapping(path = "/api/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String publishMessage(@RequestBody MessagePublishingDTO messagePublishingDto) {

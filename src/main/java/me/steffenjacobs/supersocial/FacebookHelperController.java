@@ -13,7 +13,7 @@ import me.steffenjacobs.supersocial.service.FacebookService;
 public class FacebookHelperController {
 
 	@Autowired
-	FacebookService facebookService;
+	private FacebookService facebookService;
 
 	@GetMapping(path = "/api/facebook/exchange/{token}")
 	public String exchangeToken(@PathVariable("token") String token) {

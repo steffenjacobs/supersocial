@@ -30,8 +30,7 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 public class TwitterService {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterService.class);
 
-	private static final String TWITTER_BASE_URL = "https://api.twitter.com/";
-	private static final String TWITTER_STATUS_ENDPOINT = TWITTER_BASE_URL + "1.1/statuses/update.json?status=";
+	private static final String TWITTER_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/update.json?status=";
 
 	@Autowired
 	private CredentialService credentialService;
