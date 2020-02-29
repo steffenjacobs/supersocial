@@ -30,7 +30,7 @@ services:
       - DISCOURSE_POSTGRESQL_NAME=bitnami_application
       - DISCOURSE_POSTGRESQL_USERNAME=bn_discourse
       - DISCOURSE_POSTGRESQL_PASSWORD=bitnami1
-      - DISCOURSE_HOSTNAME=www.example.com
+      - DISCOURSE_HOSTNAME=discourse.localhost
   sidekiq:
     image: 'bitnami/discourse:2'
     depends_on:
