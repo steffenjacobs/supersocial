@@ -31,6 +31,8 @@ services:
       - DISCOURSE_POSTGRESQL_USERNAME=bn_discourse
       - DISCOURSE_POSTGRESQL_PASSWORD=bitnami1
       - DISCOURSE_HOSTNAME=discourse.localhost
+      - DISCOURSE_USERNAME=admin
+      - DISCOURSE_PASSWORD=admingeheim123
   sidekiq:
     image: 'bitnami/discourse:2'
     depends_on:
