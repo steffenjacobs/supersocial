@@ -9,6 +9,6 @@ services:
     build: .
     container_name: supersocial
     ports:
-      - "80:8080"
+      - "8080:8080"
     networks:
       - network-front
