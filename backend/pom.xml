@@ -46,7 +46,14 @@
 			<groupId>oauth.signpost</groupId>
 			<artifactId>signpost-commonshttp4</artifactId>
 			<version>1.2.1.2</version>
+		</dependency>	
+			
+		<dependency>
+		    <groupId>org.ollide</groupId>
+		    <artifactId>spring-discourse-sso-autoconfigure</artifactId>
+		    <version>1.0.0-SNAPSHOT</version>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
