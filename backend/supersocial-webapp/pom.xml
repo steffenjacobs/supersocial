@@ -4,15 +4,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.5.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<groupId>me.steffenjacobs</groupId>
+		<artifactId>supersocial</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<groupId>me.steffenjacobs</groupId>
-	<artifactId>supersocial</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>supersocial</name>
+	<artifactId>supersocial-webapp</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>supersocial-webapp</name>
 	<description>Social Media Distribution Tool</description>
 
 	<properties>
@@ -46,14 +44,14 @@
 			<groupId>oauth.signpost</groupId>
 			<artifactId>signpost-commonshttp4</artifactId>
 			<version>1.2.1.2</version>
-		</dependency>	
-			
-		<dependency>
-		    <groupId>org.ollide</groupId>
-		    <artifactId>spring-discourse-sso-autoconfigure</artifactId>
-		    <version>1.0.0-SNAPSHOT</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.ollide</groupId>
+			<artifactId>spring-discourse-sso-autoconfigure</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
