@@ -1,0 +1,29 @@
+= Marketing Helper
+
+== Lokale Entwicklung
+Ein lokales setup kann mit Docker und docker-compose aufgesetzt werden.
+
+Dazu einfach
+
+[source,shell]
+----
+$ docker-compose up
+# stoppen
+$ docker-compose stop
+----
+
+verwenden.
+
+Achtung: Einige Daten werden in Volumes gehalten.
+Für ein vollständigen Neustart müssen diese gelöscht werden.
+
+[source,shell]
+----
+$ docker-compose down
+$ docker volume prune
+----
+
+== Zugriff
+Folgende URLs können aufgerufen werden:
+
+* http://discourse.localhost/  -  Discourse für lokale Tests
