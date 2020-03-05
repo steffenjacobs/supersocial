@@ -1,4 +1,4 @@
-= Marketing Helper
+= Supersocial
 
 == Lokale Entwicklung
 Ein lokales setup kann mit Docker und docker-compose aufgesetzt werden.
@@ -25,7 +25,21 @@ $ docker-compose down
 $ docker volume prune
 ----
 
+=== SSO Provider aktivieren
+Damit Supersocial über den SSO-Provider Discourse eine Session erhalten kann, muss dieser zunächst aktiviert und konfiguriert werden.
+Dazu muss: 
+1. In den Discourse-Settings unter 'Login' die Checkbox neben 'enable sso provider' aktiviert werden. Anschließend muss die Änderung über die grüne Schaltfläche mit dem Haken rechts daneben bestätigt werden.
+2. Zu den 'sso provider secrets' muss 'discourse.localhost' - 'supersecret' hinzugefügt werden. Anschließend muss auf den Plus-Knopf und wieder auf die grüne Schaltfläche mit dem Haken geklickt werden.
+
+
 == Zugriff
 Folgende URLs können aufgerufen werden:
 
 * http://discourse.localhost/  -  Discourse für lokale Tests
+
+Unter Windows muss ggf. der folgende Eintrag in C:\Windows\System32\drivers\etc\hosts hinzugefügt werden:
+[source,shell]
+----
+127.0.0.1 discourse.localhost
+----
+ 
