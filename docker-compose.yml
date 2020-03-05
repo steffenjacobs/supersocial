@@ -2,7 +2,7 @@ version: '2'
 services:
 
   backend:
-    build: backend/supersocial-webapp
+    build: backend
     environment: 
       - DISCOURSE_SSO_DISCOURSE_URL=http://discourse.localhost/session/sso_provider
       - DISCOURSE_SSO_SECRET=supersecret

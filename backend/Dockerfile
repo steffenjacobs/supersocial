@@ -10,5 +10,5 @@ FROM openjdk:11-jre-slim
 EXPOSE 8080
 ENV JAVA_OPTIONS "-XX:MaxRAMPercentage=90 -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Dfile.encoding=UTF-8"
 COPY --from=build /home/app/supersocial-webapp/target/supersocial-webapp-1.0.0-SNAPSHOT.jar /usr/local/lib/supersocial.jar
-COPY supersocial-webapp/credentials.properties /usr/local/lib/credentials.properties
-ENTRYPOINT ["java","-jar","/usr/local/lib/supersocial.jar"]
+COPY --from=build /home/app/supersocial-webapp/credentials.properties /usr/local/lib/credentials.properties
+ENTRYPOINT ["java","-Duser.dir=/usr/local/lib","-jar","/usr/local/lib/supersocial.jar"]
