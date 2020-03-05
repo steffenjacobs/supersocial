@@ -5,6 +5,8 @@ Ein lokales setup kann mit Docker und docker-compose aufgesetzt werden.
 
 Dazu einfach
 
+credentials.properties Datei in backend/supersocial-webapp anlegen
+
 [source,shell]
 ----
 $ docker-compose up
