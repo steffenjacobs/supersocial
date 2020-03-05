@@ -28,8 +28,8 @@ $ docker volume prune
 === SSO Provider aktivieren
 Damit Supersocial über den SSO-Provider Discourse eine Session erhalten kann, muss dieser zunächst aktiviert und konfiguriert werden.
 Dazu muss: 
-1. In den Discourse-Settings unter 'Login' die Checkbox neben 'enable sso provider' aktiviert werden. Anschließend muss die Änderung über die grüne Schaltfläche mit dem Haken rechts daneben bestätigt werden.
-2. Zu den 'sso provider secrets' muss 'discourse.localhost' - 'supersecret' hinzugefügt werden. Anschließend muss auf den Plus-Knopf und wieder auf die grüne Schaltfläche mit dem Haken geklickt werden.
+. In den Discourse-Settings unter 'Login' die Checkbox neben 'enable sso provider' aktiviert werden. Anschließend muss die Änderung über die grüne Schaltfläche mit dem Haken rechts daneben bestätigt werden.
+. Zu den 'sso provider secrets' muss 'discourse.localhost' - 'supersecret' hinzugefügt werden. Anschließend muss auf den Plus-Knopf und wieder auf die grüne Schaltfläche mit dem Haken geklickt werden.
 
 
 == Zugriff
