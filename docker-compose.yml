@@ -18,6 +18,9 @@ services:
     image: 'bitnami/postgresql:11'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=supersocial-db
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_USERNAME=supersocial
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_PASSWORD=supersocial
     volumes:
       - 'postgresql_data:/bitnami/postgresql'
   redis:

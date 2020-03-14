@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial.domain;
+package me.steffenjacobs.supersocial.domain.dto;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -39,12 +39,13 @@ public class TwitterService {
 	 * Tweets {@code tweetText} with the credentials given in the
 	 * credentials.properties file.
 	 */
-	public void tweet(String tweetText) {
+	public String tweet(String tweetText) {
 		try {
 			if (!credentialService.hasCredentials()) {
 				throw new TwitterException("Please provide credentials!");
 			}
-			attemptTweet(tweetText, credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN), credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN_SECRET));
+			return attemptTweet(tweetText, credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN),
+					credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN_SECRET));
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
 			LOG.error("Could not send tweet");
 			throw new TwitterException("Could not send tweet.", e);
@@ -55,7 +56,7 @@ public class TwitterService {
 	 * Attempt to tweet {@code tweetText} with the given {@code accessToken} and
 	 * {@code accessTokenSecret}.
 	 */
-	private void attemptTweet(String tweetText, String accessToken, String accessTokenSecret)
+	private String attemptTweet(String tweetText, String accessToken, String accessTokenSecret)
 			throws ClientProtocolException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
 		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialService.getCredential(Credential.TWITTER_API_KEY),
 				credentialService.getCredential(Credential.TWITTER_API_KEY_SECRET));
@@ -64,7 +65,7 @@ public class TwitterService {
 		oAuthConsumer.sign(httpPost);
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
-			LOG.info(IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8")));
+			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
 		}
 	}
 }

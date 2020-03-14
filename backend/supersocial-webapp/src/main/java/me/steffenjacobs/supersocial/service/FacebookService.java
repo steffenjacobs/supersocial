@@ -35,9 +35,9 @@ public class FacebookService {
 	 * Publishes {@code text} with the credentials given in the
 	 * credentials.properties file to the given facebook page.
 	 */
-	public void postMessage(String text) {
+	public String postMessage(String text) {
 		try {
-			attemptPostMessage(text);
+			return attemptPostMessage(text);
 		} catch (UnsupportedOperationException | IOException e) {
 			LOG.error("Could not post message to page");
 			throw new FacebookException("Could not post message to page.", e);
@@ -48,13 +48,13 @@ public class FacebookService {
 	 * Publishes {@code text} with the credentials given in the
 	 * credentials.properties file to the given Facebook page.
 	 */
-	private void attemptPostMessage(String text) throws UnsupportedOperationException, IOException {
+	private String attemptPostMessage(String text) throws UnsupportedOperationException, IOException {
 		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialService.getCredential(Credential.FACEBOOK_PAGE_ID),
 				URLEncoder.encode(text, StandardCharsets.UTF_16), credentialService.getCredential(Credential.FACEBOOK_PAGE_ACCESSTOKEN)));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
-			LOG.info(IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8")));
+			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
 		}
 	}
 
