@@ -37,20 +37,27 @@ public class PublishingController {
 		StringBuilder sb = new StringBuilder();
 		if (messagePublishingDto.getPlatforms().contains("twitter")) {
 			long id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.TWITTER).getId();
-			String externalId = twitterService.tweet(messagePublishingDto.getMessage());
-			postPersistenceManager.updateWithExternalId(id, externalId);
-			sb.append("Tweeted").append(messagePublishingDto.getMessage()).append("\n");
+			String result = twitterService.tweet(messagePublishingDto.getMessage());
+			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
+			if(json.containsKey("errors")) {
+				LOG.error("Received error from Twitter API: {0}", json);
+				sb.append("Error posting to Twitter\n");
+			} else {
+				postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));
+				sb.append("Posted to Twitter: ").append(messagePublishingDto.getMessage()).append("\n");
+			}
 		}
 		if (messagePublishingDto.getPlatforms().contains("facebook")) {
 			long id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.FACEBOOK).getId();
 			String result = facebookService.postMessage(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if(json.containsKey("error")) {
-				LOG.error("Received error from facebook api: {0}", json);
-				sb.append("Error posting to facebook\n");
+				LOG.error("Received error from Facebook API: {0}", json);
+				sb.append("Error posting to Facebook\n");
+			} else {
+				postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));
+				sb.append("Posted to Facebook: ").append(messagePublishingDto.getMessage()).append("\n");
 			}
-			postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));
-			sb.append("Posted to Facebook: ").append(messagePublishingDto.getMessage()).append("\n");
 		}
 		return sb.toString();
 	}
