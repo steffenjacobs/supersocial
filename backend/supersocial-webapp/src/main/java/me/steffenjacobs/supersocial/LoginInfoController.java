@@ -1,21 +1,21 @@
 package me.steffenjacobs.supersocial;
 
-import org.ollide.spring.discourse.sso.authentication.DiscoursePrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import me.steffenjacobs.supersocial.security.SecurityService;
 
 /** @author Steffen Jacobs */
 @RestController
 public class LoginInfoController {
+	
+	@Autowired
+	private SecurityService securityService;
 
 	@GetMapping(path = "/api/loginstatus")
-	public DiscoursePrincipal getLoginStatus() throws Exception {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-		if (principal instanceof DiscoursePrincipal) {
-			return (DiscoursePrincipal) principal;
-		}
-		throw new Exception("Invalid principal");
+	public AuthenticatedPrincipal getLoginStatus() throws Exception {
+		return securityService.getCurrentUser();
 	}
 }
