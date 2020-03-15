@@ -1,5 +1,11 @@
 = Supersocial
 
+== Discourse login
+URL: http://discourse.localhost/
+
+Username: admin
+Passwort: admingeheim123
+
 == Lokale Entwicklung
 Ein lokales setup kann mit Docker und docker-compose aufgesetzt werden.
 
@@ -25,22 +31,46 @@ $ docker-compose down
 $ docker volume prune
 ----
 
+Dockerbuild nur für das backend starten:
+[source,shell]
+----
+$ docker build --label "supersocial_backend"  --tag "supersocial_backend" ./backend
+----
+
+=== SSO Abhängigkeit
+Derzeit ist diese nicht auf maven central publiziert und muss manuell installiert werden.
+
+----
+$ cd /tmp
+$ git clone https://github.com/ollide/spring-discourse-sso-boot
+$ cd spring-discourse-sso-boot && mvn clean install
+----
+(Backup location: https://github.com/everflux/spring-discourse-sso-boot)
+
 === SSO Provider aktivieren
 Damit Supersocial über den SSO-Provider Discourse eine Session erhalten kann, muss dieser zunächst aktiviert und konfiguriert werden.
-Dazu muss: 
+Dazu muss:
 
 . In den Discourse-Settings unter 'Login' die Checkbox neben 'enable sso provider' aktiviert werden. Anschließend muss die Änderung über die grüne Schaltfläche mit dem Haken rechts daneben bestätigt werden.
 . Zu den 'sso provider secrets' muss 'discourse.localhost' - 'supersecret' hinzugefügt werden. Anschließend muss auf den Plus-Knopf und wieder auf die grüne Schaltfläche mit dem Haken geklickt werden.
+
+
+enable sso provider: checked
+//sso url: http://discourse.localhost
+sso provider secrets:
+- discourse.localhost - supersecret
+- localhost - supersecret
+
 
 
 == Zugriff
 Folgende URLs können aufgerufen werden:
 
 * http://discourse.localhost/  -  Discourse für lokale Tests
+* http://backend.localhost/api/me - Zugriff auf Backend mit SSO
 
 Unter Windows muss ggf. der folgende Eintrag in C:\Windows\System32\drivers\etc\hosts hinzugefügt werden:
 [source,shell]
 ----
 127.0.0.1 discourse.localhost
 ----
- 
