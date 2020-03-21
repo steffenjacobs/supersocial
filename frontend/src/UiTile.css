@@ -3,6 +3,11 @@
     border-radius: .2em;
     background-color: #eef8ff;
     width: 20.5em;
+    position: relative;
+}
+
+.double-container {
+    width: 42em;
 }
 
 .messageLabel {
@@ -32,4 +37,9 @@
 .box-content div textarea {
     width: 22em;
     height: 7em;
+}
+
+.vspacer, .hspacer {
+    height: 1em;
+    width: 1em;
 }

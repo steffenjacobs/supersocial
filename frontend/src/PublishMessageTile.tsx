@@ -15,11 +15,16 @@ export class PublishMessageTile extends React.Component<any, SendTextForm>{
     }
 
     private submit() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://localhost:8080/api/publish', false);
-        xhr.onload = function () { console.log(this); };
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(this.state));
+        fetch('http://localhost:8080/api/publish', {
+            method: 'post',
+            headers: new Headers({
+                'Authorization': 'Basic '+btoa('user:pass'), 
+                'Content-Type': 'application/json'
+              }),
+            body: JSON.stringify(this.state)
+          })
+        .then(response => response.json())
+        .then(data => console.log(data));
         console.log("submitted: " + JSON.stringify(this.state));
     }
 

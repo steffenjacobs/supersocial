@@ -1,7 +1,4 @@
 .btn {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     background-color: white;
     color: #3498db;
     border-radius: 0.3125rem;
@@ -9,8 +6,9 @@
     height: 2em;
     cursor: pointer;
     transition: 200ms;
-    border: 2px solid #3498db;
-
+    border: 1px solid #3498db;
+    text-align: center;
+    width: 15em;
 }
 
 .btn:hover {
@@ -28,8 +26,40 @@
     background-color: #5cb6f1;
 }
 
+.btn-align-top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.btn-icon {
+    cursor: pointer;
+    height: 1.5em;
+    width: 1.5em;
+}
+
 .textarea {
     border-radius: .3125rem;
     border: 2px solid #e3e3e3;
     padding: .3125rem;
 }
+
+.crossRotate {
+    animation:spin 1s linear infinite;
+    -webkit-animation:spin 1s linear infinite;
+    -moz-animation:spin 1s linear infinite;
+ }
+ @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+ @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+ @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}
+
+ table th {
+     padding: 1em;
+     background-color: #ccebff;
+ }
+ table td {
+     padding: 1em;
+ }
+
+ table tr:nth-child(odd) {background: #d7efff}
+ 

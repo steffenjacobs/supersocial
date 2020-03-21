@@ -1,13 +1,12 @@
 import React from 'react';
-import { PublishMessageTile } from './PublishMessageTile';
 import { Sidebar } from './Sidebar';
 import { AboutPage } from './AboutPage';
+import { MessageOverview } from './MessageOverview';
 
 function App() {
-  const rec = new Set<string>();
   const components = [{
-    title: 'Home',
-    page: <PublishMessageTile message="Test Message" platforms = {rec}/>,
+    title: 'Message Overview',
+    page: <MessageOverview/>,
     selected: true,
     id: 0,
     icon: <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +64,6 @@ function App() {
    </g>
    </svg>
   }];
-  rec.add("facebook");
   return (
     <div className="App">
       <Sidebar components = {components}/>
