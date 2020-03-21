@@ -1,0 +1,28 @@
+.btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: white;
+    color: #3498db;
+    border: none;
+    border-radius: 0.3125rem;
+    box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.2);
+    height: 2em;
+    cursor: pointer;
+    transition: 200ms;
+
+}
+
+.btn:hover {
+    background-color: #e6e6e6;
+    transition: 200ms;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5cb6f1;
+}
