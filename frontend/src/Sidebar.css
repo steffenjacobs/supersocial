@@ -1,0 +1,50 @@
+.navbar-menuItem {
+    padding: .3em;
+    cursor: pointer;
+    color: rgb(199, 215, 216);
+    fill: rgb(199, 215, 216);
+    font-size: 1.5em;
+    transition: 200ms;
+    padding-left: .667em;
+}
+
+.navbar-menuItem:hover {
+    background-color:rgb(54, 63, 69);
+    transition: 200ms;
+}
+
+.navbar-menuItem-active {
+    background-color: rgb(64, 73, 79)
+}
+
+.navbar {
+    background-color:rgb(50, 56, 59);
+    width: 18em;
+    height: 100%;
+    position: absolute;
+}
+
+.navbar-brandname {
+    font-size: 2em;
+    color: #61dafb;
+}
+
+.navbar-logo {
+    display: table;
+    margin: 0 auto;
+    margin-bottom: 1em;
+}
+
+.navbar-icon {
+    display: inline-block;
+}
+
+.navbar-text {    
+    display: inline-block;
+    margin-left: .667em;
+}
+
+.navbar-page {
+    position: absolute;
+    left: 18em;
+}
