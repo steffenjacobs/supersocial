@@ -74,7 +74,7 @@ export class PublishMessageTile extends React.Component<any, SendTextForm>{
                     <div>
                         <div className="messageLabel">Message</div>
                         <div>
-                        <textarea placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} />
+                        <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} />
                         </div>
                     </div>
                     <div>

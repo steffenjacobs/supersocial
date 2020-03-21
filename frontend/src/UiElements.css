@@ -4,12 +4,12 @@
     justify-content: center;
     background-color: white;
     color: #3498db;
-    border: none;
     border-radius: 0.3125rem;
     box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.2);
     height: 2em;
     cursor: pointer;
     transition: 200ms;
+    border: 2px solid #3498db;
 
 }
 
@@ -21,8 +21,15 @@
 .btn-primary {
     background-color: #3498db;
     color: white;
+    border: none;
 }
 
 .btn-primary:hover {
     background-color: #5cb6f1;
+}
+
+.textarea {
+    border-radius: .3125rem;
+    border: 2px solid #e3e3e3;
+    padding: .3125rem;
 }
