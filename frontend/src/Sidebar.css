@@ -14,7 +14,7 @@
 }
 
 .navbar-menuItem-active {
-    background-color: rgb(64, 73, 79)
+    background-color: rgb(64, 73, 79);
 }
 
 .navbar {
@@ -44,4 +44,26 @@
 .navbar-page {
     position: absolute;
     left: 18em;
+}
+
+.navbar-header-left {
+    padding: 1rem;
+    position: absolute;
+    left: 18rem;
+    font-size: 1.8em;
+    font-weight: 600;
+    color: rgb(50, 56, 59);
+}
+
+.navbar-header{
+    height: 4em;
+    border-bottom: 2px solid rgb(50, 56, 59);
+    margin-bottom: .5em;
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
+}
+.navbar-header-userdetails{
+    position: absolute;
+    right: 0;
+    padding: 1em;
+    padding-top: 1.2em;
 }

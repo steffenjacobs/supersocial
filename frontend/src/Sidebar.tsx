@@ -37,6 +37,21 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         //TODO: set title and url
     }
 
+
+    private getTitleComponent(elem?: PageComponent) {
+        if (elem) {
+
+            return (
+                <div>
+                    {elem?.icon}
+                    <div className="navbar-text">{elem?.title}</div>
+                </div>
+            );
+        } else {
+            return <div />;
+        }
+    }
+
     public render() {
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
@@ -50,7 +65,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
             );
         });
 
-        const selectedComponent = this.state.components.find((c) => { return c.selected })?.page;
+        const selectedComponent = this.state.components.find((c) => { return c.selected });
 
         return (
             <div>
@@ -61,7 +76,15 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
                     </div>
                     {components}
                 </div>
-                <div className="navbar-page">{selectedComponent}</div>
+                <div className="navbar-header">
+                    <div className="navbar-header-left">
+                        {this.getTitleComponent(selectedComponent)}
+                    </div>
+                    <div className="navbar-header-userdetails">
+                        Hello Steffen!
+                    </div>
+                </div>
+                <div className="navbar-page">{selectedComponent?.page}</div>
             </div>
         );
     }
