@@ -2,6 +2,7 @@ import * as React from "react";
 import './PublishedPostsTile.css';
 import './UiTile.css';
 import './UiElements.css';
+import { EventBus, EventBusEventType } from "./EventBus";
 
 export interface PublishedPost {
     id: number
@@ -14,14 +15,16 @@ export interface PublishedPost {
 export interface PublishedPosts {
     posts: PublishedPost[]
     updating?: boolean
+    eventBus: EventBus
 }
 
 export class PublishedPostsTile extends React.Component<PublishedPosts, PublishedPosts>{
     constructor(props: PublishedPosts, state: PublishedPosts) {
         super(props);
         this.state = props;
-        var x = props.posts.map;
         //refreshPosts();
+
+        this.state.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
     }
 
     private refreshPosts() {
@@ -39,8 +42,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
     private getSocialmediaIcon(platformId: number) {
         if (platformId === 1) {
             return <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                width="1.5em" height="1.5em" viewBox="0 0 266.893 266.895" enable-background="new 0 0 266.893 266.895"
-            >
+                width="1.5em" height="1.5em" viewBox="0 0 266.893 266.895">
                 <path id="Blue_1_" fill="#3C5A99" d="M248.082,262.307c7.854,0,14.223-6.369,14.223-14.225V18.812
 	c0-7.857-6.368-14.224-14.223-14.224H18.812c-7.857,0-14.224,6.367-14.224,14.224v229.27c0,7.855,6.366,14.225,14.224,14.225
 	H248.082z"/>
@@ -49,9 +51,9 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
 	v99.803H182.409z"/>
             </svg>
         }
-        else if (platformId == 2) {
+        else if (platformId === 2) {
             return <svg width="1.5em" height="1.5em" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                viewBox="0 0 210 279.9" enable-background="new 0 0 210 279.9">
+                viewBox="0 0 210 279.9">
                 <path fill="#157DC3" d="M165.5,268.2H94.3l-1.5-0.1c-48.4-4.4-80.8-40.8-80.5-90.3V41.8c0-17.7,14.3-32,32-32s32,14.3,32,32v47.2
                    l92.9,0.9c17.7,0.2,31.9,14.6,31.7,32.3c-0.2,17.6-14.5,31.7-32,31.7c-0.1,0-0.2,0-0.3,0L76.3,153v24.9
                    c-0.1,22.7,14.1,25.6,21,26.3h68.2c17.7,0,32,14.3,32,32S183.2,268.2,165.5,268.2z"/>
@@ -71,10 +73,14 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         }
     }
 
+    private selectPost(post: PublishedPost) {
+        this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
+    }
+
     public render() {
         const posts = this.state.posts.map((elem) => {
             return (
-                <tr>
+                <tr onClick={() => this.selectPost(elem)}>
                     <td>{elem.id}</td>
                     <td>{this.getSocialmediaIcon(elem.platformId)}</td>
                     <td>{elem.created}</td>
@@ -101,14 +107,18 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                 </div>
                 <div className="box-content">
                     <table>
-                        <tr>
-                            <th>ID</th>
-                            <th>Platforms</th>
-                            <th>Created</th>
-                            <th>Author</th>
-                            <th className="column-text">Post</th>
-                        </tr>
-                        {posts}
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Platforms</th>
+                                <th>Created</th>
+                                <th>Author</th>
+                                <th className="column-text">Post</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {posts}
+                        </tbody>
 
                     </table>
                 </div>

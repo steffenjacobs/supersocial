@@ -35,13 +35,10 @@
     margin-bottom: 1em;
 }
 
-.navbar-icon {
-    display: inline-block;
-}
-
 .navbar-text {    
     display: inline-block;
     margin-left: .667em;
+    font-size: .8em;
 }
 
 .navbar-page {

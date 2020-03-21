@@ -2,29 +2,46 @@ import * as React from "react";
 import './PublishMessageTile.css';
 import './UiTile.css';
 import './UiElements.css';
+import { EventBus, EventBusEventType } from "./EventBus";
 
 export interface SendTextForm {
     message: string
     platforms: Set<string>
+    eventBus: EventBus
 }
 
-export class PublishMessageTile extends React.Component<any, SendTextForm>{
-    constructor(props: any, state: SendTextForm) {
+export class PublishMessageTile extends React.Component<SendTextForm, SendTextForm>{
+    constructor(props: SendTextForm, state: SendTextForm) {
         super(props);
-        this.state = state;
+        this.state = props;
+
+        this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData) => this.selectPost(eventType, eventData));
+    }
+
+    private selectPost(eventType: EventBusEventType, eventData?: any) {
+        var platforms = new Set<string>();
+        platforms.add("" + eventData.platformId);
+        this.setState({
+            message: eventData.text,
+            platforms: platforms,
+            eventBus: this.state.eventBus
+        });
     }
 
     private submit() {
         fetch('http://localhost:8080/api/publish', {
             method: 'post',
             headers: new Headers({
-                'Authorization': 'Basic '+btoa('user:pass'), 
+                'Authorization': 'Basic ' + btoa('user:pass'),
                 'Content-Type': 'application/json'
-              }),
+            }),
             body: JSON.stringify(this.state)
-          })
-        .then(response => response.json())
-        .then(data => console.log(data));
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Result: " + data);
+                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+            });
         console.log("submitted: " + JSON.stringify(this.state));
     }
 
@@ -40,7 +57,8 @@ export class PublishMessageTile extends React.Component<any, SendTextForm>{
         if (id === "textMsg") {
             this.setState({
                 message: value,
-                platforms: this.state.platforms
+                platforms: this.state.platforms,
+                eventBus: this.state.eventBus
             });
         }
         if (id === "facebook" || id === "twitter") {
@@ -61,12 +79,16 @@ export class PublishMessageTile extends React.Component<any, SendTextForm>{
 
         this.setState({
             message: this.state.message,
-            platforms: platforms
+            platforms: platforms,
+            eventBus: this.state.eventBus
         });
     }
 
-    private validate(id: string, value: string): any {
-        return true;
+    private createCheckbox(id: string, checked: boolean) {
+        if (checked) {
+            return <input id={id} type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} checked />
+        }
+        return <input id={id} type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
     }
 
     public render() {
@@ -79,17 +101,17 @@ export class PublishMessageTile extends React.Component<any, SendTextForm>{
                     <div>
                         <div className="messageLabel">Message</div>
                         <div>
-                            <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} />
+                            <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} value={this.state.message} />
                         </div>
                     </div>
                     <div className="channel-selection">
-                        <div className="messageLabel">Distribution Channels</div>                        
+                        <div className="messageLabel">Distribution Channels</div>
                         <div>
-                            <input id="facebook" type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
+                            {this.createCheckbox("facebook", this.state.platforms.has("1"))}
                             <span>Distribute via Facebook</span>
                         </div>
                         <div>
-                            <input id="twitter" type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
+                            {this.createCheckbox("twitter", this.state.platforms.has("2"))}
                             <span>Distribute via Twitter</span>
                         </div>
                     </div>

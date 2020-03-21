@@ -56,7 +56,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
             <div>
                 <div className="navbar">
                     <div className="navbar-logo">
-                        <img src="/logo192.png" />
+                        <img src="/logo192.png" alt="Logo" />
                         <div className="navbar-brandname"> Supersocial</div>
                     </div>
                     {components}

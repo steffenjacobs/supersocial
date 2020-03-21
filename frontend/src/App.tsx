@@ -2,11 +2,13 @@ import React from 'react';
 import { Sidebar } from './Sidebar';
 import { AboutPage } from './AboutPage';
 import { MessageOverview } from './MessageOverview';
+import { EventBus } from './EventBus';
 
 function App() {
+  const eventBus = new EventBus();
   const components = [{
     title: 'Message Overview',
-    page: <MessageOverview/>,
+    page: <MessageOverview eventBus = {eventBus}/>,
     selected: true,
     id: 0,
     icon: <svg version="1.0" xmlns="http://www.w3.org/2000/svg"

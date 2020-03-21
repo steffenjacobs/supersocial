@@ -1,11 +1,16 @@
 import * as React from "react";
 import { PublishMessageTile } from "./PublishMessageTile";
 import { PublishedPostsTile } from "./PublishedPostsTile";
+import { EventBus } from "./EventBus";
 
-export class MessageOverview extends React.Component<any, any>{
-    constructor(props: any, state: any) {
+export interface Props{
+    eventBus: EventBus
+}
+
+export class MessageOverview extends React.Component<Props, Props>{
+    constructor(props: Props, state: Props) {
         super(props);
-        this.state = state;
+        this.state = props;
     }
 
     public render() {
@@ -30,9 +35,9 @@ export class MessageOverview extends React.Component<any, any>{
         }];
         return (
             <div>
-                <PublishMessageTile message="Test Message" platforms={new Set<string>()} />
+                <PublishMessageTile message="" platforms={new Set<string>()} eventBus = {this.state.eventBus} />
                 <div className="vspacer"/>
-                <PublishedPostsTile posts={posts} />
+                <PublishedPostsTile posts={posts} eventBus = {this.state.eventBus}/>
             </div>
         );
     }
