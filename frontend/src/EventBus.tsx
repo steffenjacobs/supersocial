@@ -1,4 +1,4 @@
-export enum EventBusEventType {SELECTED_POST_CHANGED, REFRESH_POSTS};
+export enum EventBusEventType {SELECTED_POST_CHANGED, REFRESH_POSTS, USER_CHANGE};
 
 export class EventBus {
     handlers: Map<EventBusEventType, Set<(eventType: EventBusEventType, eventData?:any) => void>>;

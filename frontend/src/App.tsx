@@ -6,6 +6,7 @@ import { EventBus } from './EventBus';
 
 function App() {
   const eventBus = new EventBus();
+  const dummyLoginInfo = {username: "Steffen"};
   const components = [{
     title: 'Message Overview',
     page: <MessageOverview eventBus = {eventBus}/>,
@@ -68,7 +69,7 @@ function App() {
   }];
   return (
     <div className="App">
-      <Sidebar components = {components}/>
+      <Sidebar components = {components} eventBus={eventBus} currentUser={dummyLoginInfo}/>
     </div>
   );
 }

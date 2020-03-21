@@ -15,10 +15,10 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         super(props);
         this.state = props;
 
-        this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData) => this.selectPost(eventType, eventData));
+        this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData?) => this.selectPost(eventData));
     }
 
-    private selectPost(eventType: EventBusEventType, eventData?: any) {
+    private selectPost(eventData?: any) {
         var platforms = new Set<string>();
         platforms.add("" + eventData.platformId);
         this.setState({
