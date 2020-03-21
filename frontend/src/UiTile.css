@@ -2,7 +2,7 @@
     box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
     border-radius: .2em;
     background-color: #edf0f8;
-    width: 20em;
+    width: 20.5em;
 }
 
 .messageLabel {
@@ -13,10 +13,11 @@
 }
 
 .box-header {
-    padding: .667em;
+    padding-top: .667em;
+    padding-left: .667em;
+    padding-right: .667em;
     font-weight: 600;
     font-size: 1.25em;
-
 }
 
 .box-content {    
@@ -25,7 +26,7 @@
 }
 
 .box-content div {
-    margin-bottom: .5em;
+    margin-bottom: .3125em;
 }
 
 .box-content div textarea {

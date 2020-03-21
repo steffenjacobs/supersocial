@@ -68,22 +68,25 @@ export class PublishMessageTile extends React.Component<any, SendTextForm>{
         return (
             <div className="container">
                 <div className="box-header">
-                Publish Message
+                    Publish Message
                 </div>
                 <div className="box-content">
                     <div>
                         <div className="messageLabel">Message</div>
                         <div>
-                        <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} />
+                            <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} />
                         </div>
                     </div>
-                    <div>
-                        <input id="facebook" type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
-                        <span>Send to Facebook</span>
-                    </div>
-                    <div>
-                        <input id="twitter" type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
-                        <span>Send to Twitter</span>
+                    <div className="channel-selection">
+                        <div className="messageLabel">Distribution Channels</div>                        
+                        <div>
+                            <input id="facebook" type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
+                            <span>Distribute via Facebook</span>
+                        </div>
+                        <div>
+                            <input id="twitter" type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
+                            <span>Distribute via Twitter</span>
+                        </div>
                     </div>
                     <button
                         className="btn btn-primary send-button"
