@@ -1,32 +1,36 @@
-export enum EventBusEventType {SELECTED_POST_CHANGED, REFRESH_POSTS, USER_CHANGE};
+export enum EventBusEventType { SELECTED_POST_CHANGED, REFRESH_POSTS, USER_CHANGE };
 
+/** Event Bus where listeners can be registered and events can be fired to avoid endless callbacks. */
 export class EventBus {
-    handlers: Map<EventBusEventType, Set<(eventType: EventBusEventType, eventData?:any) => void>>;
+    handlers: Map<EventBusEventType, Set<(eventType: EventBusEventType, eventData?: any) => void>>;
     constructor() {
         this.handlers = new Map<EventBusEventType, Set<(eventType: EventBusEventType) => void>>();
     }
 
-    public async fireEvent(eventType: EventBusEventType, eventData?: any){
-        this.handlers.forEach((value: Set<(eventType: EventBusEventType, eventData?:any) => void>, key: EventBusEventType)=>{
-            if(key !== eventType){
+    /** Fires an event asynchronously. The registered handlers will be triggered eventually. */
+    public async fireEvent(eventType: EventBusEventType, eventData?: any) {
+        this.handlers.forEach((value: Set<(eventType: EventBusEventType, eventData?: any) => void>, key: EventBusEventType) => {
+            if (key !== eventType) {
                 return;
             }
-            value.forEach((handler: (eventType: EventBusEventType, eventData?:any) => void) => {
-               handler(eventType, eventData);
+            value.forEach((handler: (eventType: EventBusEventType, eventData?: any) => void) => {
+                handler(eventType, eventData);
             });
         });
     }
 
-    public register(eventType: EventBusEventType, handler: (eventType: EventBusEventType, eventData?:any) => void) {
+    /** Registers a new event handler for the given eventType. It will be called when an event of this type is fired. */
+    public register(eventType: EventBusEventType, handler: (eventType: EventBusEventType, eventData?: any) => void) {
         var handlers = this.handlers.get(eventType);
         if (!handlers) {
-            handlers = new Set<(eventType: EventBusEventType, eventData?:any) => void>();
+            handlers = new Set<(eventType: EventBusEventType, eventData?: any) => void>();
         }
         handlers.add(handler);
         this.handlers.set(eventType, handlers);
     }
 
-    public unregister(eventType: EventBusEventType, handler: (eventType: EventBusEventType, eventData?:any) => void) {
+    /** Unregisters an existing event handler for the given eventType. */
+    public unregister(eventType: EventBusEventType, handler: (eventType: EventBusEventType, eventData?: any) => void) {
         var handlers = this.handlers.get(eventType);
         if (!handlers) {
             throw new ReferenceError("Handler was never registered");

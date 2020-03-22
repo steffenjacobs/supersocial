@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Supersocial from './Supersocial';
 import { Login } from './Login';
 import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
 import { EventBus, EventBusEventType } from './EventBus';
-import { LoginManager, LoginStatus } from './LoginManager';
+import { LoginManager } from './LoginManager';
 
-export interface LoginInfo{
+export interface LoginInfo {
   loggedIn?: boolean
   username?: string
 }
 
+/** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
 class App extends React.Component<LoginInfo, LoginInfo> {
   constructor() {
     super({
@@ -26,28 +27,16 @@ class App extends React.Component<LoginInfo, LoginInfo> {
     this.setState(eventData);
   }
 
-  private async performLoginCheckAndReturnResult(redirectTo: any) {
-    const response = await fetch('http://localhost:8080/api/loginstatus', {
-      method: 'GET',
-      headers: new Headers({
-        // 'Authorization': 'Basic ' + btoa('user:pass')
-      })
-    });
-    if (response.ok) {
-      return <Route path="/" component={redirectTo} />;
-    } else {
-      return <Redirect to="/login" />;
-    }
-  }
-
   render() {
     let eventBus = new EventBus();
     let loginManager = new LoginManager(eventBus);
     eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
 
+    // /login -> go to Login Page
+    // everything else -> Go to Supersocial application
     return (
       <BrowserRouter>
-        <Switch>
+        <Switch>          
           <Route path="/login" render={(props) => <Login username="" password="" eventBus={eventBus} loginManager={loginManager} />} />
           {this.state.loggedIn ? <Route path="/" render={(props) => <Supersocial eventBus={eventBus} loginManager={loginManager} />} /> : <Redirect to="/login" />} />}
         </Switch>

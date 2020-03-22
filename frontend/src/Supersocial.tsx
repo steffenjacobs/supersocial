@@ -5,11 +5,12 @@ import { MessageOverview } from './MessageOverview';
 import { EventBus } from './EventBus';
 import { LoginManager } from './LoginManager';
 
-export interface EventBusParams{
+export interface EventBusParams {
     eventBus: EventBus
     loginManager: LoginManager
 }
 
+/** This class holds the different pages that are later rendered in the side bar.  */
 export class Supersocial extends React.Component<EventBusParams> {
 
     public render() {
@@ -76,7 +77,7 @@ export class Supersocial extends React.Component<EventBusParams> {
 
         return (
             <div className="App">
-                <Sidebar components={components} eventBus={this.props.eventBus} loginManager={this.props.loginManager} />
+                <Sidebar components={components} loginManager={this.props.loginManager} />
             </div>);
     }
 }

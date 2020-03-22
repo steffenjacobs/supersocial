@@ -10,6 +10,7 @@ export interface SendTextForm {
     eventBus: EventBus
 }
 
+/** Contains a form to publish new messages. */
 export class PublishMessageTile extends React.Component<SendTextForm, SendTextForm>{
     constructor(props: SendTextForm, state: SendTextForm) {
         super(props);
@@ -18,6 +19,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData?) => this.selectPost(eventData));
     }
 
+    /** Event handler for when a post had been selected, e.g. via PublishedPostsTile.tsx */
     private selectPost(eventData?: any) {
         var platforms = new Set<string>();
         platforms.add("" + eventData.platformId);
@@ -28,17 +30,19 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         });
     }
 
-    private submit() {
+    /** Send the request to the back end triggerin a post on the selected platforms. */
+    private send() {
         fetch('http://localhost:8080/api/publish', {
             method: 'POST',
             headers: new Headers({
                 'Content-Type': 'application/json'
             }),
             credentials: 'include',
-            body: JSON.stringify({message: this.state.message, platforms: Array.from(this.state.platforms.values())})
+            body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
         })
             .then(response => {
-                response.json();})
+                response.json();
+            })
             .then(data => {
                 console.log("Result: " + data);
                 this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
@@ -117,7 +121,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                     </div>
                     <button
                         className="btn btn-primary send-button"
-                        onClick={this.submit.bind(this)}
+                        onClick={this.send.bind(this)}
                     >
                         Send
                         </button>

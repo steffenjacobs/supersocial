@@ -1,11 +1,9 @@
 import React from "react";
 import './Sidebar.css';
-import { EventBus, EventBusEventType } from "./EventBus";
 import { LoginManager } from "./LoginManager";
 
 export interface PageComponents {
     components: PageComponent[]
-    eventBus: EventBus
     loginManager: LoginManager
 }
 
@@ -17,19 +15,14 @@ export interface PageComponent {
     selected?: boolean
 }
 
+/** Menu component which holds the different pages and makes them accesible. */
 export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
         this.state = props;
-
-        this.state.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
-    private onUserChange(eventData?: any) {
-        //TODO: validate that this is necessary
-        this.setState({ components: this.state.components, eventBus: this.state.eventBus, loginManager: this.state.loginManager });
-    }
-
+    /** Set this page active. Remove the old page and select the new one to be rendered. */
     private setActivePage(pageId: number) {
         var newComponents = [];
         for (let c = 0; c < this.state.components.length; c++) {
@@ -45,10 +38,10 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         }
 
         this.setState({ components: newComponents });
-        //TODO: set title and url
+        //TODO: set title and url in browser window
     }
 
-
+    /** @return the header component with the titleo f the page. */
     private getTitleComponent(elem?: PageComponent) {
         if (elem) {
 
@@ -64,6 +57,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
     }
 
     public render() {
+        //Create the menu items
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
             return (
@@ -78,6 +72,9 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
 
         const selectedComponent = this.state.components.find((c) => { return c.selected });
 
+        //1. create the menu
+        //2. create the header
+        //3. add the page
         return (
             <div>
                 <div className="navbar">

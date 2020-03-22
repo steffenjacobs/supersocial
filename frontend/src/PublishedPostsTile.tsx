@@ -1,4 +1,5 @@
 import * as React from "react";
+import Moment from 'react-moment';
 import './PublishedPostsTile.css';
 import './UiTile.css';
 import './UiElements.css';
@@ -8,7 +9,7 @@ export interface PublishedPost {
     id: number
     text: string
     platformId: number
-    created: string
+    created: Date
     creatorName: string
 }
 
@@ -19,6 +20,9 @@ export interface PublishedPosts {
     requireLogin?: boolean
 }
 
+/** Lists the already published posts. */
+
+//TODO: make table scrollable and pageable.
 export class PublishedPostsTile extends React.Component<PublishedPosts, PublishedPosts>{
     constructor(props: PublishedPosts, state: PublishedPosts) {
         super(props);
@@ -28,6 +32,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         this.state.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
     }
 
+    /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
     private refreshPosts() {
         this.setState({ posts: this.state.posts, updating: true });
         fetch('http://localhost:8080/api/post', {
@@ -37,12 +42,18 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
             .then(response => {
                 if (response.status === 401) {
                     console.error("Could not fetch data: 401");
-                }else{
-                    response.json().then(data => this.setState({ posts: data, updating: false }));
+                } else {
+                    response.json().then(data => this.setState({
+                        posts: data.map((d: PublishedPost) => {
+                            d.created = new Date(d.created);
+                            return d;
+                        }), updating: false
+                    }));
                 }
             });
     }
 
+    /** @returns a social media icon for a given platform identifier. */
     private getSocialmediaIcon(platformId: number) {
         if (platformId === 1) {
             return <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
@@ -77,22 +88,26 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         }
     }
 
+    /** Fire an event to change the selected post. Lets all listeners on the event bus (e.g. PublishMessageTile.tsx) know to update accordingly. */
     private selectPost(post: PublishedPost) {
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
     }
 
     public render() {
-        const posts = this.state.posts.map((elem) => {
-            return (
-                <tr onClick={() => this.selectPost(elem)}>
-                    <td>{elem.id}</td>
-                    <td>{this.getSocialmediaIcon(elem.platformId)}</td>
-                    <td>{elem.created}</td>
-                    <td>{elem.creatorName}</td>
-                    <td>{elem.text}</td>
-                </tr>
-            );
-        });
+        const posts = this.state.posts.sort(
+            (p1: PublishedPost, p2: PublishedPost) => p2.created.getTime() - p1.created.getTime())
+            .map(elem => {
+                return (
+                    <tr onClick={() => this.selectPost(elem)}>
+                        <td>
+                            <Moment format="YYYY-MM-DD">{elem.created}</Moment>
+                        </td>
+                        <td>{this.getSocialmediaIcon(elem.platformId)}</td>
+                        <td>{elem.creatorName}</td>
+                        <td>{elem.text}</td>
+                    </tr>
+                );
+            });
 
         const updating = this.state.updating ? "btn-align-top-right btn-icon crossRotate" : "btn-align-top-right btn-icon";
 
@@ -113,9 +128,8 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Platforms</th>
                                 <th>Created</th>
+                                <th>Platforms</th>
                                 <th>Author</th>
                                 <th className="column-text">Post</th>
                             </tr>

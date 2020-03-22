@@ -1,11 +1,13 @@
 import { EventBus, EventBusEventType } from "./EventBus";
-import Cookies from "js-cookie";
 
 export interface LoginStatus {
     loggedIn: boolean
     username: string
 }
 
+/** The LoginManager class contains all the required logic to perform logins and check and update the login status of the current user. */
+
+//TODO: Logout
 export class LoginManager {
     eventBus: EventBus;
     loginStatus = {
@@ -17,28 +19,14 @@ export class LoginManager {
         this.eventBus = eventBus;
     }
 
+    /** @return true if the user is currently logged in. If not, the cookie is checked and a USER_CHANGE event is fired later. */
     public isLoggedIn() {
         if (!this.loginStatus.loggedIn) {
-            this.logInWithCookie();
+            //attempt login with cookie
+            this.logIn(undefined, undefined);
             return false;
         }
         return this.loginStatus.loggedIn;
-    }
-
-    public logInWithCookie() {
-        fetch('http://localhost:8080/api/loginstatus', {
-            method: 'get',
-            credentials: 'include'
-        })
-            .then(response => {
-                if (response.ok) {
-                    response.json().then(data => {
-                        this.updateLoginStatus({ loggedIn: true, username: data.name });
-                    });
-                } else {
-                    this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });
-                }
-            });
     }
 
     private updateLoginStatus(newLoginStatus: LoginStatus) {
@@ -46,13 +34,21 @@ export class LoginManager {
         this.eventBus.fireEvent(EventBusEventType.USER_CHANGE, this.loginStatus);
     }
 
-    public logIn(username: string, password: string) {
+    /** Login with username and password. If both are undefined, login just with cookie is attempted. */
+    public logIn(username?: string, password?: string) {
+        let dynamicHeaders;
+        if (username && password) {
+            dynamicHeaders = new Headers({
+                'Authorization': 'Basic ' + btoa(username + ":" + password)
+            });
+        }
+        else {
+            dynamicHeaders = new Headers({});
+        }
         fetch('http://localhost:8080/api/loginstatus', {
             method: 'get',
             credentials: 'include',
-            headers: new Headers({
-                'Authorization': 'Basic ' + btoa(username + ":" + password)
-            })
+            headers: dynamicHeaders
         })
             .then(response => {
                 if (response.ok) {
@@ -65,9 +61,10 @@ export class LoginManager {
             });
     }
 
+    /** @return the loginStatus object containing a username and a loggedIn value */
     public getLoginStatus() {
         if (!this.loginStatus.loggedIn) {
-            this.logInWithCookie();
+            this.logIn(undefined, undefined);
         }
         return { username: this.loginStatus.username, loggedIn: this.loginStatus.loggedIn };
     }

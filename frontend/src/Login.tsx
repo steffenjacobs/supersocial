@@ -11,6 +11,7 @@ export interface LoginCredentials {
     loggedIn?: boolean
 }
 
+/** Login Page. Consult the LoginManger.tsx for further login logic. */
 export class Login extends React.Component<LoginCredentials, LoginCredentials> {
     constructor(props: LoginCredentials, state: LoginCredentials) {
         super(props);
@@ -49,7 +50,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
         }
     }
 
-    private submit() {
+    private signIn() {
         this.state.loginManager.logIn(this.state.username, this.state.password);
     }
 
@@ -72,7 +73,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
                     </div>
                     <button
                         className="btn btn-primary send-button"
-                        onClick={this.submit.bind(this)}
+                        onClick={this.signIn.bind(this)}
                     >
                         Sign In &gt;
             </button>
