@@ -16,14 +16,15 @@ export interface PublishedPosts {
     posts: PublishedPost[]
     updating?: boolean
     eventBus: EventBus
+    requireLogin?: boolean
 }
 
 export class PublishedPostsTile extends React.Component<PublishedPosts, PublishedPosts>{
     constructor(props: PublishedPosts, state: PublishedPosts) {
         super(props);
         this.state = props;
-        //refreshPosts();
 
+        this.refreshPosts();
         this.state.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
     }
 
@@ -31,12 +32,15 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         this.setState({ posts: this.state.posts, updating: true });
         fetch('http://localhost:8080/api/post', {
             method: 'get',
-            headers: new Headers({
-                'Authorization': 'Basic ' + btoa('user:pass')
-            })
+            credentials: 'include',
         })
-            .then(response => response.json())
-            .then(data => this.setState({ posts: data, updating: false }));
+            .then(response => {
+                if (response.status === 401) {
+                    console.error("Could not fetch data: 401");
+                }else{
+                    response.json().then(data => this.setState({ posts: data, updating: false }));
+                }
+            });
     }
 
     private getSocialmediaIcon(platformId: number) {

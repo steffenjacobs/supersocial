@@ -32,20 +32,17 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         fetch('http://localhost:8080/api/publish', {
             method: 'POST',
             headers: new Headers({
-                'Authorization': 'Basic ' + btoa('user:pass'),
                 'Content-Type': 'application/json'
             }),
+            credentials: 'include',
             body: JSON.stringify({message: this.state.message, platforms: Array.from(this.state.platforms.values())})
         })
             .then(response => {
-                console.log(response);
-                console.log(response.status);
                 response.json();})
             .then(data => {
                 console.log("Result: " + data);
                 this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
             });
-        console.log("submitted: " + JSON.stringify(this.state));
     }
 
     private formTextAreaUpdated(event: React.ChangeEvent<HTMLTextAreaElement>) {

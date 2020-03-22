@@ -11,8 +11,8 @@ export class EventBus {
             if(key !== eventType){
                 return;
             }
-            value.forEach((value: (eventType: EventBusEventType, eventData?:any) => void) => {
-                value(eventType, eventData);
+            value.forEach((handler: (eventType: EventBusEventType, eventData?:any) => void) => {
+               handler(eventType, eventData);
             });
         });
     }

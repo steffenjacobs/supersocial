@@ -1,15 +1,12 @@
 import React from "react";
 import './Sidebar.css';
 import { EventBus, EventBusEventType } from "./EventBus";
-
-export interface CurrentUser {
-    username: string;
-}
+import { LoginManager } from "./LoginManager";
 
 export interface PageComponents {
     components: PageComponent[]
     eventBus: EventBus
-    currentUser: CurrentUser
+    loginManager: LoginManager
 }
 
 export interface PageComponent {
@@ -29,8 +26,8 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
     }
 
     private onUserChange(eventData?: any) {
-        console.log(eventData);
-        this.setState({ components: this.state.components, eventBus: this.state.eventBus, currentUser: { username: eventData.username } });
+        //TODO: validate that this is necessary
+        this.setState({ components: this.state.components, eventBus: this.state.eventBus, loginManager: this.state.loginManager });
     }
 
     private setActivePage(pageId: number) {
@@ -95,7 +92,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
                         {this.getTitleComponent(selectedComponent)}
                     </div>
                     <div className="navbar-header-userdetails">
-                        Hello {this.state.currentUser.username}!
+                        Hello {this.state.loginManager.getLoginStatus().username}!
                     </div>
                 </div>
                 <div className="navbar-page">{selectedComponent?.page}</div>

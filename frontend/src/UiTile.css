@@ -11,6 +11,15 @@
     display: inline;
 }
 
+.centered-container {
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    -webkit-transform: translate3d(-50%, -50%, 0);
+    -moz-transform: translate3d(-50%, -50%, 0);
+    transform: translate3d(-50%, -50%, 0);
+}
+
 .messageLabel {
     text-align:left;
 }
