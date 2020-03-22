@@ -1,13 +1,14 @@
 package me.steffenjacobs.supersocial.domain.dto;
 
 import java.util.Date;
+import java.util.UUID;
 
 import me.steffenjacobs.supersocial.domain.entity.Post;
 
 /** @author Steffen Jacobs */
 public class PostDTO {
 
-	private long id;
+	private UUID id;
 
 	private String text;
 
@@ -17,7 +18,7 @@ public class PostDTO {
 
 	private String creatorName;
 
-	private PostDTO(long id, String text, int platformId, Date created, String creatorName) {
+	private PostDTO(UUID id, String text, int platformId, Date created, String creatorName) {
 		super();
 		this.id = id;
 		this.text = text;
@@ -26,7 +27,7 @@ public class PostDTO {
 		this.creatorName = creatorName;
 	}
 
-	public long getId() {
+	public UUID getId() {
 		return id;
 	}
 

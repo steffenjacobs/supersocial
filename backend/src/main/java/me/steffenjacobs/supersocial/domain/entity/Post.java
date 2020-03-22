@@ -1,17 +1,18 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 
 import me.steffenjacobs.supersocial.domain.Platform;
 
@@ -20,8 +21,10 @@ import me.steffenjacobs.supersocial.domain.Platform;
 public class Post {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	@GeneratedValue(generator = "UUID")
+	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "id", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column
 	private String text;
@@ -37,7 +40,7 @@ public class Post {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
-    @ManyToOne
+	@ManyToOne
 	private SupersocialUser creator;
 
 	public Post() {
@@ -67,7 +70,7 @@ public class Post {
 		this.externalId = externalId;
 	}
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 

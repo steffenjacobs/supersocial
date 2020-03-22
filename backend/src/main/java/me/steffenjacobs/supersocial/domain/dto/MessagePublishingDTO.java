@@ -9,7 +9,7 @@ public class MessagePublishingDTO {
 	private String message;
 	
 	//TODO: use enum constants
-	private Set<String> platforms = new HashSet<String>();
+	private Set<String> platforms = new HashSet<>();
 
 	public MessagePublishingDTO() {
 

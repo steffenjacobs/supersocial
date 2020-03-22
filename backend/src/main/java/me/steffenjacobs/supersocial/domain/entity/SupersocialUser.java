@@ -1,11 +1,13 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
 /** @author Steffen Jacobs */
@@ -14,8 +16,10 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 public class SupersocialUser implements AuthenticatedPrincipal {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	@GeneratedValue(generator = "UUID")
+	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "id", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column
 	private String externalId;
@@ -26,7 +30,7 @@ public class SupersocialUser implements AuthenticatedPrincipal {
 	@Column
 	private String name;
 
-	public long getId() {
+	public UUID getId() {
 		return id;
 	}
 

@@ -1,6 +1,7 @@
 package me.steffenjacobs.supersocial;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,14 @@ public class PublishingController {
 
 	@PostMapping(path = "/api/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String publishMessage(@RequestBody MessagePublishingDTO messagePublishingDto) {
+		LOG.info("Publish: " + messagePublishingDto);
 		StringBuilder sb = new StringBuilder();
 		if (messagePublishingDto.getPlatforms().contains("twitter")) {
-			long id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.TWITTER).getId();
+			UUID id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.TWITTER).getId();
 			String result = twitterService.tweet(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if(json.containsKey("errors")) {
-				LOG.error("Received error from Twitter API: {0}", json);
+				LOG.error("Received error from Twitter API: {}", json);
 				sb.append("Error posting to Twitter\n");
 			} else {
 				postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));
@@ -48,11 +50,11 @@ public class PublishingController {
 			}
 		}
 		if (messagePublishingDto.getPlatforms().contains("facebook")) {
-			long id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.FACEBOOK).getId();
+			UUID id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.FACEBOOK).getId();
 			String result = facebookService.postMessage(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if(json.containsKey("error")) {
-				LOG.error("Received error from Facebook API: {0}", json);
+				LOG.error("Received error from Facebook API: {}", json);
 				sb.append("Error posting to Facebook\n");
 			} else {
 				postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));

@@ -1,6 +1,7 @@
 package me.steffenjacobs.supersocial.persistence;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,7 +33,7 @@ public class PostPersistenceManager {
 		return postRepository.save(p);
 	}
 
-	public Post updateWithExternalId(long postId, String externalId) {
+	public Post updateWithExternalId(UUID postId, String externalId) {
 		Post p = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		p.setExternalId(externalId);
 		return postRepository.save(p);
@@ -42,7 +43,7 @@ public class PostPersistenceManager {
 		return StreamSupport.stream(postRepository.findAll().spliterator(), true).map(PostDTO::fromPost).collect(Collectors.toSet());
 	}
 
-	public PostDTO findPostById(long id) {
+	public PostDTO findPostById(UUID id) {
 		return PostDTO.fromPost(postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id)));
 	}
 

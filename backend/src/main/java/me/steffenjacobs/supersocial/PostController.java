@@ -1,6 +1,7 @@
 package me.steffenjacobs.supersocial;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class PostController {
 	}
 
 	@GetMapping(path = "/api/post/{id}")
-	public ResponseEntity<PostDTO> getPublishedPostById(@PathVariable(name="id") long id) {
+	public ResponseEntity<PostDTO> getPublishedPostById(@PathVariable(name="id") UUID id) {
 		try {
 			return new ResponseEntity<>(postPersistenceManager.findPostById(id), HttpStatus.OK);
 		} catch (PostNotFoundException e) {
