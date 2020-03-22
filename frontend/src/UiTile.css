@@ -7,7 +7,8 @@
 }
 
 .double-container {
-    width: 42em;
+    max-width: 42em;
+    display: inline;
 }
 
 .messageLabel {
@@ -28,6 +29,7 @@
 .box-content {    
     padding: 1em;
     font-size: .8125em;
+    display: inline-block;
 }
 
 .box-content div {
