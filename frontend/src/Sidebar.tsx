@@ -24,7 +24,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
     private setActivePage(pageId: number) {
-        var newComponents = [];
+        var newComponents: PageComponent[] = [];
         for (let c = 0; c < this.state.components.length; c++) {
             let comp = this.state.components[c];
             if (comp.selected && comp.id !== pageId) {
@@ -43,17 +43,12 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
 
     /** @return the header component with the titleo f the page. */
     private getTitleComponent(elem?: PageComponent) {
-        if (elem) {
-
-            return (
-                <div>
-                    {elem?.icon}
-                    <div className="navbar-text">{elem?.title}</div>
-                </div>
-            );
-        } else {
-            return <div />;
-        }
+        return (<div>
+            {elem != null && <>
+                {elem?.icon}
+                <div className="navbar-text">{elem?.title}</div>
+            </>}
+        </div>);
     }
 
     public render() {
@@ -70,7 +65,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
             );
         });
 
-        const selectedComponent = this.state.components.find((c) => { return c.selected });
+        const selectedComponent = this.state.components.find(c => c.selected);
 
         //1. create the menu
         //2. create the header

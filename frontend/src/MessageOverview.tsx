@@ -17,22 +17,10 @@ export class MessageOverview extends React.Component<Props, Props>{
     public render() {
         let posts = [{
             id: 0,
-            text: "Test text",
-            platformId: 1,
-            created: new Date(2020, 3, 22, 0,0,0,0),
-            creatorName: "Steffen"
-        }, {
-            id: 1,
-            text: "Test text 2",
-            platformId: 2,
-            created: new Date(2020, 3, 20, 0,0,0,0),
-            creatorName: "Steffen"
-        }, {
-            id: 2,
-            text: "Posted on invalid platform",
+            text: "",
             platformId: 0,
-            created: new Date(2020, 3, 21, 0,0,0,0),
-            creatorName: "Steffen"
+            created: new Date(2020, 3, 22, 0,0,0,0),
+            creatorName: ""
         }];
         return (
             <div>

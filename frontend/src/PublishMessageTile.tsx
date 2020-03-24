@@ -65,7 +65,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                 eventBus: this.state.eventBus
             });
         }
-        if (id === "facebook" || id === "twitter") {
+        if(id === "facebook" || id ==="twitter"){
             this.updateCheckbox(id, value);
         }
     }
@@ -124,7 +124,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                         onClick={this.send.bind(this)}
                     >
                         Send
-                        </button>
+                    </button>
                 </div>
             </div>
         );

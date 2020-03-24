@@ -15,14 +15,16 @@ export interface LoginCredentials {
 export class Login extends React.Component<LoginCredentials, LoginCredentials> {
     constructor(props: LoginCredentials, state: LoginCredentials) {
         super(props);
-        this.state = {username: props.username, password: props.password, eventBus: props.eventBus, loginManager: props.loginManager, loggedIn: props.loginManager.isLoggedIn()};
+        this.state = { username: props.username, password: props.password, eventBus: props.eventBus, loginManager: props.loginManager, loggedIn: props.loginManager.isLoggedIn() };
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
     private onUserChange(eventData?: any) {
-        this.setState({username: this.state.username, password: this.state.password,
+        this.setState({
+            username: this.state.username, password: this.state.password,
             eventBus: this.state.eventBus,
-            loginManager: this.state.loginManager, loggedIn: eventData.loggedIn});
+            loginManager: this.state.loginManager, loggedIn: eventData.loggedIn
+        });
     }
 
     private formInputFieldUpdated(event: React.ChangeEvent<HTMLInputElement>) {
@@ -62,7 +64,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
             <div className="container centered-container">
                 <div className="box-header">
                     Sign In
-                        </div>
+                </div>
                 <div className="box-content">
                     <div>
                         <div className="messageLabel">Username</div>
@@ -76,7 +78,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
                         onClick={this.signIn.bind(this)}
                     >
                         Sign In &gt;
-            </button>
+                    </button>
                 </div>
             </div>
         );
