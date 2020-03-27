@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import me.steffenjacobs.supersocial.service.CredentialService.Credential;
+import me.steffenjacobs.supersocial.service.CredentialService.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
 
 /** @author Steffen Jacobs */
@@ -49,8 +49,8 @@ public class FacebookService {
 	 * credentials.properties file to the given Facebook page.
 	 */
 	private String attemptPostMessage(String text) throws UnsupportedOperationException, IOException {
-		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialService.getCredential(Credential.FACEBOOK_PAGE_ID),
-				URLEncoder.encode(text, StandardCharsets.UTF_16), credentialService.getCredential(Credential.FACEBOOK_PAGE_ACCESSTOKEN)));
+		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialService.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
+				URLEncoder.encode(text, StandardCharsets.UTF_16), credentialService.getCredential(CredentialType.FACEBOOK_PAGE_ACCESSTOKEN).get()));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
@@ -63,7 +63,7 @@ public class FacebookService {
 	 * API. @return the result from the Facebook API.
 	 */
 	public String exchangeForPageToken(String userToken) {
-		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT, credentialService.getCredential(Credential.FACEBOOK_PAGE_ID),
+		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT, credentialService.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
 				URLEncoder.encode(userToken, StandardCharsets.UTF_8)));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import me.steffenjacobs.supersocial.service.CredentialService.Credential;
+import me.steffenjacobs.supersocial.service.CredentialService.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.TwitterException;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
@@ -41,11 +41,8 @@ public class TwitterService {
 	 */
 	public String tweet(String tweetText) {
 		try {
-			if (!credentialService.hasCredentials()) {
-				throw new TwitterException("Please provide credentials!");
-			}
-			return attemptTweet(tweetText, credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN),
-					credentialService.getCredential(Credential.TWITTER_ACCESS_TOKEN_SECRET));
+			return attemptTweet(tweetText, credentialService.getCredential(CredentialType.TWITTER_ACCESS_TOKEN).get(),
+					credentialService.getCredential(CredentialType.TWITTER_ACCESS_TOKEN_SECRET).get());
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
 			LOG.error("Could not send tweet");
 			throw new TwitterException("Could not send tweet.", e);
@@ -58,8 +55,8 @@ public class TwitterService {
 	 */
 	private String attemptTweet(String tweetText, String accessToken, String accessTokenSecret)
 			throws ClientProtocolException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialService.getCredential(Credential.TWITTER_API_KEY),
-				credentialService.getCredential(Credential.TWITTER_API_KEY_SECRET));
+		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialService.getCredential(CredentialType.TWITTER_API_KEY).get(),
+				credentialService.getCredential(CredentialType.TWITTER_API_KEY_SECRET).get());
 		oAuthConsumer.setTokenWithSecret(accessToken, accessTokenSecret);
 		final HttpPost httpPost = new HttpPost(TWITTER_STATUS_ENDPOINT + URLEncoder.encode(tweetText, StandardCharsets.UTF_16));
 		oAuthConsumer.sign(httpPost);
