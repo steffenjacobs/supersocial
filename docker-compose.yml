@@ -32,7 +32,7 @@ services:
     - 8081:8080
 
   frontend:
-    image: nginx
+    build: frontend
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"

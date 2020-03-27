@@ -11,7 +11,6 @@ WORKDIR /app/
 COPY --from=dep /root/.m2/repository/org/ollide /root/.m2/repository/org/ollide
 COPY src src
 COPY pom.xml .
-COPY credentials.properties credentials.properties
 RUN mvn clean package
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
@@ -28,4 +27,3 @@ EXPOSE 8080
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=builder ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/classes /app
-COPY --from=builder /app/credentials.properties /app/lib/credentials.properties

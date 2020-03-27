@@ -1,4 +1,5 @@
 import { EventBus, EventBusEventType } from "./EventBus";
+import { DeploymentManager } from "./DeploymentManager";
 
 export interface LoginStatus {
     loggedIn: boolean
@@ -45,7 +46,7 @@ export class LoginManager {
         else {
             dynamicHeaders = new Headers({});
         }
-        fetch('http://localhost:8080/api/loginstatus', {
+        fetch(DeploymentManager.getUrl() + 'api/loginstatus', {
             method: 'get',
             credentials: 'include',
             headers: dynamicHeaders

@@ -5,6 +5,7 @@ import './UiTile.css';
 import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { ImageProvider } from "./ImageProvider";
+import { DeploymentManager } from "./DeploymentManager";
 
 export interface PublishedPost {
     id: number
@@ -36,7 +37,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
     private refreshPosts() {
         this.setState({ posts: this.state.posts, updating: true });
-        fetch('http://localhost:8080/api/post', {
+        fetch(DeploymentManager.getUrl() + 'api/post', {
             method: 'get',
             credentials: 'include',
         })

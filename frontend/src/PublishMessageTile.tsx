@@ -3,6 +3,7 @@ import './PublishMessageTile.css';
 import './UiTile.css';
 import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
+import { DeploymentManager } from "./DeploymentManager";
 
 export interface SendTextForm {
     message: string
@@ -32,7 +33,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
 
     /** Send the request to the back end triggerin a post on the selected platforms. */
     private send() {
-        fetch('http://localhost:8080/api/publish', {
+        fetch(DeploymentManager.getUrl() + 'api/publish', {
             method: 'POST',
             headers: new Headers({
                 'Content-Type': 'application/json'
