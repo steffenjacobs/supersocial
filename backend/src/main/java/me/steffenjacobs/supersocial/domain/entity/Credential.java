@@ -67,6 +67,7 @@ public class Credential {
 		dto.setDescriptor(this.descriptor);
 		dto.setValue("(omitted)");
 		dto.setId(this.id);
+		dto.setOmitted(true);
 		return dto;
 	}
 

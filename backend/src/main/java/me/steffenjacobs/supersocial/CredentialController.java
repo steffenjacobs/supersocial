@@ -32,7 +32,7 @@ public class CredentialController {
 	@PutMapping(path = "/api/credential", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> createOrUpdateCredential(@RequestBody CredentialDTO credential) throws Exception {
 		Pair<Credential, Boolean> c = credentialService.createOrUpdateCredential(credential);
-		return new ResponseEntity<>(c.getA().toDTO(), c.getB() ? HttpStatus.CREATED : HttpStatus.FOUND);
+		return new ResponseEntity<>(c.getA().toDTO(), c.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
 	}
 
 	@GetMapping(path = "/api/credential", produces = MediaType.APPLICATION_JSON_VALUE)

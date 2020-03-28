@@ -7,6 +7,7 @@ public class CredentialDTO {
 	private UUID id;
 	private String value;
 	private String descriptor;
+	private boolean omitted;
 
 	public CredentialDTO() {
 		super();
@@ -34,6 +35,14 @@ public class CredentialDTO {
 
 	public void setDescriptor(String descriptor) {
 		this.descriptor = descriptor;
+	}
+
+	public boolean isOmitted() {
+		return omitted;
+	}
+
+	public void setOmitted(boolean omitted) {
+		this.omitted = omitted;
 	}
 
 }
