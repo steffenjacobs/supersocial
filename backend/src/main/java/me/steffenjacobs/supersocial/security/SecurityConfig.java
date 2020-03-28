@@ -21,7 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/login/discourse/success").permitAll()//
 				.antMatchers(HttpMethod.OPTIONS,"/api/**").permitAll()//
 				.anyRequest().authenticated();//
-		if("true".equals(env.getProperty("security.dummy"))) {
+		if("true".equals(env.getProperty("security.standalone"))) {
 			http.httpBasic();
 			http.csrf().disable();
 		}
@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if ("true".equals(env.getProperty("security.dummy"))) {
+		if ("true".equals(env.getProperty("security.standalone"))) {
 			auth.inMemoryAuthentication().withUser("user").password("{noop}pass") // Spring Security 5 requires specifying the password storage format
 					.roles("USER");
 		} else {
