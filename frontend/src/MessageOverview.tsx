@@ -15,18 +15,11 @@ export class MessageOverview extends React.Component<Props, Props>{
     }
 
     public render() {
-        let posts = [{
-            id: 0,
-            text: "",
-            platformId: 0,
-            created: new Date(2020, 3, 22, 0,0,0,0),
-            creatorName: ""
-        }];
         return (
             <div>
                 <PublishMessageTile message="" platforms={new Set<string>()} eventBus={this.state.eventBus} />
                 <div className="vspacer" />
-                <PublishedPostsTile posts={posts} eventBus={this.state.eventBus} />
+                <PublishedPostsTile posts={[]} eventBus={this.state.eventBus} />
             </div>
         );
     }

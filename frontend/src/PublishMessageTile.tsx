@@ -34,23 +34,38 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
     /** Send the request to the back end triggerin a post on the selected platforms. */
     private send() {
         if (this.state.platforms.size === 0) {
-            return;
-        }
-        fetch(DeploymentManager.getUrl() + 'api/publish', {
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            }),
-            credentials: 'include',
-            body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
-        })
-            .then(response => {
-                response.json();
+            fetch(DeploymentManager.getUrl() + 'api/post', {
+                method: 'PUT',
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                }),
+                credentials: 'include',
+                body: JSON.stringify({ message: this.state.message, platforms: [] })
             })
-            .then(data => {
-                console.log("Result: " + data);
-                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
-            });
+                .then(response => {
+                    response.json();
+                })
+                .then(data => {
+                    console.log("Result: " + data);
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                });
+        } else {
+            fetch(DeploymentManager.getUrl() + 'api/publish', {
+                method: 'POST',
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                }),
+                credentials: 'include',
+                body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
+            })
+                .then(response => {
+                    response.json();
+                })
+                .then(data => {
+                    console.log("Result: " + data);
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                });
+        }
     }
 
     private formTextAreaUpdated(event: React.ChangeEvent<HTMLTextAreaElement>) {

@@ -5,3 +5,11 @@
 .checkmark {
     fill: #4fd961
 }
+
+.checkmark-gray {
+    fill: #baddbe
+}
+
+.x-gray {
+    fill: rgb(185, 139, 139);
+}

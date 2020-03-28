@@ -15,6 +15,7 @@ export interface PublishedPost {
     creatorName: string
     errorMessage?: string
     postUrl?: string
+    published: Date
 }
 
 export interface PublishedPosts {
@@ -70,6 +71,15 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         }
     }
 
+    private createPlatformElement(platformId: number){
+        if(platformId == 0){
+            return <td className="centered tooltip x-gray">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
+        }
+        else{
+            return <td className="centered">{this.getSocialmediaIcon(platformId)}</td>;
+        }
+    }
+
     /** Fire an event to change the selected post. Lets all listeners on the event bus (e.g. PublishMessageTile.tsx) know to update accordingly. */
     private selectPost(post: PublishedPost) {
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
@@ -89,15 +99,21 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                     <span className="tooltiptext">{elem.errorMessage}</span></td>
 
                 } else{
-                    status = <td onClick={o=>this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
+                    if(elem.postUrl){
+                        status = <td onClick={o=>this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
+                    }else {
+                        status = <td className="checkmark checkmark-gray centered tooltip">{ImageProvider.getImage("check")}<span className="tooltiptext">Not published yet.</span></td>
+                    }
                 }
+
+                const published = elem.published?<Moment format="YYYY-MM-DD">{elem.published}</Moment>:"";
                 return (
                     <tr onClick={() => this.selectPost(elem)}>
                         {status}
                         <td>
-                            <Moment format="YYYY-MM-DD">{elem.created}</Moment>
+                            {published}
                         </td>
-                        <td className="centered">{this.getSocialmediaIcon(elem.platformId)}</td>
+                        {this.createPlatformElement(elem.platformId)}
                         <td>{elem.creatorName}</td>
                         <td>{elem.text}</td>
                     </tr>
@@ -112,7 +128,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         return (
             <div className="container double-container inline">
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block">Published Posts</div>
+                    <div className="inline-block">All Posts</div>
                     <div
                         className={classUpdating.join(" ")}
                         onClick={this.refreshPosts.bind(this)}
@@ -125,7 +141,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                         <thead>
                             <tr>
                                 <th>Status</th>
-                                <th>Created</th>
+                                <th>Published</th>
                                 <th>Platform</th>
                                 <th>Author</th>
                                 <th className="column-text">Post</th>
