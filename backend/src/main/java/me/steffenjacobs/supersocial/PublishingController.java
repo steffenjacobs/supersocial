@@ -39,7 +39,7 @@ public class PublishingController {
 	public String publishMessage(@RequestBody MessagePublishingDTO messagePublishingDto) {
 		LOG.info("Publish: {}", messagePublishingDto);
 		StringBuilder sb = new StringBuilder();
-		if (messagePublishingDto.getPlatforms().contains("twitter")) {
+		if (messagePublishingDto.getPlatforms().contains(Platform.TWITTER.getIdAsString())) {
 			UUID id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.TWITTER).getId();
 			String result = twitterService.tweet(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
@@ -55,7 +55,7 @@ public class PublishingController {
 				sb.append("Posted to Twitter: ").append(messagePublishingDto.getMessage()).append("\n");
 			}
 		}
-		if (messagePublishingDto.getPlatforms().contains("facebook")) {
+		if (messagePublishingDto.getPlatforms().contains(Platform.FACEBOOK.getIdAsString())) {
 			UUID id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.FACEBOOK).getId();
 			String result = facebookService.postMessage(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);

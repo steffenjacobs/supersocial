@@ -13,6 +13,10 @@ public enum Platform {
 	public int getId() {
 		return id;
 	}
+	
+	public String getIdAsString() {
+		return "" + id;
+	}
 
 	public static Platform fromId(int platformId) {
 		switch (platformId) {

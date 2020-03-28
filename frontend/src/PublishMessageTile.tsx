@@ -33,6 +33,9 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
 
     /** Send the request to the back end triggerin a post on the selected platforms. */
     private send() {
+        if (this.state.platforms.size === 0) {
+            return;
+        }
         fetch(DeploymentManager.getUrl() + 'api/publish', {
             method: 'POST',
             headers: new Headers({
@@ -55,7 +58,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
     }
 
     private formInputFieldUpdated(event: React.ChangeEvent<HTMLInputElement>) {
-        this.update(event.currentTarget.id, event.currentTarget.value);
+        this.update(event.currentTarget.id, "" + event.currentTarget.checked);
     }
 
     private update(id: string, value: string) {
@@ -66,12 +69,12 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                 eventBus: this.state.eventBus
             });
         }
-        if(id === "facebook" || id ==="twitter"){
-            this.updateCheckbox(id, value);
+        if (id === "1" || id === "2") {
+            this.updateCheckbox(id, value === "true");
         }
     }
 
-    private updateCheckbox(id: string, value: string) {
+    private updateCheckbox(id: string, value: boolean) {
         var platforms = this.state.platforms;
         if (!platforms) {
             platforms = new Set<string>();
@@ -112,11 +115,11 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                     <div className="channel-selection">
                         <div className="messageLabel">Distribution Channels</div>
                         <div>
-                            {this.createCheckbox("facebook", this.state.platforms.has("1"))}
+                            {this.createCheckbox("1", this.state.platforms.has("1"))}
                             <span>Distribute via Facebook</span>
                         </div>
                         <div>
-                            {this.createCheckbox("twitter", this.state.platforms.has("2"))}
+                            {this.createCheckbox("2", this.state.platforms.has("2"))}
                             <span>Distribute via Twitter</span>
                         </div>
                     </div>
