@@ -1,9 +1,7 @@
 package me.steffenjacobs.supersocial.service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +10,6 @@ import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.Platform;
-import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
 import me.steffenjacobs.supersocial.service.exception.PlatformNotFoundException;
@@ -60,13 +57,5 @@ public class PostPublishingService {
 		} else {
 			throw new PlatformNotFoundException(post.getPlatformId());
 		}
-	}
-
-	public Set<PostDTO> createPosts(MessagePublishingDTO messagePublishingDto) {
-		Set<PostDTO> result = new HashSet<>();
-		for (String platform : messagePublishingDto.getPlatforms()) {
-			result.add(postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.fromId(Integer.parseInt(platform))));
-		}
-		return result;
 	}
 }

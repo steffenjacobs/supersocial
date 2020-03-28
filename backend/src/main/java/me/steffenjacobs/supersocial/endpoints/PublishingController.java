@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.service.PostPublishingService;
+import me.steffenjacobs.supersocial.service.PostService;
 
 /** @author Steffen Jacobs */
 @RestController
@@ -26,11 +27,14 @@ public class PublishingController {
 	@Autowired
 	private PostPublishingService postPublishingService;
 
+	@Autowired
+	private PostService postService;
+
 	@PostMapping(path = "/api/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<PostDTO>> publishMessage(@RequestBody MessagePublishingDTO messagePublishingDto) {
 		LOG.info("Publish: {}", messagePublishingDto);
 		Set<PostDTO> result = new HashSet<>();
-		Set<PostDTO> posts = postPublishingService.createPosts(messagePublishingDto);
+		Set<PostDTO> posts = postService.createPosts(messagePublishingDto);
 		for (PostDTO post : posts) {
 			result.add(postPublishingService.publish(post));
 		}
