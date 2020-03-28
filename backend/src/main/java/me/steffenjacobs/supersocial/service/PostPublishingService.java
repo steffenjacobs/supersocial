@@ -39,6 +39,7 @@ public class PostPublishingService {
 				LOG.error("Received error from Facebook API: {}", json);
 				return postPersistenceManager.updateWithErrorMessage(post.getId(), "" + error.get("message"));
 			} else {
+				LOG.info("Published post on Facebook: {}", post);
 				return postPersistenceManager.updateWithExternalId(post.getId(), "" + json.get("id"));
 			}
 		} else if (post.getPlatformId() == Platform.TWITTER.getId()) {
@@ -52,6 +53,7 @@ public class PostPublishingService {
 				}
 				return postPersistenceManager.findPostById(post.getId());
 			} else {
+				LOG.info("Published post on Twitter: {}", post);
 				return postPersistenceManager.updateWithExternalId(post.getId(), "" + json.get("id"));
 			}
 		} else {

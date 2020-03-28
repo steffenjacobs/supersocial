@@ -34,4 +34,13 @@ public class LinkedScheduledPostDTO {
 	public UUID getId() {
 		return id;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("LinkedScheduledPostDTO [scheduled=").append(scheduled).append(", postId=").append(postId).append(", id=").append(id).append("]");
+		return builder.toString();
+	}
+	
+	
 }

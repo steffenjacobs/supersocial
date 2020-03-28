@@ -28,7 +28,7 @@ public class ScheduledPublishingService {
 
 	@PostConstruct
 	public void setup() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> checkAndPublishPosts(), 0, 60, TimeUnit.SECONDS);
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::checkAndPublishPosts, 0, 60, TimeUnit.SECONDS);
 	}
 
 	private void checkAndPublishPosts() {

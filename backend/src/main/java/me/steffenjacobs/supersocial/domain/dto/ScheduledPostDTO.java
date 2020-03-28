@@ -23,7 +23,15 @@ public class ScheduledPostDTO extends PostDTO {
 	}
 
 	public static ScheduledPostDTO fromScheduledPost(ScheduledPost post) {
-		return new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getPlatform().getId(), post.getPost().getCreated(), post.getPost().getCreator().getName(),
-				null, null, null, post.getScheduledDate());
+		return new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getPlatform().getId(), post.getPost().getCreated(),
+				post.getPost().getCreator().getName(), null, null, null, post.getScheduledDate());
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ScheduledPostDTO [scheduled=").append(scheduled).append(super.toString()).append("]");
+		return builder.toString();
+	}
+
 }

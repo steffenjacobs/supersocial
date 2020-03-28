@@ -8,6 +8,7 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.PostRepository;
 import me.steffenjacobs.supersocial.domain.ScheduledPostRepository;
@@ -54,7 +55,8 @@ public class ScheduledPostPersistenceManager {
 	}
 
 	public Set<ScheduledPostDTO> getAllScheduledAndNotPublishedPosts() {
-		return StreamSupport.stream(scheduledPostRepository.findAll().spliterator(), false).filter(p -> p.getPost().getPublished() == null && p.getPost().getErrorMessage() == null)
-				.map(ScheduledPostDTO::fromScheduledPost).collect(Collectors.toSet());
+		return StreamSupport.stream(scheduledPostRepository.findAll().spliterator(), false)
+				.filter(p -> p.getPost().getPublished() == null && StringUtils.isEmpty(p.getPost().getErrorMessage())).map(ScheduledPostDTO::fromScheduledPost)
+				.collect(Collectors.toSet());
 	}
 }

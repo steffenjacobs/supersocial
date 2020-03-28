@@ -77,4 +77,12 @@ public class PostDTO {
 				post.getPublished());
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PostDTO [id=").append(id).append(", text=").append(text).append(", platformId=").append(platformId).append(", created=").append(created)
+				.append(", published=").append(published).append(", creatorName=").append(creatorName).append(", errorMessage=").append(errorMessage).append(", postUrl=")
+				.append(postUrl).append("]");
+		return builder.toString();
+	}
 }
