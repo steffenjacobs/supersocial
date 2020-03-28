@@ -26,12 +26,6 @@
     background-color: #5cb6f1;
 }
 
-.btn-align-top-right {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
 .btn-icon {
     cursor: pointer;
     height: 1.5em;

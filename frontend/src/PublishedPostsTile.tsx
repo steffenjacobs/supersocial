@@ -104,15 +104,15 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                 );
             });
 
-        let classUpdating = ["btn-align-top-right", "btn-icon"]
+        let classUpdating = ["inline-block", "btn-icon"]
         if (this.state.updating) {
             classUpdating.push("crossRotate");
         }
 
         return (
             <div className="container double-container inline">
-                <div className="box-header">
-                    Published Posts
+                <div className="box-header box-header-with-icon">
+                    <div className="inline-block">Published Posts</div>
                     <div
                         className={classUpdating.join(" ")}
                         onClick={this.refreshPosts.bind(this)}

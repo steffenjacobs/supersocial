@@ -24,14 +24,14 @@ export class Supersocial extends React.Component<EventBusParams> {
             icon: ImageProvider.getImage("home-icon")
         }, {
             id: 1,
-            title: 'About',
-            page: <AboutPage />,
-            icon: ImageProvider.getImage("info-icon")
-        }, {
-            id: 2,
             title: 'Settings',
             page: <SettingsPage eventBus={this.props.eventBus}/>,
             icon: ImageProvider.getImage("settings-icon")
+        }, {
+            id: 2,
+            title: 'About',
+            page: <AboutPage />,
+            icon: ImageProvider.getImage("info-icon")
         }];
 
         return (

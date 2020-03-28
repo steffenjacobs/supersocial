@@ -1,4 +1,4 @@
-.container {   
+.container {
     box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
     border-radius: .2em;
     background-color: #eef8ff;
@@ -12,6 +12,10 @@
 
 .inline {
     display: inline;
+}
+
+.inline-block {
+    display: inline-block;
 }
 
 .pointer {
@@ -28,8 +32,9 @@
 }
 
 .messageLabel {
-    text-align:left;
+    text-align: left;
 }
+
 .messageLabel:after {
     content: ":";
 }
@@ -42,7 +47,12 @@
     font-size: 1.25em;
 }
 
-.box-content {    
+.box-header-with-icon {
+    display: flex;
+    justify-content: space-between;
+}
+
+.box-content {
     padding: 1em;
     font-size: .8125em;
     display: inline-block;
