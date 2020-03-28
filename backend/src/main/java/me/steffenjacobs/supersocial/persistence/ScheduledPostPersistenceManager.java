@@ -47,9 +47,14 @@ public class ScheduledPostPersistenceManager {
 
 	public void deleteScheduledPost(UUID id) {
 		try {
-		scheduledPostRepository.deleteById(id);
-	} catch (EmptyResultDataAccessException e) {
-		throw new ScheduledPostNotFoundException("Scheduled post with this id was not found", e);
+			scheduledPostRepository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			throw new ScheduledPostNotFoundException("Scheduled post with this id was not found", e);
+		}
 	}
+
+	public Set<ScheduledPostDTO> getAllScheduledAndNotPublishedPosts() {
+		return StreamSupport.stream(scheduledPostRepository.findAll().spliterator(), false).filter(p -> p.getPost().getPublished() == null && p.getPost().getErrorMessage() == null)
+				.map(ScheduledPostDTO::fromScheduledPost).collect(Collectors.toSet());
 	}
 }

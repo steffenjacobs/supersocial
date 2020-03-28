@@ -27,25 +27,25 @@ public class PostPersistenceManager {
 	@Autowired
 	private SecurityService securityService;
 
-	public Post storePost(String postText, Platform platform) {
+	public PostDTO storePost(String postText, Platform platform) {
 		Post p = new Post();
 		p.setPlatform(platform);
 		p.setText(postText);
 		p.setCreator(securityService.getCurrentUser());
-		return postRepository.save(p);
+		return toDto(postRepository.save(p));
 	}
 
-	public Post updateWithExternalId(UUID postId, String externalId) {
+	public PostDTO updateWithExternalId(UUID postId, String externalId) {
 		Post p = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		p.setExternalId(externalId);
 		p.setPublished(new Date());
-		return postRepository.save(p);
+		return toDto(postRepository.save(p));
 	}
 
-	public Post updateWithErrorMessage(UUID postId, String errorMessage) {
+	public PostDTO updateWithErrorMessage(UUID postId, String errorMessage) {
 		Post p = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		p.setErrorMessage(errorMessage);
-		return postRepository.save(p);
+		return toDto(postRepository.save(p));
 	}
 
 	public Set<PostDTO> getAllPosts() {

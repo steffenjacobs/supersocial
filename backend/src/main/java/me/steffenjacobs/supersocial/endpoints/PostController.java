@@ -29,6 +29,7 @@ public class PostController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PostController.class);
 
+	//TODO: move into PostPublishingService
 	@Autowired
 	PostPersistenceManager postPersistenceManager;
 
@@ -53,10 +54,10 @@ public class PostController {
 		LOG.info("Creating new post {}", message);
 		Set<PostDTO> resultingPosts = new HashSet<>();
 		for (String platform : message.getPlatforms()) {
-			resultingPosts.add(PostDTO.fromPost(postPersistenceManager.storePost(message.getMessage(), Platform.fromId(Integer.parseInt(platform))), ""));
+			resultingPosts.add(postPersistenceManager.storePost(message.getMessage(), Platform.fromId(Integer.parseInt(platform))));
 		}
 		if (message.getPlatforms().size() == 0) {
-			resultingPosts.add(PostDTO.fromPost(postPersistenceManager.storePost(message.getMessage(), Platform.UNKNOWN), ""));
+			resultingPosts.add(postPersistenceManager.storePost(message.getMessage(), Platform.UNKNOWN));
 		}
 		return new ResponseEntity<>(resultingPosts, HttpStatus.ACCEPTED);
 	}
