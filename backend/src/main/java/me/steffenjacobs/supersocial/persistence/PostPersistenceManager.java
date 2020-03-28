@@ -14,8 +14,8 @@ import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.PostRepository;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
+import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
-import me.steffenjacobs.supersocial.service.exception.PostNotFoundException;
 
 /** @author Steffen Jacobs */
 @Component

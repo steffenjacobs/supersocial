@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial.service;
+package me.steffenjacobs.supersocial.persistence;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 import me.steffenjacobs.supersocial.domain.CredentialRepository;
 import me.steffenjacobs.supersocial.domain.dto.CredentialDTO;
 import me.steffenjacobs.supersocial.domain.entity.Credential;
-import me.steffenjacobs.supersocial.service.exception.CredentialNotFoundException;
+import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /** @author Steffen Jacobs */
 @Component
-public class CredentialService {
+public class CredentialPersistenceManager {
 
 	@Autowired
 	private Environment env;

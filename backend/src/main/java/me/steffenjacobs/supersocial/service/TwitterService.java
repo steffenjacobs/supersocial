@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import me.steffenjacobs.supersocial.service.CredentialService.CredentialType;
+import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
+import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.TwitterException;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
@@ -33,7 +34,7 @@ public class TwitterService {
 	private static final String TWITTER_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/update.json?status=";
 
 	@Autowired
-	private CredentialService credentialService;
+	private CredentialPersistenceManager credentialService;
 
 	/**
 	 * Tweets {@code tweetText} with the credentials given in the

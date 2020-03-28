@@ -14,8 +14,8 @@ import me.steffenjacobs.supersocial.domain.ScheduledPostRepository;
 import me.steffenjacobs.supersocial.domain.dto.LinkedScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.entity.ScheduledPost;
+import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
-import me.steffenjacobs.supersocial.service.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /** @author Steffen Jacobs */

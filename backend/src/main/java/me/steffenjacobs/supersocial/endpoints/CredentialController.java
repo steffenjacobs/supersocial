@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial;
+package me.steffenjacobs.supersocial.endpoints;
 
 import java.util.Set;
 import java.util.UUID;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.domain.dto.CredentialDTO;
 import me.steffenjacobs.supersocial.domain.entity.Credential;
-import me.steffenjacobs.supersocial.service.CredentialService;
-import me.steffenjacobs.supersocial.service.exception.CredentialNotFoundException;
+import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
+import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /** @author Steffen Jacobs */
@@ -27,24 +27,24 @@ import me.steffenjacobs.supersocial.util.Pair;
 public class CredentialController {
 
 	@Autowired
-	private CredentialService credentialService;
+	private CredentialPersistenceManager credentialPersistenceManager;
 
 	@PutMapping(path = "/api/credential", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> createOrUpdateCredential(@RequestBody CredentialDTO credential) throws Exception {
-		Pair<Credential, Boolean> c = credentialService.createOrUpdateCredential(credential);
+		Pair<Credential, Boolean> c = credentialPersistenceManager.createOrUpdateCredential(credential);
 		return new ResponseEntity<>(c.getA().toDTO(), c.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
 	}
 
 	@GetMapping(path = "/api/credential", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<CredentialDTO>> getCredentials() throws Exception {
-		Set<CredentialDTO> dtos = StreamSupport.stream(credentialService.getAll().spliterator(), false).map(Credential::toDTO).collect(Collectors.toSet());
+		Set<CredentialDTO> dtos = StreamSupport.stream(credentialPersistenceManager.getAll().spliterator(), false).map(Credential::toDTO).collect(Collectors.toSet());
 		return new ResponseEntity<>(dtos, HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "/api/credential/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> deleteCredential(@PathVariable(name = "id") UUID id) {
 		try {
-			credentialService.deleteCredential(id);
+			credentialPersistenceManager.deleteCredential(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (CredentialNotFoundException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

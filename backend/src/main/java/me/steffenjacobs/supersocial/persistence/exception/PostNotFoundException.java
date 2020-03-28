@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial.service.exception;
+package me.steffenjacobs.supersocial.persistence.exception;
 
 import java.util.UUID;
 

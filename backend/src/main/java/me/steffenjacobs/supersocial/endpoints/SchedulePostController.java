@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial;
+package me.steffenjacobs.supersocial.endpoints;
 
 import java.util.Set;
 import java.util.UUID;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import me.steffenjacobs.supersocial.domain.dto.LinkedScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
 import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
-import me.steffenjacobs.supersocial.service.exception.ScheduledPostNotFoundException;
+import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /** @author Steffen Jacobs */

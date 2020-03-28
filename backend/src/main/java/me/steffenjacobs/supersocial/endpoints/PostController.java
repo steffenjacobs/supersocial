@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial;
+package me.steffenjacobs.supersocial.endpoints;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +20,7 @@ import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
-import me.steffenjacobs.supersocial.service.exception.PostNotFoundException;
+import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 
 /** @author Steffen Jacobs */
 

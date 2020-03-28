@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import me.steffenjacobs.supersocial.service.CredentialService.CredentialType;
+import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
+import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
 
 /** @author Steffen Jacobs */
@@ -26,7 +27,7 @@ public class FacebookService {
 	private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
 
 	@Autowired
-	private CredentialService credentialService;
+	private CredentialPersistenceManager credentialPersistenceManager;
 
 	private static final String FACEBOOK_POST_TO_PAGE_ENDPOINT = "https://graph.facebook.com/%s/feed?message=%s&access_token=%s";
 	private static final String FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT = "https://graph.facebook.com/%s?access_token=%s&fields=access_token";
@@ -49,8 +50,8 @@ public class FacebookService {
 	 * credentials.properties file to the given Facebook page.
 	 */
 	private String attemptPostMessage(String text) throws UnsupportedOperationException, IOException {
-		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialService.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
-				URLEncoder.encode(text, StandardCharsets.UTF_16), credentialService.getCredential(CredentialType.FACEBOOK_PAGE_ACCESSTOKEN).get()));
+		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialPersistenceManager.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
+				URLEncoder.encode(text, StandardCharsets.UTF_16), credentialPersistenceManager.getCredential(CredentialType.FACEBOOK_PAGE_ACCESSTOKEN).get()));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
@@ -63,7 +64,7 @@ public class FacebookService {
 	 * API. @return the result from the Facebook API.
 	 */
 	public String exchangeForPageToken(String userToken) {
-		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT, credentialService.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
+		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT, credentialPersistenceManager.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
 				URLEncoder.encode(userToken, StandardCharsets.UTF_8)));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {

@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial;
+package me.steffenjacobs.supersocial.endpoints;
 
 import java.util.List;
 import java.util.Map;
