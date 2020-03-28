@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial.persistence;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class PostPersistenceManager {
 	public Post updateWithExternalId(UUID postId, String externalId) {
 		Post p = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 		p.setExternalId(externalId);
+		p.setPublished(new Date());
 		return postRepository.save(p);
 	}
 
@@ -63,8 +65,8 @@ public class PostPersistenceManager {
 			String url = String.format("https://www.facebook.com/permalink.php?story_fbid=%s&id=%s", ids[1], ids[0]);
 			return PostDTO.fromPost(post, url);
 		} else if (post.getPlatform() == Platform.TWITTER) {
-				String url = String.format("https://twitter.com/%s/status/%s", "Steffen_Jacobs_", post.getExternalId());
-				return PostDTO.fromPost(post, url);
+			String url = String.format("https://twitter.com/%s/status/%s", "Steffen_Jacobs_", post.getExternalId());
+			return PostDTO.fromPost(post, url);
 		}
 		return PostDTO.fromPost(post, "TBD");
 	}

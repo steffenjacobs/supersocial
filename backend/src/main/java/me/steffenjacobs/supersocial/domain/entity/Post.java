@@ -40,6 +40,10 @@ public class Post {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date published;
+
 	@ManyToOne
 	private SupersocialUser creator;
 
@@ -95,5 +99,13 @@ public class Post {
 
 	public String getErrorMessage() {
 		return errorMessage;
+	}
+
+	public Date getPublished() {
+		return published;
+	}
+
+	public void setPublished(Date published) {
+		this.published = published;
 	}
 }
