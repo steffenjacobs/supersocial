@@ -13,6 +13,8 @@ export interface PublishedPost {
     platformId: number
     created: Date
     creatorName: string
+    errorMessage?: string
+    postUrl?: string
 }
 
 export interface PublishedPosts {
@@ -73,16 +75,29 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
     }
 
+    private goToPost(post: PublishedPost){
+        window.open(post.postUrl, "_blank")
+    }
+
     public render() {
         const posts = this.state.posts.sort(
             (p1: PublishedPost, p2: PublishedPost) => p2.created.getTime() - p1.created.getTime())
             .map(elem => {
+                var status;
+                if(elem.errorMessage){
+                    status = <td className="tooltip centered">{ImageProvider.getImage("none-logo")}
+                    <span className="tooltiptext">{elem.errorMessage}</span></td>
+
+                } else{
+                    status = <td onClick={o=>this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
+                }
                 return (
                     <tr onClick={() => this.selectPost(elem)}>
+                        {status}
                         <td>
                             <Moment format="YYYY-MM-DD">{elem.created}</Moment>
                         </td>
-                        <td>{this.getSocialmediaIcon(elem.platformId)}</td>
+                        <td className="centered">{this.getSocialmediaIcon(elem.platformId)}</td>
                         <td>{elem.creatorName}</td>
                         <td>{elem.text}</td>
                     </tr>
@@ -109,8 +124,9 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                     <table>
                         <thead>
                             <tr>
+                                <th>Status</th>
                                 <th>Created</th>
-                                <th>Platforms</th>
+                                <th>Platform</th>
                                 <th>Author</th>
                                 <th className="column-text">Post</th>
                             </tr>

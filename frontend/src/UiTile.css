@@ -14,6 +14,10 @@
     display: inline;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .centered-container {
     left: 50%;
     top: 50%;
