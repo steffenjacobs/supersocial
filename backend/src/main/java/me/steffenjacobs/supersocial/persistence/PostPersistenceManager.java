@@ -7,6 +7,7 @@ import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.PostRepository;
@@ -39,12 +40,33 @@ public class PostPersistenceManager {
 		return postRepository.save(p);
 	}
 
+	public Post updateWithErrorMessage(UUID postId, String errorMessage) {
+		Post p = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+		p.setErrorMessage(errorMessage);
+		return postRepository.save(p);
+	}
+
 	public Set<PostDTO> getAllPosts() {
-		return StreamSupport.stream(postRepository.findAll().spliterator(), true).map(PostDTO::fromPost).collect(Collectors.toSet());
+		return StreamSupport.stream(postRepository.findAll().spliterator(), true).map(this::toDto).collect(Collectors.toSet());
 	}
 
 	public PostDTO findPostById(UUID id) {
-		return PostDTO.fromPost(postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id)));
+		return toDto(postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id)));
+	}
+
+	public PostDTO toDto(Post post) {
+		if (StringUtils.isEmpty(post.getExternalId())) {
+			return PostDTO.fromPost(post, "");
+		}
+		if (post.getPlatform() == Platform.FACEBOOK) {
+			String[] ids = post.getExternalId().split("_");
+			String url = String.format("https://www.facebook.com/permalink.php?story_fbid=%s&id=%s", ids[1], ids[0]);
+			return PostDTO.fromPost(post, url);
+		} else if (post.getPlatform() == Platform.TWITTER) {
+				String url = String.format("https://twitter.com/%s/status/%s", "Steffen_Jacobs_", post.getExternalId());
+				return PostDTO.fromPost(post, url);
+		}
+		return PostDTO.fromPost(post, "TBD");
 	}
 
 }

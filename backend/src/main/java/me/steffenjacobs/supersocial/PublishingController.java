@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,17 +34,22 @@ public class PublishingController {
 	@Autowired
 	private PostPersistenceManager postPersistenceManager;
 
+	@SuppressWarnings("unchecked")
 	@PostMapping(path = "/api/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String publishMessage(@RequestBody MessagePublishingDTO messagePublishingDto) {
-		LOG.info("Publish: " + messagePublishingDto);
+		LOG.info("Publish: {}", messagePublishingDto);
 		StringBuilder sb = new StringBuilder();
 		if (messagePublishingDto.getPlatforms().contains("twitter")) {
 			UUID id = postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.TWITTER).getId();
 			String result = twitterService.tweet(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if(json.containsKey("errors")) {
-				LOG.error("Received error from Twitter API: {}", json);
-				sb.append("Error posting to Twitter\n");
+				List<Map<String,?>> errors = (List<Map<String, ?>>) json.get("errors");
+				for(Map<String,?> error : errors) {
+					LOG.error("Received error from Twitter API: {}", json);
+					sb.append(error.get("message"));
+					postPersistenceManager.updateWithErrorMessage(id, "" + error.get("message"));
+				}
 			} else {
 				postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));
 				sb.append("Posted to Twitter: ").append(messagePublishingDto.getMessage()).append("\n");
@@ -54,8 +60,10 @@ public class PublishingController {
 			String result = facebookService.postMessage(messagePublishingDto.getMessage());
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if(json.containsKey("error")) {
+				Map<String, ?> error = (Map<String, ?>) json.get("error");
 				LOG.error("Received error from Facebook API: {}", json);
 				sb.append("Error posting to Facebook\n");
+				postPersistenceManager.updateWithErrorMessage(id, "" + error.get("message"));
 			} else {
 				postPersistenceManager.updateWithExternalId(id, "" + json.get("id"));
 				sb.append("Posted to Facebook: ").append(messagePublishingDto.getMessage()).append("\n");

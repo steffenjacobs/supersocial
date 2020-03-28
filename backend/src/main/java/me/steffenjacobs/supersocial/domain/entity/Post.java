@@ -43,6 +43,9 @@ public class Post {
 	@ManyToOne
 	private SupersocialUser creator;
 
+	@Column(length = 512)
+	private String errorMessage;
+
 	public Post() {
 	}
 
@@ -84,5 +87,13 @@ public class Post {
 
 	public SupersocialUser getCreator() {
 		return creator;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 }

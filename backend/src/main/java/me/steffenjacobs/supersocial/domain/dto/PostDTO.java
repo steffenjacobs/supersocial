@@ -18,13 +18,19 @@ public class PostDTO {
 
 	private String creatorName;
 
-	private PostDTO(UUID id, String text, int platformId, Date created, String creatorName) {
+	private String errorMessage;
+	
+	private String postUrl;
+
+	private PostDTO(UUID id, String text, int platformId, Date created, String creatorName, String errorMessage, String postUrl) {
 		super();
 		this.id = id;
 		this.text = text;
 		this.platformId = platformId;
 		this.created = created;
 		this.creatorName = creatorName;
+		this.errorMessage = errorMessage;
+		this.postUrl = postUrl;
 	}
 
 	public UUID getId() {
@@ -46,9 +52,17 @@ public class PostDTO {
 	public String getCreatorName() {
 		return creatorName;
 	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 	
-	public static PostDTO fromPost(Post post) {
-		return new PostDTO(post.getId(), post.getText(), post.getPlatform().getId(), post.getCreated(), post.getCreator().getName());
+	public String getPostUrl() {
+		return postUrl;
+	}
+
+	public static PostDTO fromPost(Post post, String url) {
+		return new PostDTO(post.getId(), post.getText(), post.getPlatform().getId(), post.getCreated(), post.getCreator().getName(), post.getErrorMessage(), url);
 	}
 
 }
