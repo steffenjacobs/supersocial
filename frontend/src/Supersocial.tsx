@@ -5,6 +5,7 @@ import { MessageOverview } from './MessageOverview';
 import { EventBus } from './EventBus';
 import { LoginManager } from './LoginManager';
 import { ImageProvider } from './ImageProvider';
+import { SettingsPage } from './SettingsPage';
 
 export interface EventBusParams {
     eventBus: EventBus
@@ -26,6 +27,11 @@ export class Supersocial extends React.Component<EventBusParams> {
             title: 'About',
             page: <AboutPage />,
             icon: ImageProvider.getImage("info-icon")
+        }, {
+            id: 2,
+            title: 'Settings',
+            page: <SettingsPage eventBus={this.props.eventBus}/>,
+            icon: ImageProvider.getImage("settings-icon")
         }];
 
         return (

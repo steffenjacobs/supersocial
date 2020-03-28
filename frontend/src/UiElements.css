@@ -37,6 +37,22 @@
     height: 1.5em;
     width: 1.5em;
 }
+.btn-icon:hover {
+    fill: #ccc;
+    transition: 200ms;
+}
+
+.btn-icon-delete {
+    fill: rgb(185, 139, 139);
+}
+
+.btn-icon-delete:hover {
+    fill: rgb(182, 48, 48);
+}
+
+.monospace-font {
+    font-family: "Courier New", Courier, monospace;
+}
 
 .textarea {
     border-radius: .3125rem;

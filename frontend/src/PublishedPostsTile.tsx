@@ -95,7 +95,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         }
 
         return (
-            <div className="container double-container">
+            <div className="container double-container inline">
                 <div className="box-header">
                     Published Posts
                     <div
