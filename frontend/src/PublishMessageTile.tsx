@@ -32,8 +32,8 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
             message: eventData.text,
             platforms: platforms,
             eventBus: this.state.eventBus,
-            schedule: this.state.schedule,
-            scheduled: this.state.scheduled
+            schedule: eventData.scheduled?true:false,
+            scheduled: eventData.scheduled?eventData.scheduled:new Date()
         });
     }
 
@@ -108,6 +108,13 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                 this.createAndPublishPost();
             }
         }
+        this.setState({
+            message: "",
+            platforms: new Set<string>(),
+            eventBus: this.state.eventBus,
+            schedule: false,
+            scheduled: new Date()
+        });
     }
 
     private formTextAreaUpdated(event: React.ChangeEvent<HTMLTextAreaElement>) {
