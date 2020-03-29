@@ -1,20 +1,21 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.security.core.AuthenticatedPrincipal;
 
 /** @author Steffen Jacobs */
-
 @Entity
-public class SupersocialUser implements AuthenticatedPrincipal, Secured {
+public class UserGroup implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -22,15 +23,9 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 	@Column(name = "id", updatable = false, nullable = false)
 	private UUID id;
 
-	@Column
-	private String externalId;
+	@ManyToMany
+	private Set<SupersocialUser> users = new HashSet<>();
 
-	@Column
-	private int loginProviderId;
-
-	@Column
-	private String name;
-	
 	@OneToOne
 	private AccessControlList accessControlList;
 
@@ -38,34 +33,17 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 		return id;
 	}
 
-	public String getExternalId() {
-		return externalId;
+	public Set<SupersocialUser> getUsers() {
+		return users;
 	}
 
-	public void setExternalId(String externalId) {
-		this.externalId = externalId;
-	}
-
-	public LoginProvider getLoginProvider() {
-		return LoginProvider.fromId(loginProviderId);
-	}
-
-	public void setLoginProvider(LoginProvider loginProvider) {
-		this.loginProviderId = loginProvider.getId();
-	}
-
-	@Override
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setUsers(Set<SupersocialUser> users) {
+		this.users = users;
 	}
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.SupersocialUser;
+		return SecuredType.UserGroup;
 	}
 
 	@Override
@@ -76,6 +54,31 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 	@Override
 	public void setAccessControlList(AccessControlList accessControlList) {
 		this.accessControlList = accessControlList;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserGroup other = (UserGroup) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 }

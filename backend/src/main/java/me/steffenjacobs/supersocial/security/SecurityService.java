@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial.security;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.ollide.spring.discourse.sso.authentication.DiscoursePrincipal;
@@ -10,16 +11,20 @@ import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.SupersocialUserRepository;
 import me.steffenjacobs.supersocial.domain.entity.LoginProvider;
+import me.steffenjacobs.supersocial.domain.entity.Secured;
+import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
+import me.steffenjacobs.supersocial.domain.entity.StandaloneUser;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
+import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 
 /** @author Steffen Jacobs */
 @Component
 public class SecurityService {
 
 	@Autowired
-	SupersocialUserRepository supersocialUserRepository;
+	private SupersocialUserRepository supersocialUserRepository;
 
-	public synchronized SupersocialUser getCurrentUser() {
+	public SupersocialUser getCurrentUser() {
 		Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		if (user instanceof SupersocialUser) {
@@ -38,19 +43,36 @@ public class SecurityService {
 			newUser.setLoginProvider(LoginProvider.DISCOURSE);
 			return supersocialUserRepository.save(newUser);
 		}
-		
-		if(user instanceof User) {
-			//Dummy Authentication
-			return supersocialUserRepository.findByName("dummy").orElseGet(()->{
-				SupersocialUser dummyUser = new SupersocialUser();
-				dummyUser.setLoginProvider(LoginProvider.SUPERSOCIAL);
-				dummyUser.setName("dummy");
-				return supersocialUserRepository.save(dummyUser);
-			});
+
+		if (user instanceof User) {
+			return supersocialUserRepository.findByName(((User) user).getUsername()).orElse(createAnonymousUser());
 		}
 
+		if (user instanceof StandaloneUser) {
+			return supersocialUserRepository.findByExternalId(((StandaloneUser) user).getId().toString()).orElse(createAnonymousUser());
+		}
+
+		return createAnonymousUser();
+	}
+
+	private SupersocialUser createAnonymousUser() {
 		SupersocialUser anonymousUser = new SupersocialUser();
 		anonymousUser.setLoginProvider(LoginProvider.NONE);
 		return anonymousUser;
+	}
+
+	public boolean isPermitted(SupersocialUser user, Secured securedObject, SecuredAction actionToPerform) {
+		for (Map.Entry<UserGroup, SecuredAction> entry : securedObject.getAccessControlList().getPermittedActions().entrySet()) {
+			if (entry.getKey().getUsers().contains(user)) {
+				if (implies(entry.getValue(), actionToPerform)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean implies(SecuredAction action, SecuredAction impliedAction) {
+		return (impliedAction.getMask() & action.getMask()) == impliedAction.getMask();
 	}
 }
