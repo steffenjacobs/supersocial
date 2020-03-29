@@ -4,6 +4,7 @@ import { Login } from './Login';
 import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
 import { EventBus, EventBusEventType } from './EventBus';
 import { LoginManager } from './LoginManager';
+import { Registration } from './Registration';
 
 export interface LoginInfo {
   loggedIn?: boolean
@@ -33,7 +34,8 @@ class App extends React.Component<LoginInfo, LoginInfo> {
     // everything else -> Go to Supersocial application
     return (
       <BrowserRouter>
-        <Switch>          
+        <Switch>  
+          <Route path="/register" render={(props) => <Registration username="" password="" email="" eventBus={eventBus} loginManager={loginManager} />} />        
           <Route path="/login" render={(props) => <Login username="" password="" eventBus={eventBus} loginManager={loginManager} />} />
           {this.state.loggedIn ? <Route path="/" render={(props) => <Supersocial eventBus={eventBus} loginManager={loginManager} />} /> : <Redirect to="/login" />} />}
         </Switch>
