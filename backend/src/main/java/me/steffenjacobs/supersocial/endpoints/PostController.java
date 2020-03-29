@@ -31,7 +31,7 @@ public class PostController {
 	private PostService postService;
 
 	@GetMapping(path = "/api/post")
-	public Set<PostDTO> getAllPublishedPosts() {
+	public Set<PostDTO> getAllPosts() {
 		LOG.info("Retrieving all posts");
 		return postService.getAllPosts();
 	}

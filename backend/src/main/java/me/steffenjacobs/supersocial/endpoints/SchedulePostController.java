@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import me.steffenjacobs.supersocial.domain.dto.LinkedScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
 import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
+import me.steffenjacobs.supersocial.persistence.exception.PostAlreadyScheduledException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -34,8 +35,12 @@ public class SchedulePostController {
 	@PutMapping(path = "/api/schedule/post", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ScheduledPostDTO> schedulePost(@RequestBody LinkedScheduledPostDTO post) throws Exception {
 		LOG.info("Scheduling new post {}", post);
-		Pair<ScheduledPostDTO, Boolean> result = scheduledPostPersistenceManager.scheduleOrUpdateScheduledPost(post);
-		return new ResponseEntity<>(result.getA(), result.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
+		try {
+			Pair<ScheduledPostDTO, Boolean> result = scheduledPostPersistenceManager.scheduleOrUpdateScheduledPost(post);
+			return new ResponseEntity<>(result.getA(), result.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
+		} catch (PostAlreadyScheduledException e) {
+			return new ResponseEntity<>(HttpStatus.FOUND);
+		}
 	}
 
 	@DeleteMapping(path = "/api/schedule/post/{id}")

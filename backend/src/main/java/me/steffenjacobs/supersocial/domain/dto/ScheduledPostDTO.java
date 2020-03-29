@@ -1,6 +1,7 @@
 package me.steffenjacobs.supersocial.domain.dto;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 import me.steffenjacobs.supersocial.domain.entity.ScheduledPost;
@@ -25,6 +26,11 @@ public class ScheduledPostDTO extends PostDTO {
 	public static ScheduledPostDTO fromScheduledPost(ScheduledPost post) {
 		return new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getPlatform().getId(), post.getPost().getCreated(),
 				post.getPost().getCreator().getName(), null, null, null, post.getScheduledDate());
+	}
+	
+	public static Optional<ScheduledPostDTO> fromScheduledPost(Optional<ScheduledPost> optinalPost) {
+		return optinalPost.map(post -> new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getPlatform().getId(), post.getPost().getCreated(),
+				post.getPost().getCreator().getName(), null, null, null, post.getScheduledDate()));
 	}
 
 	@Override

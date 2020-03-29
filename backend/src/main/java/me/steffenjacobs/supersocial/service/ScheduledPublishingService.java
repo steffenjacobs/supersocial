@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
 
 /** @author Steffen Jacobs */
@@ -36,11 +37,11 @@ public class ScheduledPublishingService {
 		Date now = new Date();
 		AtomicInteger counter = new AtomicInteger();
 		scheduledPostPersistenceManager.getAllScheduledAndNotPublishedPosts().forEach(p -> {
-			if (now.after(p.getScheduled())) {
-				postPublishingService.publish(p);
+			if (now.after(p.getScheduledDate())) {
+				postPublishingService.publish(PostDTO.fromPost(p.getPost(), ""));
 				counter.getAndIncrement();
 			}
 		});
-		LOG.info("Finished publish job. Published {} posts.", counter.get());
+		LOG.info("Finished publish job. Attempted to published {} posts.", counter.get());
 	}
 }
