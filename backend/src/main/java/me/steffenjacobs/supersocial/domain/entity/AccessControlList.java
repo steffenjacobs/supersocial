@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -12,7 +13,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 /** @author Steffen Jacobs */
@@ -23,6 +27,11 @@ public class AccessControlList {
 	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
 	@Column(name = "id", updatable = false, nullable = false)
 	private UUID id;
+
+	@Column
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
 
 	@ElementCollection
 	@CollectionTable(name = "usergroup_securedaction_mapping", joinColumns = { @JoinColumn(name = "acl_id", referencedColumnName = "id") })
@@ -40,6 +49,10 @@ public class AccessControlList {
 
 	public void setPermittedActions(Map<UserGroup, SecuredAction> permittedActions) {
 		this.permittedActions = permittedActions;
+	}
+
+	public Date getCreated() {
+		return created;
 	}
 
 	@Override

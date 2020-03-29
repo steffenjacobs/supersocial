@@ -1,18 +1,15 @@
 package me.steffenjacobs.supersocial.domain.dto;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.UUID;
 
 /** @author Steffen Jacobs */
 public class MessagePublishingDTO {
 
 	private String message;
-	
-	//TODO: use enum constants
-	private Set<String> platforms = new HashSet<>();
+
+	private UUID accountId;
 
 	public MessagePublishingDTO() {
-
 	}
 
 	public String getMessage() {
@@ -23,18 +20,18 @@ public class MessagePublishingDTO {
 		this.message = message;
 	}
 
-	public Set<String> getPlatforms() {
-		return platforms;
+	public UUID getAccountId() {
+		return accountId;
 	}
 
-	public void setPlatforms(Set<String> platforms) {
-		this.platforms = platforms;
+	public void setAccountId(UUID accountId) {
+		this.accountId = accountId;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("MessagePublishingDTO [message=").append(message).append(", platforms=").append(platforms).append("]");
+		builder.append("MessagePublishingDTO [message=").append(message).append(", accountId=").append(accountId).append("]");
 		return builder.toString();
 	}
 

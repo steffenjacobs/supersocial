@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
+import me.steffenjacobs.supersocial.domain.entity.Post;
+import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
 
@@ -26,19 +27,19 @@ import me.steffenjacobs.supersocial.service.exception.FacebookException;
 public class FacebookService {
 	private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
 
-	@Autowired
-	private CredentialPersistenceManager credentialPersistenceManager;
-
 	private static final String FACEBOOK_POST_TO_PAGE_ENDPOINT = "https://graph.facebook.com/%s/feed?message=%s&access_token=%s";
 	private static final String FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT = "https://graph.facebook.com/%s?access_token=%s&fields=access_token";
+
+	@Autowired
+	private CredentialLookupService credentialLookupService;
 
 	/**
 	 * Publishes {@code text} with the credentials given in the
 	 * credentials.properties file to the given facebook page.
 	 */
-	public String postMessage(String text) {
+	public String postMessage(Post post) {
 		try {
-			return attemptPostMessage(text);
+			return attemptPostMessage(post);
 		} catch (UnsupportedOperationException | IOException e) {
 			LOG.error("Could not post message to page");
 			throw new FacebookException("Could not post message to page.", e);
@@ -49,9 +50,9 @@ public class FacebookService {
 	 * Publishes {@code text} with the credentials given in the
 	 * credentials.properties file to the given Facebook page.
 	 */
-	private String attemptPostMessage(String text) throws UnsupportedOperationException, IOException {
-		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialPersistenceManager.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
-				URLEncoder.encode(text, StandardCharsets.UTF_16), credentialPersistenceManager.getCredential(CredentialType.FACEBOOK_PAGE_ACCESSTOKEN).get()));
+	private String attemptPostMessage(Post post) throws UnsupportedOperationException, IOException {
+		final HttpPost httpPost = new HttpPost(String.format(FACEBOOK_POST_TO_PAGE_ENDPOINT, credentialLookupService.getCredential(post, CredentialType.FACEBOOK_PAGE_ID),
+				URLEncoder.encode(post.getText(), StandardCharsets.UTF_16), credentialLookupService.getCredential(post, CredentialType.FACEBOOK_PAGE_ACCESSTOKEN)));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
@@ -63,8 +64,8 @@ public class FacebookService {
 	 * Exchange an {@code userToken} for a page token using the Facebook Graph
 	 * API. @return the result from the Facebook API.
 	 */
-	public String exchangeForPageToken(String userToken) {
-		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT, credentialPersistenceManager.getCredential(CredentialType.FACEBOOK_PAGE_ID).get(),
+	public String exchangeForPageToken(SocialMediaAccount account, String userToken) {
+		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT, credentialLookupService.getCredential(account, CredentialType.FACEBOOK_PAGE_ID),
 				URLEncoder.encode(userToken, StandardCharsets.UTF_8)));
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
@@ -74,5 +75,4 @@ public class FacebookService {
 			throw new FacebookException("Could not exchange user token for page token", e1);
 		}
 	}
-
 }

@@ -1,9 +1,8 @@
 package me.steffenjacobs.supersocial.persistence;
 
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.PostRepository;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
+import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
 
@@ -27,12 +27,12 @@ public class PostPersistenceManager {
 	@Autowired
 	private SecurityService securityService;
 
-	public PostDTO storePost(String postText, Platform platform) {
+	public Post storePost(String postText, SocialMediaAccount account) {
 		Post p = new Post();
-		p.setPlatform(platform);
 		p.setText(postText);
 		p.setCreator(securityService.getCurrentUser());
-		return toDto(postRepository.save(p));
+		p.setSocialMediaAccountToPostWith(account);
+		return postRepository.save(p);
 	}
 
 	public PostDTO updateWithExternalId(UUID postId, String externalId) {
@@ -48,23 +48,23 @@ public class PostPersistenceManager {
 		return toDto(postRepository.save(p));
 	}
 
-	public Set<PostDTO> getAllPosts() {
-		return StreamSupport.stream(postRepository.findAll().spliterator(), true).map(this::toDto).collect(Collectors.toSet());
+	public Stream<Post> getAllPosts() {
+		return StreamSupport.stream(postRepository.findAll().spliterator(), true);
 	}
 
-	public PostDTO findPostById(UUID id) {
-		return toDto(postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id)));
+	public Post findPostById(UUID id) {
+		return postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
 	}
 
 	public PostDTO toDto(Post post) {
 		if (StringUtils.isEmpty(post.getExternalId())) {
 			return PostDTO.fromPost(post, "");
 		}
-		if (post.getPlatform() == Platform.FACEBOOK) {
+		if (post.getSocialMediaAccountToPostWith().getPlatform() == Platform.FACEBOOK) {
 			String[] ids = post.getExternalId().split("_");
 			String url = String.format("https://www.facebook.com/permalink.php?story_fbid=%s&id=%s", ids[1], ids[0]);
 			return PostDTO.fromPost(post, url);
-		} else if (post.getPlatform() == Platform.TWITTER) {
+		} else if (post.getSocialMediaAccountToPostWith().getPlatform() == Platform.TWITTER) {
 			String url = String.format("https://twitter.com/%s/status/%s", "Steffen_Jacobs_", post.getExternalId());
 			return PostDTO.fromPost(post, url);
 		}

@@ -19,6 +19,7 @@ import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.service.PostService;
+import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
 /** @author Steffen Jacobs */
 
@@ -47,8 +48,12 @@ public class PostController {
 	}
 
 	@PutMapping(path = "/api/post", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Set<PostDTO>> createUnpublishedPost(@RequestBody MessagePublishingDTO messagePublishingDtos) throws Exception {
+	public ResponseEntity<PostDTO> createUnpublishedPost(@RequestBody MessagePublishingDTO messagePublishingDtos) throws Exception {
 		LOG.info("Creating new post {}", messagePublishingDtos);
-		return new ResponseEntity<>(postService.createPosts(messagePublishingDtos), HttpStatus.ACCEPTED);
+		try {
+			return new ResponseEntity<>(postService.createUnpublishedPost(messagePublishingDtos), HttpStatus.ACCEPTED);
+		} catch (SocialMediaAccountNotFoundException e) {
+			return new ResponseEntity<>(new PostDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 }

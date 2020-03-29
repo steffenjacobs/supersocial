@@ -8,6 +8,7 @@ public class CredentialDTO {
 	private String value;
 	private String descriptor;
 	private boolean omitted;
+	private UserGroupDTO userGroup;
 
 	public CredentialDTO() {
 		super();
@@ -43,6 +44,14 @@ public class CredentialDTO {
 
 	public void setOmitted(boolean omitted) {
 		this.omitted = omitted;
+	}
+
+	public UserGroupDTO getUserGroup() {
+		return userGroup;
+	}
+
+	public void setUserGroup(UserGroupDTO userGroup) {
+		this.userGroup = userGroup;
 	}
 
 }

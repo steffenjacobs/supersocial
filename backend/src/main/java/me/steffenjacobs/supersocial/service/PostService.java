@@ -1,6 +1,5 @@
 package me.steffenjacobs.supersocial.service;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -10,12 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import me.steffenjacobs.supersocial.domain.Platform;
+import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
 import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
+import me.steffenjacobs.supersocial.domain.entity.Post;
+import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
+import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
 import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
+import me.steffenjacobs.supersocial.security.SecurityService;
+import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
+import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
 /** @author Steffen Jacobs */
 @Component
@@ -25,19 +30,35 @@ public class PostService {
 	@Autowired
 	private ScheduledPostPersistenceManager scheduledPostPersistenceManager;
 
-	public Set<PostDTO> createPosts(MessagePublishingDTO messagePublishingDto) {
-		Set<PostDTO> result = new HashSet<>();
-		for (String platform : messagePublishingDto.getPlatforms()) {
-			result.add(postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.fromId(Integer.parseInt(platform))));
+	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
+	private SocialMediaAccountRepository socialMediaAccountRepository;
+	
+	@Autowired
+	private PostPublishingService postPublishingService;
+	
+	public PostDTO createAndPublishPost(MessagePublishingDTO messagePublishingDTO) {
+		return postPublishingService.publish(createPost(messagePublishingDTO));
+	}
+
+	public PostDTO createUnpublishedPost(MessagePublishingDTO messagePublishingDto) {
+		return postPersistenceManager.toDto(createPost(messagePublishingDto));
+	}
+	private Post createPost(MessagePublishingDTO messagePublishingDto) {
+		if(messagePublishingDto.getAccountId() == null) {
+			throw new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId());
 		}
-		if (messagePublishingDto.getPlatforms().isEmpty()) {
-			result.add(postPersistenceManager.storePost(messagePublishingDto.getMessage(), Platform.UNKNOWN));
-		}
-		return result;
+		SocialMediaAccount account = socialMediaAccountRepository.findById(messagePublishingDto.getAccountId())
+				.orElseThrow(() -> new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId()));
+		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.READ);
+		return postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
 	}
 
 	public Set<PostDTO> getAllPosts() {
-		return postPersistenceManager.getAllPosts().stream().map(this::addSchedulingInformationIfAvailable).collect(Collectors.toSet());
+		return securityService.filterForCurrentUser(postPersistenceManager.getAllPosts(), SecuredAction.READ).map(postPersistenceManager::toDto)
+				.map(this::addSchedulingInformationIfAvailable).collect(Collectors.toSet());
 	}
 
 	private PostDTO addSchedulingInformationIfAvailable(PostDTO post) {
@@ -54,6 +75,11 @@ public class PostService {
 	}
 
 	public PostDTO findPostById(UUID id) {
-		return postPersistenceManager.findPostById(id);
+		final Post post = postPersistenceManager.findPostById(id);
+		if(securityService.isCurrentUserPermitted(post, SecuredAction.READ)){
+			return postPersistenceManager.toDto(post);
+		}else {
+			throw new AuthorizationException("post", SecuredAction.READ);
+		}
 	}
 }

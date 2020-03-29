@@ -8,17 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
-import me.steffenjacobs.supersocial.domain.Platform;
-
 /** @author Steffen Jacobs */
 @Entity
-public class Post {
+public class Post implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -28,9 +27,6 @@ public class Post {
 
 	@Column
 	private String text;
-
-	@Column
-	private int platformId;
 
 	@Column
 	private String externalId;
@@ -50,6 +46,12 @@ public class Post {
 	@Column(length = 512)
 	private String errorMessage;
 
+	@OneToOne
+	private AccessControlList accessControlList;
+
+	@ManyToOne
+	private SocialMediaAccount socialMediaAccountToPostWith;
+
 	public Post() {
 	}
 
@@ -59,14 +61,6 @@ public class Post {
 
 	public void setText(String text) {
 		this.text = text;
-	}
-
-	public Platform getPlatform() {
-		return Platform.fromId(platformId);
-	}
-
-	public void setPlatform(Platform platform) {
-		this.platformId = platform.getId();
 	}
 
 	public String getExternalId() {
@@ -107,5 +101,28 @@ public class Post {
 
 	public void setPublished(Date published) {
 		this.published = published;
+	}
+
+	@Override
+	public SecuredType getSecuredType() {
+		return SecuredType.Post;
+	}
+
+	@Override
+	public AccessControlList getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public void setAccessControlList(AccessControlList accessControlList) {
+		this.accessControlList = accessControlList;
+	}
+
+	public SocialMediaAccount getSocialMediaAccountToPostWith() {
+		return socialMediaAccountToPostWith;
+	}
+
+	public void setSocialMediaAccountToPostWith(SocialMediaAccount socialMediaAccountToPostWith) {
+		this.socialMediaAccountToPostWith = socialMediaAccountToPostWith;
 	}
 }

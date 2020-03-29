@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
+import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
 import me.steffenjacobs.supersocial.service.exception.PlatformNotFoundException;
 
@@ -28,11 +29,14 @@ public class PostPublishingService {
 
 	@Autowired
 	private PostPersistenceManager postPersistenceManager;
+	
+	@Autowired
+	private PostService postService;
 
 	@SuppressWarnings("unchecked")
-	public PostDTO publish(PostDTO post) {
-		if (post.getPlatformId() == Platform.FACEBOOK.getId()) {
-			String result = facebookService.postMessage(post.getText());
+	public PostDTO publish(Post post) {
+		if (post.getSocialMediaAccountToPostWith().getPlatform() == Platform.FACEBOOK) {
+			String result = facebookService.postMessage(post);
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if (json.containsKey("error")) {
 				Map<String, ?> error = (Map<String, ?>) json.get("error");
@@ -42,8 +46,8 @@ public class PostPublishingService {
 				LOG.info("Published post on Facebook: {}", post);
 				return postPersistenceManager.updateWithExternalId(post.getId(), "" + json.get("id"));
 			}
-		} else if (post.getPlatformId() == Platform.TWITTER.getId()) {
-			String result = twitterService.tweet(post.getText());
+		} else if (post.getSocialMediaAccountToPostWith().getPlatform() == Platform.TWITTER) {
+			String result = twitterService.tweet(post);
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if (json.containsKey("errors")) {
 				List<Map<String, ?>> errors = (List<Map<String, ?>>) json.get("errors");
@@ -51,13 +55,13 @@ public class PostPublishingService {
 					LOG.error("Received error from Twitter API: {}", json);
 					postPersistenceManager.updateWithErrorMessage(post.getId(), "" + error.get("message"));
 				}
-				return postPersistenceManager.findPostById(post.getId());
+				return postService.findPostById(post.getId());
 			} else {
 				LOG.info("Published post on Twitter: {}", post);
 				return postPersistenceManager.updateWithExternalId(post.getId(), "" + json.get("id"));
 			}
 		} else {
-			throw new PlatformNotFoundException(post.getPlatformId());
+			throw new PlatformNotFoundException(post.getSocialMediaAccountToPostWith().getPlatform());
 		}
 	}
 }

@@ -17,7 +17,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 /** @author Steffen Jacobs */
 @Entity
-public class ScheduledPost {
+public class ScheduledPost implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -25,6 +25,8 @@ public class ScheduledPost {
 	@Column(name = "id", updatable = false, nullable = false)
 	private UUID id;
 
+	@OneToOne
+	private AccessControlList accessControlList;
 	@OneToOne
 	private Post post;
 
@@ -73,6 +75,21 @@ public class ScheduledPost {
 
 	public Date getCreated() {
 		return created;
+	}
+
+	@Override
+	public SecuredType getSecuredType() {
+		return SecuredType.ScheduledPost;
+	}
+
+	@Override
+	public AccessControlList getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public void setAccessControlList(AccessControlList accessControlList) {
+		this.accessControlList = accessControlList;
 	}
 
 }

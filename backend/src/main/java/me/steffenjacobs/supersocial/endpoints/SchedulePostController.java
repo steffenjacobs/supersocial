@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.domain.dto.LinkedScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
-import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
+import me.steffenjacobs.supersocial.persistence.ScheduledPostService;
 import me.steffenjacobs.supersocial.persistence.exception.PostAlreadyScheduledException;
+import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -30,24 +31,26 @@ public class SchedulePostController {
 	private static final Logger LOG = LoggerFactory.getLogger(SchedulePostController.class);
 
 	@Autowired
-	ScheduledPostPersistenceManager scheduledPostPersistenceManager;
+	ScheduledPostService scheduledPostService;
 
 	@PutMapping(path = "/api/schedule/post", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ScheduledPostDTO> schedulePost(@RequestBody LinkedScheduledPostDTO post) throws Exception {
 		LOG.info("Scheduling new post {}", post);
 		try {
-			Pair<ScheduledPostDTO, Boolean> result = scheduledPostPersistenceManager.scheduleOrUpdateScheduledPost(post);
+			Pair<ScheduledPostDTO, Boolean> result = scheduledPostService.scheduleOrUpdateScheduledPost(post);
 			return new ResponseEntity<>(result.getA(), result.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
 		} catch (PostAlreadyScheduledException e) {
 			return new ResponseEntity<>(HttpStatus.FOUND);
+		} catch (PostNotFoundException e2) {
+			return new ResponseEntity<>(new ScheduledPostDTO(e2.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@DeleteMapping(path = "/api/schedule/post/{id}")
-	public ResponseEntity<ScheduledPostDTO> schedulePost(@PathVariable(name = "id") UUID id) throws Exception {
+	public ResponseEntity<ScheduledPostDTO> deleteScheduledPost(@PathVariable(name = "id") UUID id) throws Exception {
 		LOG.info("Deleting scheduled post post {}", id);
 		try {
-			scheduledPostPersistenceManager.deleteScheduledPost(id);
+			scheduledPostService.deleteScheduledPost(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (ScheduledPostNotFoundException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -57,6 +60,6 @@ public class SchedulePostController {
 	@GetMapping(path = "/api/schedule/post", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<ScheduledPostDTO>> getAllScheduledPosts() throws Exception {
 		LOG.info("Retrieving all scheduled posts.");
-		return new ResponseEntity<>(scheduledPostPersistenceManager.getAllScheduledPosts(), HttpStatus.OK);
+		return new ResponseEntity<>(scheduledPostService.getAllScheduledPosts(), HttpStatus.OK);
 	}
 }

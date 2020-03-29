@@ -12,9 +12,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import me.steffenjacobs.supersocial.domain.entity.AccessControlList;
+import me.steffenjacobs.supersocial.domain.entity.SecuredType;
 import me.steffenjacobs.supersocial.domain.entity.Secured;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
-import me.steffenjacobs.supersocial.domain.entity.SecuredType;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 import me.steffenjacobs.supersocial.util.Pair;

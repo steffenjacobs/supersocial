@@ -24,6 +24,12 @@ public class PostDTO {
 
 	private String postUrl;
 
+	private String error;
+
+	public PostDTO(String error) {
+		this.error = error;
+	}
+
 	protected PostDTO(UUID id, String text, int platformId, Date created, String creatorName, String errorMessage, String postUrl, Date published) {
 		super();
 		this.id = id;
@@ -72,9 +78,13 @@ public class PostDTO {
 		this.published = published;
 	}
 
+	public String getError() {
+		return error;
+	}
+
 	public static PostDTO fromPost(Post post, String url) {
-		return new PostDTO(post.getId(), post.getText(), post.getPlatform().getId(), post.getCreated(), post.getCreator().getName(), post.getErrorMessage(), url,
-				post.getPublished());
+		return new PostDTO(post.getId(), post.getText(), post.getSocialMediaAccountToPostWith().getPlatform().getId(), post.getCreated(), post.getCreator().getName(),
+				post.getErrorMessage(), url, post.getPublished());
 	}
 
 	@Override

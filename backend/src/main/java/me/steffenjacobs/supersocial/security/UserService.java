@@ -66,7 +66,10 @@ public class UserService implements UserDetailsService {
 		Set<SupersocialUser> users = new HashSet<>();
 		users.add(supersocialUser);
 		defaultUserGroup.setUsers(users);
+		defaultUserGroup.setName("default-" + displayName);
 		defaultUserGroup = userGroupRepository.save(defaultUserGroup);
+		
+		supersocialUser.setDefaultUserGroup(defaultUserGroup);
 		
 		//create ACL for default user group
 		Map<UserGroup, SecuredAction> permittedActionsGroup = new HashMap<>();

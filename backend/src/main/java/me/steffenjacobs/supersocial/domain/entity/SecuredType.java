@@ -1,6 +1,6 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
 /** @author Steffen Jacobs */
-public enum SecuredType {
-	Unknown, Post, ScheduledType, SupersocialUser, User, UserGroup, Credential
+public enum SecuredType{
+	Unknown, Post, ScheduledPost, SupersocialUser, User, UserGroup, Credential, SocialMediaAccount
 }

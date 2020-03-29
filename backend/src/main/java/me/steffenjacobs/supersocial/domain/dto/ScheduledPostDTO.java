@@ -9,6 +9,10 @@ import me.steffenjacobs.supersocial.domain.entity.ScheduledPost;
 /** @author Steffen Jacobs */
 public class ScheduledPostDTO extends PostDTO {
 	private Date scheduled;
+	
+	public ScheduledPostDTO(String error) {
+		super(error);
+	}
 
 	public ScheduledPostDTO(UUID id, String text, int platformId, Date created, String creatorName, String errorMessage, String postUrl, Date published, Date scheduled) {
 		super(id, text, platformId, created, creatorName, errorMessage, postUrl, published);
@@ -24,12 +28,12 @@ public class ScheduledPostDTO extends PostDTO {
 	}
 
 	public static ScheduledPostDTO fromScheduledPost(ScheduledPost post) {
-		return new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getPlatform().getId(), post.getPost().getCreated(),
+		return new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getSocialMediaAccountToPostWith().getPlatform().getId(), post.getPost().getCreated(),
 				post.getPost().getCreator().getName(), null, null, null, post.getScheduledDate());
 	}
 	
 	public static Optional<ScheduledPostDTO> fromScheduledPost(Optional<ScheduledPost> optinalPost) {
-		return optinalPost.map(post -> new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getPlatform().getId(), post.getPost().getCreated(),
+		return optinalPost.map(post -> new ScheduledPostDTO(post.getId(), post.getPost().getText(), post.getPost().getSocialMediaAccountToPostWith().getPlatform().getId(), post.getPost().getCreated(),
 				post.getPost().getCreator().getName(), null, null, null, post.getScheduledDate()));
 	}
 

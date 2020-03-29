@@ -1,19 +1,24 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import me.steffenjacobs.supersocial.domain.dto.CredentialDTO;
 
 /** @author Steffen Jacobs */
 @Entity
-public class Credential {
+public class Credential implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -22,10 +27,18 @@ public class Credential {
 	private UUID id;
 
 	@Column
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+
+	@Column
 	private String value;
 
 	@Column
 	private String descriptor;
+
+	@OneToOne
+	private AccessControlList accessControlList;
 
 	public Credential() {
 	}
@@ -62,13 +75,32 @@ public class Credential {
 		return c;
 	}
 
-	public CredentialDTO toDTO() {
+	public CredentialDTO toDTO(UserGroup userGroup) {
 		CredentialDTO dto = new CredentialDTO();
 		dto.setDescriptor(this.descriptor);
 		dto.setValue("(omitted)");
 		dto.setId(this.id);
 		dto.setOmitted(true);
 		return dto;
+	}
+
+	@Override
+	public SecuredType getSecuredType() {
+		return SecuredType.Credential;
+	}
+
+	@Override
+	public AccessControlList getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public void setAccessControlList(AccessControlList accessControlList) {
+		this.accessControlList = accessControlList;
+	}
+
+	public Date getCreated() {
+		return created;
 	}
 
 }

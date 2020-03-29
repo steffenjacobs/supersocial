@@ -1,7 +1,6 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,7 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -17,9 +16,11 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
+import me.steffenjacobs.supersocial.domain.Platform;
+
 /** @author Steffen Jacobs */
 @Entity
-public class UserGroup implements Secured {
+public class SocialMediaAccount implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -32,30 +33,29 @@ public class UserGroup implements Secured {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
-	@Column
-	private String name;
-
-	@ManyToMany
-	private Set<SupersocialUser> users = new HashSet<>();
+	@OneToMany
+	private Set<Credential> credentials;
 
 	@OneToOne
 	private AccessControlList accessControlList;
+
+	@Column
+	private Platform platform;
+
+	public Set<Credential> getCredentials() {
+		return credentials;
+	}
+
+	public void setCredentials(Set<Credential> credentials) {
+		this.credentials = credentials;
+	}
 
 	public UUID getId() {
 		return id;
 	}
 
-	public Set<SupersocialUser> getUsers() {
-		return users;
-	}
-
-	public void setUsers(Set<SupersocialUser> users) {
-		this.users = users;
-	}
-
-	@Override
-	public SecuredType getSecuredType() {
-		return SecuredType.UserGroup;
+	public Date getCreated() {
+		return created;
 	}
 
 	@Override
@@ -68,41 +68,16 @@ public class UserGroup implements Secured {
 		this.accessControlList = accessControlList;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public SecuredType getSecuredType() {
+		return SecuredType.SocialMediaAccount;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UserGroup other = (UserGroup) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	public Platform getPlatform() {
+		return platform;
 	}
 
+	public void setPlatform(Platform platform) {
+		this.platform = platform;
+	}
 }

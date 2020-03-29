@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -7,7 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
@@ -23,6 +27,11 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 	private UUID id;
 
 	@Column
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+
+	@Column
 	private String externalId;
 
 	@Column
@@ -30,9 +39,12 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 
 	@Column
 	private String name;
-	
+
 	@OneToOne
 	private AccessControlList accessControlList;
+
+	@OneToOne
+	private UserGroup defaultUserGroup;
 
 	public UUID getId() {
 		return id;
@@ -76,6 +88,18 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 	@Override
 	public void setAccessControlList(AccessControlList accessControlList) {
 		this.accessControlList = accessControlList;
+	}
+
+	public UserGroup getDefaultUserGroup() {
+		return defaultUserGroup;
+	}
+
+	public void setDefaultUserGroup(UserGroup defaultUserGroup) {
+		this.defaultUserGroup = defaultUserGroup;
+	}
+
+	public Date getCreated() {
+		return created;
 	}
 
 }

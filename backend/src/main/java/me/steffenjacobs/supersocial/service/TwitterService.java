@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
+import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.TwitterException;
 import oauth.signpost.OAuthConsumer;
@@ -34,16 +34,16 @@ public class TwitterService {
 	private static final String TWITTER_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/update.json?status=";
 
 	@Autowired
-	private CredentialPersistenceManager credentialService;
+	private CredentialLookupService credentialLookupService;
 
 	/**
 	 * Tweets {@code tweetText} with the credentials given in the
 	 * credentials.properties file.
 	 */
-	public String tweet(String tweetText) {
+	public String tweet(Post post) {
 		try {
-			return attemptTweet(tweetText, credentialService.getCredential(CredentialType.TWITTER_ACCESS_TOKEN).get(),
-					credentialService.getCredential(CredentialType.TWITTER_ACCESS_TOKEN_SECRET).get());
+			return attemptTweet(post, credentialLookupService.getCredential(post, CredentialType.TWITTER_ACCESS_TOKEN),
+					credentialLookupService.getCredential(post, CredentialType.TWITTER_ACCESS_TOKEN_SECRET));
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
 			LOG.error("Could not send tweet");
 			throw new TwitterException("Could not send tweet.", e);
@@ -54,12 +54,12 @@ public class TwitterService {
 	 * Attempt to tweet {@code tweetText} with the given {@code accessToken} and
 	 * {@code accessTokenSecret}.
 	 */
-	private String attemptTweet(String tweetText, String accessToken, String accessTokenSecret)
+	private String attemptTweet(Post post, String accessToken, String accessTokenSecret)
 			throws ClientProtocolException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialService.getCredential(CredentialType.TWITTER_API_KEY).get(),
-				credentialService.getCredential(CredentialType.TWITTER_API_KEY_SECRET).get());
+		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialLookupService.getCredential(post, CredentialType.TWITTER_API_KEY),
+				credentialLookupService.getCredential(post, CredentialType.TWITTER_API_KEY_SECRET));
 		oAuthConsumer.setTokenWithSecret(accessToken, accessTokenSecret);
-		final HttpPost httpPost = new HttpPost(TWITTER_STATUS_ENDPOINT + URLEncoder.encode(tweetText, StandardCharsets.UTF_16));
+		final HttpPost httpPost = new HttpPost(TWITTER_STATUS_ENDPOINT + URLEncoder.encode(post.getText(), StandardCharsets.UTF_16));
 		oAuthConsumer.sign(httpPost);
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
