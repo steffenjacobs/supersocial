@@ -5,6 +5,7 @@ import { LoginManager } from "./LoginManager";
 export interface PageComponents {
     components: PageComponent[]
     loginManager: LoginManager
+    selected: number
 }
 
 export interface PageComponent {
@@ -12,6 +13,7 @@ export interface PageComponent {
     title: string
     page: JSX.Element
     icon: JSX.Element
+    path: string
     selected?: boolean
 }
 
@@ -19,7 +21,8 @@ export interface PageComponent {
 export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
-        this.state = {components: props.components, loginManager: props.loginManager};
+        this.state = {components: props.components, loginManager: props.loginManager, selected:props.selected};
+        this.setActivePage(this.state.selected);
     }
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
@@ -28,16 +31,16 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         for (let c = 0; c < this.state.components.length; c++) {
             let comp = this.state.components[c];
             if (comp.selected && comp.id !== pageId) {
-                newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon })
+                newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, path: comp.path })
             }
             else if (comp.id === pageId) {
-                newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, selected: true })
+                newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, selected: true, path: comp.path })
             } else {
                 newComponents.push(comp);
             }
         }
 
-        this.setState({ components: newComponents });
+        this.setState({ components: newComponents, loginManager: this.state.loginManager, selected: pageId });
         //TODO: set title and url in browser window
     }
 
@@ -56,7 +59,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
             return (
-                <a key={elem.id} onClick={() => this.setActivePage(elem.id)}>
+                <a key={elem.id} onClick={() => this.setActivePage(elem.id)} /*href={elem.path}*/>
                     <div className={clazz}>
                         {elem.icon}
                         <div className="navbar-text">{elem.title}</div>
