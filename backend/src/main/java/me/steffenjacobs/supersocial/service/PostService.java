@@ -53,7 +53,9 @@ public class PostService {
 		SocialMediaAccount account = socialMediaAccountRepository.findById(messagePublishingDto.getAccountId())
 				.orElseThrow(() -> new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId()));
 		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.READ);
-		return postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
+		Post post =  postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
+		securityService.appendAcl(post);
+		return post;
 	}
 
 	public Set<PostDTO> getAllPosts() {

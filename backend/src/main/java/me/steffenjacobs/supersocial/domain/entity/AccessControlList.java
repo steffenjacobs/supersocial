@@ -34,9 +34,9 @@ public class AccessControlList {
 	private Date created;
 
 	@ElementCollection
-	@CollectionTable(name = "usergroup_securedaction_mapping", joinColumns = { @JoinColumn(name = "acl_id", referencedColumnName = "id") })
+	@CollectionTable(name = "acl_usergroup_secured_action", joinColumns = { @JoinColumn(name = "acl_id", referencedColumnName = "id") })
 	@MapKeyColumn(name = "user_group_id")
-	@Column(name = "secured_action")
+	@Column(name = "acl_secured_action")
 	private Map<UserGroup, SecuredAction> permittedActions = new HashMap<>();
 
 	public UUID getId() {

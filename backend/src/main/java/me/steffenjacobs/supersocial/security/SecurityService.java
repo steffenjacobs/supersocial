@@ -36,6 +36,9 @@ public class SecurityService {
 
 	@Autowired
 	private EntityManager entityManager;
+	
+	@Autowired
+	private UserService userService;
 
 	public SupersocialUser getCurrentUser() {
 		Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -54,6 +57,7 @@ public class SecurityService {
 			SupersocialUser newUser = new SupersocialUser();
 			newUser.setExternalId(principal.getExternalId());
 			newUser.setLoginProvider(LoginProvider.DISCOURSE);
+			userService.createAclWithDefaultUserGroup(newUser);
 			return supersocialUserRepository.save(newUser);
 		}
 

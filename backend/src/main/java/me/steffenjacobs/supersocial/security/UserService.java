@@ -62,21 +62,11 @@ public class UserService implements UserDetailsService {
 		supersocialUser = supersocialUserRepository.save(supersocialUser);
 
 		// create default user group for user
-		UserGroup defaultUserGroup = new UserGroup();
-		Set<SupersocialUser> users = new HashSet<>();
-		users.add(supersocialUser);
-		defaultUserGroup.setUsers(users);
-		defaultUserGroup.setName("default-" + displayName);
-		defaultUserGroup = userGroupRepository.save(defaultUserGroup);
-		
+		UserGroup defaultUserGroup = createDefaultUserGroup(supersocialUser);		
 		supersocialUser.setDefaultUserGroup(defaultUserGroup);
 		
 		//create ACL for default user group
-		Map<UserGroup, SecuredAction> permittedActionsGroup = new HashMap<>();
-		permittedActionsGroup.put(defaultUserGroup, SecuredAction.ALL);
-		AccessControlList aclGroup = new AccessControlList();
-		aclGroup.setPermittedActions(permittedActionsGroup);
-		aclGroup = accessControlListRepository.save(aclGroup);
+		AccessControlList aclGroup = createUserGroupAcl(defaultUserGroup);
 		
 		//add user group ACL to user group
 		defaultUserGroup.setAccessControlList(aclGroup);
@@ -94,16 +84,49 @@ public class UserService implements UserDetailsService {
 		user = standaloneUserRepository.save(user);
 		
 		//create ACL for Supersocial user
-		Map<UserGroup, SecuredAction> permittedActionsSupersocailUser = new HashMap<>();
-		permittedActionsSupersocailUser.put(defaultUserGroup, SecuredAction.ALL);
-		AccessControlList aclSupersocialUser = new AccessControlList();
-		aclSupersocialUser.setPermittedActions(permittedActionsSupersocailUser);
-		aclSupersocialUser = accessControlListRepository.save(aclSupersocialUser);
+		AccessControlList aclSupersocialUser = createAclWithUserGroup(defaultUserGroup);
 		
 		//add Supersocial user ACL to Supersocial user
 		supersocialUser.setAccessControlList(aclSupersocialUser);
 		supersocialUser = supersocialUserRepository.save(supersocialUser);
 		return SupersocialUserDTO.fromSupersocialUser(supersocialUser);
+	}
+
+	private AccessControlList createUserGroupAcl(UserGroup defaultUserGroup) {
+		Map<UserGroup, SecuredAction> permittedActionsGroup = new HashMap<>();
+		permittedActionsGroup.put(defaultUserGroup, SecuredAction.ALL);
+		AccessControlList aclGroup = new AccessControlList();
+		aclGroup.setPermittedActions(permittedActionsGroup);
+		aclGroup = accessControlListRepository.save(aclGroup);
+		return aclGroup;
+	}
+	
+	public void createAclWithDefaultUserGroup(SupersocialUser supersocialUser) {
+		UserGroup defaultUserGroup = createDefaultUserGroup(supersocialUser);
+		defaultUserGroup.setAccessControlList(createUserGroupAcl(defaultUserGroup));
+		defaultUserGroup = userGroupRepository.save(defaultUserGroup);
+		
+		supersocialUser.setAccessControlList(createAclWithUserGroup(defaultUserGroup));
+		supersocialUser.setDefaultUserGroup(defaultUserGroup);
+	}
+
+	private AccessControlList createAclWithUserGroup(UserGroup defaultUserGroup) {
+		Map<UserGroup, SecuredAction> permittedActionsSupersocialUser = new HashMap<>();
+		permittedActionsSupersocialUser.put(defaultUserGroup, SecuredAction.ALL);
+		AccessControlList aclSupersocialUser = new AccessControlList();
+		aclSupersocialUser.setPermittedActions(permittedActionsSupersocialUser);
+		aclSupersocialUser = accessControlListRepository.save(aclSupersocialUser);
+		return aclSupersocialUser;
+	}
+
+	private UserGroup createDefaultUserGroup(SupersocialUser supersocialUser) {
+		UserGroup defaultUserGroup = new UserGroup();
+		Set<SupersocialUser> users = new HashSet<>();
+		users.add(supersocialUser);
+		defaultUserGroup.setUsers(users);
+		defaultUserGroup.setName("default-" + supersocialUser.getName());
+		defaultUserGroup = userGroupRepository.save(defaultUserGroup);
+		return defaultUserGroup;
 	}
 
 	@Override

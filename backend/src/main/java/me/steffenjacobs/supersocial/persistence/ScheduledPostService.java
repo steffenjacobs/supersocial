@@ -41,6 +41,8 @@ public class ScheduledPostService {
 		ScheduledPost sPost = post.getId() == null ? new ScheduledPost() : scheduledPostPersistenceManager.findById(post.getId()).orElse(new ScheduledPost());
 		if (sPost.getId() != null) {
 			securityService.checkIfCurrentUserIsPermitted(sPost, SecuredAction.UPDATE);
+		}else {
+			securityService.appendAcl(sPost);
 		}
 
 		if (sPost.getId() == null && scheduledPostPersistenceManager.findByPostId(post.getPostId()).isPresent()) {
