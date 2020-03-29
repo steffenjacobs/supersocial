@@ -12,11 +12,8 @@ export interface LoginInfo {
 
 /** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
 class App extends React.Component<LoginInfo, LoginInfo> {
-  constructor() {
-    super({
-      loggedIn: false,
-      username: "Not logged in"
-    });
+  constructor(props) {
+    super(props);
     this.state = {
       loggedIn: false,
       username: "Not logged in"

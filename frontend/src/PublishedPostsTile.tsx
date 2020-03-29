@@ -31,7 +31,7 @@ export interface PublishedPosts {
 export class PublishedPostsTile extends React.Component<PublishedPosts, PublishedPosts>{
     constructor(props: PublishedPosts, state: PublishedPosts) {
         super(props);
-        this.state = props;
+        this.state = {posts: props.posts, updating: props.updating, eventBus: props.eventBus, requireLogin: props.requireLogin};
 
         this.refreshPosts();
         this.state.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
@@ -72,7 +72,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
     }
 
     private createPlatformElement(platformId: number){
-        if(platformId == 0){
+        if(platformId === 0){
             return <td className="centered tooltip x-gray">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
         }
         else{
@@ -108,7 +108,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
 
                 const published = elem.published?<Moment format="YYYY-MM-DD">{elem.published}</Moment>:"";
                 return (
-                    <tr onClick={() => this.selectPost(elem)}>
+                    <tr key={elem.id} onClick={() => this.selectPost(elem)}>
                         {status}
                         <td>
                             {published}

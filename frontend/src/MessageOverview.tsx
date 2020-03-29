@@ -11,7 +11,7 @@ export interface Props {
 export class MessageOverview extends React.Component<Props, Props>{
     constructor(props: Props, state: Props) {
         super(props);
-        this.state = props;
+        this.state = {eventBus: props.eventBus};
     }
 
     public render() {

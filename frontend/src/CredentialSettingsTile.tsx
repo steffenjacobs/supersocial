@@ -3,7 +3,7 @@ import './PublishMessageTile.css';
 import './CredentialSettingsTile.css';
 import './UiTile.css';
 import './UiElements.css';
-import { EventBus, EventBusEventType } from "./EventBus";
+import { EventBus } from "./EventBus";
 import { DeploymentManager } from "./DeploymentManager";
 import { ImageProvider } from "./ImageProvider";
 

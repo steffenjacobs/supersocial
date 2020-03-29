@@ -19,7 +19,7 @@ export interface PageComponent {
 export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
-        this.state = props;
+        this.state = {components: props.components, loginManager: props.loginManager};
     }
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
@@ -56,7 +56,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
             return (
-                <a onClick={() => this.setActivePage(elem.id)}>
+                <a key={elem.id} onClick={() => this.setActivePage(elem.id)}>
                     <div className={clazz}>
                         {elem.icon}
                         <div className="navbar-text">{elem.title}</div>
