@@ -6,6 +6,7 @@ import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { ImageProvider } from "./ImageProvider";
 import { DeploymentManager } from "./DeploymentManager";
+import moment from "moment";
 
 export interface PublishedPost {
     id: number
@@ -16,6 +17,7 @@ export interface PublishedPost {
     errorMessage?: string
     postUrl?: string
     published: Date
+    scheduled?: Date
 }
 
 export interface PublishedPosts {
@@ -102,7 +104,9 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                     if(elem.postUrl){
                         status = <td onClick={o=>this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
                     }else {
-                        status = <td className="checkmark checkmark-gray centered tooltip">{ImageProvider.getImage("check")}<span className="tooltiptext">Not published yet.</span></td>
+                        const statusMsg = elem.scheduled?"This post is scheduled for " + moment(elem.scheduled).format("YYYY-MM-DD HH:mm") :"This post is not posted and not scheduled yet.";
+                        const statusIcons = elem.scheduled?[ImageProvider.getImage("check"),ImageProvider.getImage("clock")]:ImageProvider.getImage("check");
+                        status = <td className="checkmark checkmark-gray centered tooltip">{statusIcons}<span className="tooltiptext">{statusMsg}</span></td>
                     }
                 }
 

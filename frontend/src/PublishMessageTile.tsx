@@ -2,20 +2,24 @@ import * as React from "react";
 import './PublishMessageTile.css';
 import './UiTile.css';
 import './UiElements.css';
+import './react-datetime.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { DeploymentManager } from "./DeploymentManager";
+import Datetime from 'react-datetime';
 
 export interface SendTextForm {
     message: string
     platforms: Set<string>
     eventBus: EventBus
+    schedule: boolean
+    scheduled: Date
 }
 
 /** Contains a form to publish new messages. */
 export class PublishMessageTile extends React.Component<SendTextForm, SendTextForm>{
     constructor(props: SendTextForm, state: SendTextForm) {
         super(props);
-        this.state = props;
+        this.state = { message: props.message, platforms: props.platforms, eventBus: props.eventBus, scheduled: props.scheduled, schedule: props.schedule };
 
         this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData?) => this.selectPost(eventData));
     }
@@ -27,44 +31,82 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         this.setState({
             message: eventData.text,
             platforms: platforms,
-            eventBus: this.state.eventBus
+            eventBus: this.state.eventBus,
+            schedule: this.state.schedule,
+            scheduled: this.state.scheduled
         });
+    }
+
+    private createPost(callback?: Function) {
+        fetch(DeploymentManager.getUrl() + 'api/post', {
+            method: 'PUT',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            credentials: 'include',
+            body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log("Result: " + data);
+                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                if (callback) {
+                    data.forEach(element => {
+                        callback(element.id);
+                    });
+                }
+            });
+    }
+
+    private createAndPublishPost() {
+        fetch(DeploymentManager.getUrl() + 'api/publish', {
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            credentials: 'include',
+            body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
+        })
+            .then(response => {
+                response.json();
+            })
+            .then(data => {
+                console.log("Result: " + data);
+                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+            });
+    }
+
+    private createScheduledPost(postId: string) {
+        fetch(DeploymentManager.getUrl() + 'api/schedule/post', {
+            method: 'PUT',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            credentials: 'include',
+            body: JSON.stringify({ postId: postId, scheduled: this.state.scheduled })
+        })
+            .then(response => {
+                response.json();
+            })
+            .then(data => {
+                console.log("Schedule result: " + data);
+                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+            });
     }
 
     /** Send the request to the back end triggerin a post on the selected platforms. */
     private send() {
-        if (this.state.platforms.size === 0) {
-            fetch(DeploymentManager.getUrl() + 'api/post', {
-                method: 'PUT',
-                headers: new Headers({
-                    'Content-Type': 'application/json'
-                }),
-                credentials: 'include',
-                body: JSON.stringify({ message: this.state.message, platforms: [] })
-            })
-                .then(response => {
-                    response.json();
-                })
-                .then(data => {
-                    console.log("Result: " + data);
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
-                });
-        } else {
-            fetch(DeploymentManager.getUrl() + 'api/publish', {
-                method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/json'
-                }),
-                credentials: 'include',
-                body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
-            })
-                .then(response => {
-                    response.json();
-                })
-                .then(data => {
-                    console.log("Result: " + data);
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
-                });
+        if (this.state.schedule) {
+            this.createPost(this.createScheduledPost.bind(this));
+        }
+        else {
+            if (this.state.platforms.size === 0) {
+                this.createPost();
+            } else {
+                this.createAndPublishPost();
+            }
         }
     }
 
@@ -81,7 +123,9 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
             this.setState({
                 message: value,
                 platforms: this.state.platforms,
-                eventBus: this.state.eventBus
+                eventBus: this.state.eventBus,
+                schedule: this.state.schedule,
+                scheduled: this.state.scheduled
             });
         }
         if (id === "1" || id === "2") {
@@ -103,7 +147,9 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         this.setState({
             message: this.state.message,
             platforms: platforms,
-            eventBus: this.state.eventBus
+            eventBus: this.state.eventBus,
+            schedule: this.state.schedule,
+            scheduled: this.state.scheduled
         });
     }
 
@@ -114,7 +160,32 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         return <input id={id} type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
     }
 
+    private updateSchedulingMode(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            message: this.state.message,
+            platforms: this.state.platforms,
+            eventBus: this.state.eventBus,
+            schedule: event.currentTarget.checked,
+            scheduled: this.state.scheduled
+        });
+    }
+
+    onDateChange = date => this.setState({
+        message: this.state.message,
+        platforms: this.state.platforms,
+        eventBus: this.state.eventBus,
+        schedule: true,
+        scheduled: date
+    })
+
     public render() {
+        var checkBoxSchedule;
+        if (this.state.schedule) {
+            checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} checked />
+        } else {
+
+            checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} />
+        }
         return (
             <div className="container">
                 <div className="box-header">
@@ -127,6 +198,10 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                             <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} value={this.state.message} />
                         </div>
                     </div>
+
+                    <div className="messageLabel">Schedule Publishing</div>
+                    {checkBoxSchedule}
+                    <Datetime dateFormat="YYYY-MM-DD" timeFormat="HH:mm" closeOnSelect={true} onChange={this.onDateChange} value={this.state.scheduled} />
                     <div className="channel-selection">
                         <div className="messageLabel">Distribution Channels</div>
                         <div>

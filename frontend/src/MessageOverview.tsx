@@ -17,7 +17,7 @@ export class MessageOverview extends React.Component<Props, Props>{
     public render() {
         return (
             <div>
-                <PublishMessageTile message="" platforms={new Set<string>()} eventBus={this.state.eventBus} />
+                <PublishMessageTile message="" platforms={new Set<string>()} eventBus={this.state.eventBus} schedule={false} scheduled={new Date()}/>
                 <div className="vspacer" />
                 <PublishedPostsTile posts={[]} eventBus={this.state.eventBus} />
             </div>
