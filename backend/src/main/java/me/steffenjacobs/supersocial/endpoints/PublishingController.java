@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.service.PostService;
+import me.steffenjacobs.supersocial.service.exception.CredentialMissingException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
 /** @author Steffen Jacobs */
@@ -29,7 +30,7 @@ public class PublishingController {
 		LOG.info("Publish: {}", messagePublishingDto);
 		try {
 			return new ResponseEntity<>(postService.createAndPublishPost(messagePublishingDto), HttpStatus.CREATED);
-		} catch (SocialMediaAccountNotFoundException e) {
+		} catch (SocialMediaAccountNotFoundException | CredentialMissingException e) {
 			return new ResponseEntity<>(new PostDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}

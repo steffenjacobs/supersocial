@@ -1,6 +1,7 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,13 +35,16 @@ public class SocialMediaAccount implements Secured {
 	private Date created;
 
 	@OneToMany
-	private Set<Credential> credentials;
+	private Set<Credential> credentials = new HashSet<Credential>();
 
 	@OneToOne
 	private AccessControlList accessControlList;
 
 	@Column
 	private Platform platform;
+
+	@Column
+	private String displayName;
 
 	public Set<Credential> getCredentials() {
 		return credentials;
@@ -79,5 +83,13 @@ public class SocialMediaAccount implements Secured {
 
 	public void setPlatform(Platform platform) {
 		this.platform = platform;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 }

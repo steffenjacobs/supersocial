@@ -23,7 +23,7 @@ public class FacebookHelperController {
 
 	@GetMapping(path = "/api/facebook/exchange/{accountId}/{token}")
 	public String exchangeToken(@PathVariable("accountId") String accountId, @PathVariable("token") String token) {
-		return facebookService.exchangeForPageToken(socialMediaAccountService.findById(UUID.fromString(accountId)), token);
+		return facebookService.exchangeForPageToken(socialMediaAccountService.findByIdNonDto(UUID.fromString(accountId)), token);
 	}
 
 }

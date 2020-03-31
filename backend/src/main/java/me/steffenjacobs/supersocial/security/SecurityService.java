@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 import org.ollide.spring.discourse.sso.authentication.DiscoursePrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,7 @@ public class SecurityService {
 		return (impliedAction.getMask() & action.getMask()) == impliedAction.getMask();
 	}
 
+	@Transactional
 	public void appendAcl(Secured securedObject) {
 		// retrieve or create ACL
 		AccessControlList acl = securedObject.getAccessControlList();

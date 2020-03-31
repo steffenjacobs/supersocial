@@ -75,7 +75,7 @@ public class Credential implements Secured {
 		return c;
 	}
 
-	public CredentialDTO toDTO(UserGroup userGroup) {
+	public CredentialDTO toDTO() {
 		CredentialDTO dto = new CredentialDTO();
 		dto.setDescriptor(this.descriptor);
 		dto.setValue("(omitted)");

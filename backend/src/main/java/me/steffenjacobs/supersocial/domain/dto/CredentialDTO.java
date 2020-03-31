@@ -9,9 +9,15 @@ public class CredentialDTO {
 	private String descriptor;
 	private boolean omitted;
 	private UserGroupDTO userGroup;
+	private UUID accountId;
+	private String error;
 
 	public CredentialDTO() {
 		super();
+	}
+
+	public CredentialDTO(String error) {
+		this.error = error;
 	}
 
 	public UUID getId() {
@@ -52,6 +58,22 @@ public class CredentialDTO {
 
 	public void setUserGroup(UserGroupDTO userGroup) {
 		this.userGroup = userGroup;
+	}
+
+	public UUID getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId(UUID accountId) {
+		this.accountId = accountId;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 }

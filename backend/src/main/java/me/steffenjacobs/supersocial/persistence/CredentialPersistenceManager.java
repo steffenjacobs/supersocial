@@ -17,6 +17,7 @@ import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
+import me.steffenjacobs.supersocial.service.SocialMediaAccountService;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /** @author Steffen Jacobs */
@@ -31,6 +32,9 @@ public class CredentialPersistenceManager {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private SocialMediaAccountService socialMediaAccountService;
 
 	public enum CredentialType {
 		TWITTER_API_KEY("twitter.api.key"), TWITTER_API_KEY_SECRET("twitter.api.secret"), TWITTER_ACCESS_TOKEN("twitter.api.accesstoken"), TWITTER_ACCESS_TOKEN_SECRET(
@@ -58,9 +62,8 @@ public class CredentialPersistenceManager {
 				.map(c -> new Pair<>(securityService.getFirstMatchinUserGroupForCurrentUser(c, SecuredAction.READ), c));
 	}
 
-	public Stream<Pair<UserGroup, Credential>> getAll() {
-		return securityService.filterForCurrentUser(StreamSupport.stream(credentialRepository.findAll().spliterator(), false), SecuredAction.READ)
-				.map(c -> new Pair<>(securityService.getFirstMatchinUserGroupForCurrentUser(c, SecuredAction.READ), c));
+	public Stream<Credential> getAll() {
+		return securityService.filterForCurrentUser(StreamSupport.stream(credentialRepository.findAll().spliterator(), false), SecuredAction.READ);
 	}
 
 	public Optional<Credential> getCredentialForUserGroup(UserGroup userGroup, CredentialType credentialType) {
@@ -69,18 +72,34 @@ public class CredentialPersistenceManager {
 	}
 
 	public Pair<Credential, Boolean> createOrUpdateCredential(CredentialDTO credential) {
-		if (credential.getId() == null) {
-			throw new CredentialNotFoundException(credential.getId());
-		}
 		// TODO: check create action
-		Credential cred = securityService.filterForCurrentUser(this.credentialRepository.findById(credential.getId()), SecuredAction.UPDATE).orElse(new Credential());
-		final boolean created = cred.getId() == null;
+		Optional<Credential> optCred = Optional.empty();
+		if (credential.getId() != null) {
+			optCred = this.credentialRepository.findById(credential.getId());
+			optCred.ifPresent(c -> securityService.checkIfCurrentUserIsPermitted(c, SecuredAction.UPDATE));
+		}
+
+		if (credential.getAccountId() != null) {
+			// check if account exists and user is permitted to assign new
+			// credentials to it
+			securityService.checkIfCurrentUserIsPermitted(socialMediaAccountService.findByIdNonDto(credential.getAccountId()), SecuredAction.UPDATE);
+		}
+
+		Credential cred = optCred.orElse(new Credential());
+		boolean created = credential.getId() == null;
+
 		cred.setDescriptor(credential.getDescriptor());
 		cred.setValue(credential.getValue());
+		cred = this.credentialRepository.save(cred);
 		if (created) {
 			securityService.appendAcl(cred);
 		}
-		return new Pair<>(this.credentialRepository.save(cred), created);
+
+		if (credential.getAccountId() != null) {
+			socialMediaAccountService.appendCredential(credential.getAccountId(), cred.getId());
+		}
+
+		return new Pair<>(cred, created);
 	}
 
 	public void deleteCredential(UUID id) {
@@ -91,5 +110,11 @@ public class CredentialPersistenceManager {
 		} catch (EmptyResultDataAccessException e) {
 			throw new CredentialNotFoundException(id);
 		}
+	}
+
+	public Credential findById(UUID credentialId) {
+		Credential c = credentialRepository.findById(credentialId).orElseThrow(() -> new CredentialNotFoundException(credentialId));
+		securityService.checkIfCurrentUserIsPermitted(c, SecuredAction.READ);
+		return c;
 	}
 }

@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.domain.dto.CredentialDTO;
 import me.steffenjacobs.supersocial.domain.entity.Credential;
-import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
 import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundException;
-import me.steffenjacobs.supersocial.security.SecurityService;
+import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /** @author Steffen Jacobs */
@@ -29,24 +28,24 @@ public class CredentialController {
 
 	@Autowired
 	private CredentialPersistenceManager credentialPersistenceManager;
-	
-	@Autowired
-	private SecurityService securityService;
 
 	@PutMapping(path = "/api/credential", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> createOrUpdateCredential(@RequestBody CredentialDTO credential) throws Exception {
 		try {
 			Pair<Credential, Boolean> c = credentialPersistenceManager.createOrUpdateCredential(credential);
-			return new ResponseEntity<>(c.getA().toDTO(securityService.getFirstMatchinUserGroupForCurrentUser(c.getA(), SecuredAction.UPDATE)), c.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(c.getA().toDTO(), c.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
 		} catch (CredentialNotFoundException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new CredentialDTO(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@GetMapping(path = "/api/credential", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<CredentialDTO>> getCredentials() throws Exception {
-		Set<CredentialDTO> dtos = credentialPersistenceManager.getAll().map(c -> c.getB().toDTO(c.getA())).collect(Collectors.toSet());
-		return new ResponseEntity<>(dtos, HttpStatus.OK);
+		try {
+			return new ResponseEntity<>(credentialPersistenceManager.getAll().map(Credential::toDTO).collect(Collectors.toSet()), HttpStatus.OK);
+		} catch (SocialMediaAccountNotFoundException e) {
+			return new ResponseEntity<>(Set.of(new CredentialDTO(e.getMessage())), HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping(path = "/api/credential/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +54,7 @@ public class CredentialController {
 			credentialPersistenceManager.deleteCredential(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (CredentialNotFoundException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new CredentialDTO(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 }
