@@ -26,11 +26,13 @@ public class PostDTO {
 
 	private String error;
 
+	private UUID accountId;
+
 	public PostDTO(String error) {
 		this.error = error;
 	}
 
-	protected PostDTO(UUID id, String text, int platformId, Date created, String creatorName, String errorMessage, String postUrl, Date published) {
+	protected PostDTO(UUID id, String text, int platformId, Date created, String creatorName, String errorMessage, String postUrl, Date published, UUID accountId) {
 		super();
 		this.id = id;
 		this.text = text;
@@ -40,6 +42,7 @@ public class PostDTO {
 		this.errorMessage = errorMessage;
 		this.postUrl = postUrl;
 		this.published = published;
+		this.accountId = accountId;
 	}
 
 	public UUID getId() {
@@ -82,17 +85,27 @@ public class PostDTO {
 		return error;
 	}
 
-	public static PostDTO fromPost(Post post, String url) {
-		return new PostDTO(post.getId(), post.getText(), post.getSocialMediaAccountToPostWith().getPlatform().getId(), post.getCreated(), post.getCreator().getName(),
-				post.getErrorMessage(), url, post.getPublished());
+	public UUID getAccountId() {
+		return accountId;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PostDTO [id=").append(id).append(", text=").append(text).append(", platformId=").append(platformId).append(", created=").append(created)
-				.append(", published=").append(published).append(", creatorName=").append(creatorName).append(", errorMessage=").append(errorMessage).append(", postUrl=")
-				.append(postUrl).append("]");
-		return builder.toString();
+	public static PostDTO fromPost(Post post, String url) {
+		return new PostDTO(post.getId(), post.getText(), post.getSocialMediaAccountToPostWith().getPlatform().getId(), post.getCreated(), post.getCreator().getName(),
+				post.getErrorMessage(), url, post.getPublished(), post.getSocialMediaAccountToPostWith().getId());
 	}
+
+	public PostDTO(UUID id, String text, int platformId, Date created, Date published, String creatorName, String errorMessage, String postUrl, String error, UUID accountId) {
+		super();
+		this.id = id;
+		this.text = text;
+		this.platformId = platformId;
+		this.created = created;
+		this.published = published;
+		this.creatorName = creatorName;
+		this.errorMessage = errorMessage;
+		this.postUrl = postUrl;
+		this.error = error;
+		this.accountId = accountId;
+	}
+
 }

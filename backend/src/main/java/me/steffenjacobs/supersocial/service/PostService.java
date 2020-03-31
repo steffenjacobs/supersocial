@@ -63,6 +63,7 @@ public class PostService {
 				.map(this::addSchedulingInformationIfAvailable).collect(Collectors.toSet());
 	}
 
+
 	private PostDTO addSchedulingInformationIfAvailable(PostDTO post) {
 		if (post.getPublished() != null || !StringUtils.isEmpty(post.getErrorMessage())) {
 			return post;
