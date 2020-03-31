@@ -1,4 +1,4 @@
-export enum EventBusEventType { SELECTED_POST_CHANGED, REFRESH_POSTS, USER_CHANGE };
+export enum EventBusEventType { SELECTED_POST_CHANGED, REFRESH_POSTS, USER_CHANGE, REFRESH_SOCIAL_MEDIA_ACCOUNTS, SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED };
 
 /** Event Bus where listeners can be registered and events can be fired to avoid endless callbacks. */
 export class EventBus {

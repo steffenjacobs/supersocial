@@ -54,7 +54,7 @@ export class LoginManager {
             .then(response => {
                 if (response.ok) {
                     response.json().then(data => {
-                        this.updateLoginStatus({ loggedIn: true, username: data.name });
+                        this.updateLoginStatus({ loggedIn: true, username: data.username });
                     });
                 } else {
                     this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });

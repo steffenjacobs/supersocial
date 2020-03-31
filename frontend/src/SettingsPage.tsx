@@ -1,6 +1,7 @@
 import * as React from "react";
 import { EventBus } from "./EventBus";
 import { CredentialSettingsTile } from "./CredentialSettingsTile";
+import { SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
 
 export interface Props {
     eventBus: EventBus
@@ -16,7 +17,7 @@ export class SettingsPage extends React.Component<Props, Props>{
     public render() {
         return (
             <div>
-                <CredentialSettingsTile credentials={[]} eventBus={this.state.eventBus} />
+                <SocialMediaAccountsListTile accounts={[]} eventBus={this.state.eventBus} />
             </div>
         );
     }

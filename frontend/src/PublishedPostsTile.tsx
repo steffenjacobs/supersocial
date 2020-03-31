@@ -9,7 +9,7 @@ import { DeploymentManager } from "./DeploymentManager";
 import moment from "moment";
 
 export interface PublishedPost {
-    id: number
+    id: string
     text: string
     platformId: number
     created: Date
@@ -18,6 +18,7 @@ export interface PublishedPost {
     postUrl?: string
     published: Date
     scheduled?: Date
+    error: string
 }
 
 export interface PublishedPosts {
