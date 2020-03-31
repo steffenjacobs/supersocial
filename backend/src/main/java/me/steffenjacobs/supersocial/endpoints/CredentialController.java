@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import me.steffenjacobs.supersocial.util.Pair;
 /** @author Steffen Jacobs */
 @RestController
 public class CredentialController {
+	private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(CredentialController.class);
 
 	@Autowired
 	private CredentialPersistenceManager credentialPersistenceManager;
@@ -32,6 +34,7 @@ public class CredentialController {
 	@PutMapping(path = "/api/credential", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> createOrUpdateCredential(@RequestBody CredentialDTO credential) throws Exception {
 		try {
+			LOG.info("Creating or updating credential {} for account {}.", credential.getDescriptor(), credential.getAccountId());
 			Pair<Credential, Boolean> c = credentialPersistenceManager.createOrUpdateCredential(credential);
 			return new ResponseEntity<>(c.getA().toDTO(), c.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
 		} catch (CredentialNotFoundException e) {
@@ -41,6 +44,7 @@ public class CredentialController {
 
 	@GetMapping(path = "/api/credential", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<CredentialDTO>> getCredentials() throws Exception {
+		LOG.info("Retrieving all credentials.");
 		try {
 			return new ResponseEntity<>(credentialPersistenceManager.getAll().map(Credential::toDTO).collect(Collectors.toSet()), HttpStatus.OK);
 		} catch (SocialMediaAccountNotFoundException e) {
@@ -50,6 +54,7 @@ public class CredentialController {
 
 	@DeleteMapping(path = "/api/credential/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> deleteCredential(@PathVariable(name = "id") UUID id) {
+		LOG.info("Deleting credential {}.", id);
 		try {
 			credentialPersistenceManager.deleteCredential(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);

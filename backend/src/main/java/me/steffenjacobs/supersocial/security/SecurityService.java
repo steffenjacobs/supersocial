@@ -42,6 +42,9 @@ public class SecurityService {
 	private UserService userService;
 
 	public SupersocialUser getCurrentUser() {
+		if(SecurityContextHolder.getContext().getAuthentication() == null) {
+			return createAnonymousUser();
+		}
 		Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		if (user instanceof SupersocialUser) {
@@ -75,6 +78,7 @@ public class SecurityService {
 
 	private SupersocialUser createAnonymousUser() {
 		SupersocialUser anonymousUser = new SupersocialUser();
+		anonymousUser.setName("Anonymous");
 		anonymousUser.setLoginProvider(LoginProvider.NONE);
 		return anonymousUser;
 	}

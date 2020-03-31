@@ -74,7 +74,9 @@ public class SocialMediaAccountService {
 		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.UPDATE);
 
 		Credential credential = credentialPersistenceManager.findById(credentialId);
-		// permission + existance check already done
+		securityService.checkIfCurrentUserIsPermitted(credential, SecuredAction.UPDATE);
+
+		credential = credentialPersistenceManager.appendToAccount(credential, account);
 
 		account.getCredentials().add(credential);
 

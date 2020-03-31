@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial.domain.dto;
 
+import java.util.Date;
 import java.util.UUID;
 
 /** @author Steffen Jacobs */
@@ -11,6 +12,7 @@ public class CredentialDTO {
 	private UserGroupDTO userGroup;
 	private UUID accountId;
 	private String error;
+	private Date created;
 
 	public CredentialDTO() {
 		super();
@@ -74,6 +76,14 @@ public class CredentialDTO {
 
 	public void setError(String error) {
 		this.error = error;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
 }

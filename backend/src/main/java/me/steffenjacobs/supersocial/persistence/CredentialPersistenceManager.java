@@ -14,6 +14,7 @@ import me.steffenjacobs.supersocial.domain.CredentialRepository;
 import me.steffenjacobs.supersocial.domain.dto.CredentialDTO;
 import me.steffenjacobs.supersocial.domain.entity.Credential;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
+import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
@@ -116,5 +117,10 @@ public class CredentialPersistenceManager {
 		Credential c = credentialRepository.findById(credentialId).orElseThrow(() -> new CredentialNotFoundException(credentialId));
 		securityService.checkIfCurrentUserIsPermitted(c, SecuredAction.READ);
 		return c;
+	}
+
+	public Credential appendToAccount(Credential credential, SocialMediaAccount account) {
+		credential.setAccount(account);
+		return credentialRepository.save(credential);
 	}
 }

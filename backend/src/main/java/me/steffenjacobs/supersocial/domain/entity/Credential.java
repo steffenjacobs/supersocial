@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,6 +41,9 @@ public class Credential implements Secured {
 	@OneToOne
 	private AccessControlList accessControlList;
 
+	@ManyToOne
+	private SocialMediaAccount account;
+
 	public Credential() {
 	}
 
@@ -67,6 +71,14 @@ public class Credential implements Secured {
 		this.descriptor = descriptor;
 	}
 
+	public SocialMediaAccount getAccount() {
+		return account;
+	}
+
+	public void setAccount(SocialMediaAccount account) {
+		this.account = account;
+	}
+
 	public static Credential fromDto(CredentialDTO dto) {
 		Credential c = new Credential();
 		c.setDescriptor(dto.getDescriptor());
@@ -81,6 +93,8 @@ public class Credential implements Secured {
 		dto.setValue("(omitted)");
 		dto.setId(this.id);
 		dto.setOmitted(true);
+		dto.setAccountId(this.getAccount() != null ? this.getAccount().getId() : null);
+		dto.setCreated(this.getCreated());
 		return dto;
 	}
 
