@@ -73,7 +73,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
             return <td className="centered tooltip x-gray">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
         }
         else {
-            return <td className="centered">{this.getSocialmediaIcon(platformId)}</td>;
+            return <td className="centered icon-medium">{this.getSocialmediaIcon(platformId)}</td>;
         }
     }
 

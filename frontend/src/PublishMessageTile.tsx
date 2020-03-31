@@ -6,22 +6,47 @@ import './react-datetime.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { DeploymentManager } from "./DeploymentManager";
 import Datetime from 'react-datetime';
+import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
+import { ImageProvider } from "./ImageProvider";
+
+export interface PublishMessageTileState {
+    sendTextForm: SendTextForm
+    accounts: SocialMediaAccount[]
+    eventBus: EventBus
+}
 
 export interface SendTextForm {
     message: string
-    platforms: Set<string>
-    eventBus: EventBus
+    accountIds: string[]
     schedule: boolean
     scheduled: Date
 }
 
 /** Contains a form to publish new messages. */
-export class PublishMessageTile extends React.Component<SendTextForm, SendTextForm>{
-    constructor(props: SendTextForm, state: SendTextForm) {
+export class PublishMessageTile extends React.Component<PublishMessageTileState, PublishMessageTileState>{
+    constructor(props: PublishMessageTileState, state: PublishMessageTileState) {
         super(props);
-        this.state = { message: props.message, platforms: props.platforms, eventBus: props.eventBus, scheduled: props.scheduled, schedule: props.schedule };
+        this.state = { sendTextForm: props.sendTextForm, accounts: props.accounts, eventBus: props.eventBus };
 
         this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData?) => this.selectPost(eventData));
+        this.refreshAccounts();
+        this.state.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, this.refreshAccounts.bind(this));
+    }
+
+    private refreshAccounts() {
+        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
+            method: 'get',
+            credentials: 'include',
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    console.error("Could not fetch data: 401");
+                } else {
+                    response.json().then(data => this.setState({
+                        accounts: data
+                    }));
+                }
+            });
     }
 
     /** Event handler for when a post had been selected, e.g. via PublishedPostsTile.tsx */
@@ -29,53 +54,56 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
         var platforms = new Set<string>();
         platforms.add("" + eventData.platformId);
         this.setState({
-            message: eventData.text,
-            platforms: platforms,
-            eventBus: this.state.eventBus,
-            schedule: eventData.scheduled?true:false,
-            scheduled: eventData.scheduled?eventData.scheduled:new Date()
+            sendTextForm: {
+                message: eventData.text,
+                accountIds: eventData.accountIds,
+                schedule: eventData.scheduled ? true : false,
+                scheduled: eventData.scheduled ? eventData.scheduled : new Date()
+            }
         });
     }
 
     private createPost(callback?: Function) {
-        fetch(DeploymentManager.getUrl() + 'api/post', {
-            method: 'PUT',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            }),
-            credentials: 'include',
-            body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
-        })
-            .then(response => {
-                return response.json();
+        this.state.sendTextForm.accountIds.forEach(accId => {
+            fetch(DeploymentManager.getUrl() + 'api/post', {
+                method: 'PUT',
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                }),
+                credentials: 'include',
+                body: JSON.stringify({ message: this.state.sendTextForm.message, accountId: accId })
             })
-            .then(data => {
-                console.log("Result: " + data);
-                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
-                if (callback) {
-                    data.forEach(element => {
-                        callback(element.id);
-                    });
-                }
-            });
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Result: " + data);
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                    if (callback) {
+                        callback(data.id);
+                    }
+                });
+        });
     }
 
     private createAndPublishPost() {
-        fetch(DeploymentManager.getUrl() + 'api/publish', {
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            }),
-            credentials: 'include',
-            body: JSON.stringify({ message: this.state.message, platforms: Array.from(this.state.platforms.values()) })
-        })
-            .then(response => {
-                response.json();
+        this.state.sendTextForm.accountIds.forEach(accId => {
+            fetch(DeploymentManager.getUrl() + 'api/publish', {
+                method: 'POST',
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                }),
+                credentials: 'include',
+                body: JSON.stringify({ message: this.state.sendTextForm.message, accountId: accId })
             })
-            .then(data => {
-                console.log("Result: " + data);
-                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
-            });
+                .then(response => {
+                    response.json();
+                })
+                .then(data => {
+                    console.log("Result: " + data);
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                });
+        })
     }
 
     private createScheduledPost(postId: string) {
@@ -85,7 +113,7 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                 'Content-Type': 'application/json'
             }),
             credentials: 'include',
-            body: JSON.stringify({ postId: postId, scheduled: this.state.scheduled })
+            body: JSON.stringify({ postId: postId, scheduled: this.state.sendTextForm.scheduled })
         })
             .then(response => {
                 response.json();
@@ -98,65 +126,49 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
 
     /** Send the request to the back end triggerin a post on the selected platforms. */
     private send() {
-        if (this.state.schedule) {
+        if (this.state.sendTextForm.schedule) {
             this.createPost(this.createScheduledPost.bind(this));
-        }
-        else {
-            if (this.state.platforms.size === 0) {
-                this.createPost();
-            } else {
-                this.createAndPublishPost();
-            }
+        } else {
+            this.createAndPublishPost();
         }
         this.setState({
-            message: "",
-            platforms: new Set<string>(),
-            eventBus: this.state.eventBus,
-            schedule: false,
-            scheduled: new Date()
+            sendTextForm: {
+                message: "",
+                accountIds: [],
+                schedule: false,
+                scheduled: new Date()
+            }
         });
     }
 
     private formTextAreaUpdated(event: React.ChangeEvent<HTMLTextAreaElement>) {
-        this.update(event.currentTarget.id, event.currentTarget.value);
+        this.setState({
+            sendTextForm: {
+                message: event.currentTarget.value,
+                schedule: this.state.sendTextForm.schedule,
+                scheduled: this.state.sendTextForm.scheduled,
+                accountIds: this.state.sendTextForm.accountIds
+            }
+        });
     }
 
     private formInputFieldUpdated(event: React.ChangeEvent<HTMLInputElement>) {
-        this.update(event.currentTarget.id, "" + event.currentTarget.checked);
-    }
-
-    private update(id: string, value: string) {
-        if (id === "textMsg") {
-            this.setState({
-                message: value,
-                platforms: this.state.platforms,
-                eventBus: this.state.eventBus,
-                schedule: this.state.schedule,
-                scheduled: this.state.scheduled
-            });
-        }
-        if (id === "1" || id === "2") {
-            this.updateCheckbox(id, value === "true");
-        }
-    }
-
-    private updateCheckbox(id: string, value: boolean) {
-        var platforms = this.state.platforms;
-        if (!platforms) {
-            platforms = new Set<string>();
-        }
-        if (value) {
-            platforms.add(id);
+        var ids = Object.assign([], this.state.sendTextForm.accountIds);
+        if (event.currentTarget.checked) {
+            ids.push(event.currentTarget.id);
         } else {
-            platforms.delete(id);
+            const index = ids.indexOf(event.currentTarget.id, 0);
+            if (index > -1) {
+                ids.splice(index, 1);
+            }
         }
-
         this.setState({
-            message: this.state.message,
-            platforms: platforms,
-            eventBus: this.state.eventBus,
-            schedule: this.state.schedule,
-            scheduled: this.state.scheduled
+            sendTextForm: {
+                message: this.state.sendTextForm.message,
+                schedule: this.state.sendTextForm.schedule,
+                scheduled: this.state.sendTextForm.scheduled,
+                accountIds: ids
+            }
         });
     }
 
@@ -169,30 +181,42 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
 
     private updateSchedulingMode(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
-            message: this.state.message,
-            platforms: this.state.platforms,
-            eventBus: this.state.eventBus,
-            schedule: event.currentTarget.checked,
-            scheduled: this.state.scheduled
+            sendTextForm: {
+                message: this.state.sendTextForm.message,
+                schedule: event.currentTarget.checked,
+                scheduled: this.state.sendTextForm.scheduled,
+                accountIds: this.state.sendTextForm.accountIds
+            }
         });
     }
 
     onDateChange = date => this.setState({
-        message: this.state.message,
-        platforms: this.state.platforms,
-        eventBus: this.state.eventBus,
-        schedule: true,
-        scheduled: date
+        sendTextForm: {
+            message: this.state.sendTextForm.message,
+            schedule: true,
+            scheduled: date,
+            accountIds: this.state.sendTextForm.accountIds
+        }
     })
 
     public render() {
         var checkBoxSchedule;
-        if (this.state.schedule) {
+        if (this.state.sendTextForm.schedule) {
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} checked />
         } else {
 
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} />
         }
+
+        const accounts = this.state.accounts.sort(
+            (a1, a2) => a1.id.localeCompare(a2.id))
+            .map(elem => (<div>
+                {this.createCheckbox(elem.id, this.state.sendTextForm.accountIds.includes(elem.id))}
+                <span className="icon-intext">{ImageProvider.getSocialmediaIcon(elem.platformId)}</span>
+                <span>Distribute via {elem.displayName}</span>
+            </div>)
+            );
+
         return (
             <div className="container">
                 <div className="box-header">
@@ -202,23 +226,16 @@ export class PublishMessageTile extends React.Component<SendTextForm, SendTextFo
                     <div>
                         <div className="messageLabel">Message</div>
                         <div>
-                            <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} value={this.state.message} />
+                            <textarea className="textarea" placeholder="Enter your message here." id="textMsg" onChange={this.formTextAreaUpdated.bind(this)} value={this.state.sendTextForm.message} />
                         </div>
                     </div>
 
                     <div className="messageLabel">Schedule Publishing</div>
                     {checkBoxSchedule}
-                    <Datetime dateFormat="YYYY-MM-DD" timeFormat="HH:mm" closeOnSelect={true} onChange={this.onDateChange} value={this.state.scheduled} />
+                    <Datetime dateFormat="YYYY-MM-DD" timeFormat="HH:mm" closeOnSelect={true} onChange={this.onDateChange} value={this.state.sendTextForm.scheduled} />
                     <div className="channel-selection">
                         <div className="messageLabel">Distribution Channels</div>
-                        <div>
-                            {this.createCheckbox("1", this.state.platforms.has("1"))}
-                            <span>Distribute via Facebook</span>
-                        </div>
-                        <div>
-                            {this.createCheckbox("2", this.state.platforms.has("2"))}
-                            <span>Distribute via Twitter</span>
-                        </div>
+                        {accounts}
                     </div>
                     <button
                         className="btn btn-primary send-button"

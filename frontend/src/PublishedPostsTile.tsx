@@ -19,6 +19,7 @@ export interface PublishedPost {
     published: Date
     scheduled?: Date
     error: string
+    accountId: string
 }
 
 export interface PublishedPosts {
@@ -61,25 +62,12 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
             });
     }
 
-    /** @returns a social media icon for a given platform identifier. */
-    private getSocialmediaIcon(platformId: number) {
-        if (platformId === 1) {
-            return ImageProvider.getImage("facebook-logo");
-        }
-        else if (platformId === 2) {
-            return ImageProvider.getImage("twitter-logo");
-        }
-        else {
-            return ImageProvider.getImage("none-logo");
-        }
-    }
-
     private createPlatformElement(platformId: number){
         if(platformId === 0){
             return <td className="centered tooltip x-gray">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
         }
         else{
-            return <td className="centered">{this.getSocialmediaIcon(platformId)}</td>;
+            return <td className="centered icon-medium">{ImageProvider.getSocialmediaIcon(platformId)}</td>;
         }
     }
 

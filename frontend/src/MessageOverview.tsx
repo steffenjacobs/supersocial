@@ -11,13 +11,15 @@ export interface Props {
 export class MessageOverview extends React.Component<Props, Props>{
     constructor(props: Props, state: Props) {
         super(props);
-        this.state = {eventBus: props.eventBus};
+        this.state = { eventBus: props.eventBus };
     }
 
     public render() {
         return (
             <div>
-                <PublishMessageTile message="" platforms={new Set<string>()} eventBus={this.state.eventBus} schedule={false} scheduled={new Date()}/>
+                <PublishMessageTile eventBus={this.state.eventBus} accounts={[]} sendTextForm={{
+                    message: "", accountIds: [], schedule: false, scheduled: new Date()
+                }} />
                 <div className="vspacer" />
                 <PublishedPostsTile posts={[]} eventBus={this.state.eventBus} />
             </div>

@@ -2,13 +2,28 @@ import React from "react";
 
 export class ImageProvider {
 
+    
+
+    /** @returns a social media icon for a given platform identifier. */
+    static getSocialmediaIcon(platformId: number) {
+        if (platformId === 1) {
+            return ImageProvider.getImage("facebook-logo");
+        }
+        else if (platformId === 2) {
+            return ImageProvider.getImage("twitter-logo");
+        }
+        else {
+            return ImageProvider.getImage("none-logo");
+        }
+    }
+
     static getImage(id: string): JSX.Element {
         switch (id) {
 
             //Facebook Logo
             case "facebook-logo":
                 return <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                    width="1.5em" height="1.5em" viewBox="0 0 266.893 266.895">
+                    viewBox="0 0 266.893 266.895">
                     <path id="Blue_1_" fill="#3C5A99" d="M248.082,262.307c7.854,0,14.223-6.369,14.223-14.225V18.812
 	c0-7.857-6.368-14.224-14.223-14.224H18.812c-7.857,0-14.224,6.367-14.224,14.224v229.27c0,7.855,6.366,14.225,14.224,14.225
 	H248.082z"/>
@@ -18,14 +33,14 @@ export class ImageProvider {
                 </svg>;
 
             //Twitter Logo
-            case "twitter-logo": return <svg width="1.5em" height="1.5em" version="1.0" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED"
+            case "twitter-logo": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED"
                 data-name="Logo — FIXED" viewBox="90 90 240 240">
                 <path fill="#1da1f2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23" />
             </svg>;
 
             //X Logo
             case "none-logo": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                width="1.5em" height="1.5em" viewBox="0 0 1280.000000 1280.000000">
+               viewBox="0 0 1280.000000 1280.000000">
                 <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"
                     fill="#d94f4f">
                     <path d="M1327 11473 l-1327 -1328 1872 -1872 1873 -1873 -1873 -1873 -1872
