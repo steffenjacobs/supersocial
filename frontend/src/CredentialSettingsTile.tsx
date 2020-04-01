@@ -65,7 +65,7 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
                     descriptor: c.descriptor,
                     value: c.value,
                     accountId: this.state.account.id,
-                    id: c.id.startsWith("fe_id_")?"":c.id
+                    id: c.id.startsWith("fe_id_") ? "" : c.id
                 })
             })
                 .then(data => {
@@ -73,6 +73,31 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
                     this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
                 });
         });
+    }
+
+    private saveDisplayName() {
+        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount/' + this.state.account.id, {
+            method: 'PUT',
+            credentials: 'include',
+
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                id: this.state.account.id,
+                displayName: this.state.account.displayName,
+                platformId: this.state.account.platformId
+            })
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                this.setState({
+                    eventBus: this.state.eventBus,
+                    account: data
+                });
+            });
     }
 
     private removeCredential(credentialId: string) {
@@ -87,6 +112,17 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
 
     private updateStateIfNecessary(property: string, id: string, value: string) {
         if (!id.startsWith(property)) {
+            if (id === "displayName") {
+                this.setState({
+                    account: {
+                        credentials: this.state.account.credentials,
+                        id: this.state.account.id,
+                        platformId: this.state.account.platformId,
+                        displayName: value,
+                        error: this.state.account.error
+                    }
+                });
+            }
             return;
         }
 
@@ -170,9 +206,15 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
         return (
             <div className="container double-container" >
                 <div className="box-header">
-                    Stored Credentials {this.state.account.displayName}
+                    Account Details for {this.state.account.displayName}
                 </div>
                 <div className="box-content">
+                    <div className="credential">
+                        <div className="credentialLabel">Display Name: </div>
+                        <input className="credentialField textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id="displayName" type="text" value={this.state.account.displayName} />
+                        <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
+                    </div>
+                    <div className="displayName">Credentials: </div>
                     {elems}
                     <div className="btn btn-icon btn-add btn-icon-big">
                         <div className="btn-add-inner" onClick={this.addCredential.bind(this)} >{ImageProvider.getImage("add-icon")}</div>

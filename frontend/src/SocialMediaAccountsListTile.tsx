@@ -85,18 +85,22 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, account);
     }
 
+    private addAccount() {
+
+    }
+
     public render() {
         const accounts = this.state.accounts.sort(
             (p1, p2) => p1.displayName.localeCompare(p2.displayName)).map(elem => {
 
-            return (
-                <tr key={elem.id} onClick={() => this.selectAccount(elem)}>
-                    {this.createPlatformElement(elem.platformId)}
-                    <td>{elem.displayName}</td>
-                    <td>{elem.credentials.length}</td>
-                </tr>
-            );
-        });
+                return (
+                    <tr key={elem.id} onClick={() => this.selectAccount(elem)}>
+                        {this.createPlatformElement(elem.platformId)}
+                        <td>{elem.displayName}</td>
+                        <td>{elem.credentials.length}</td>
+                    </tr>
+                );
+            });
 
         let classUpdating = ["inline-block", "btn-icon"]
         if (this.state.updating) {
@@ -107,7 +111,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
 
         return (
             <div>
-                <div className="container double-container inline">
+                <div className="container inline-block">
                     <div className="box-header box-header-with-icon">
                         <div className="inline-block">All Accounts</div>
                         <div
@@ -118,7 +122,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                         </div>
                     </div>
                     <div className="box-content">
-                        <table>
+                        <table className="table">
                             <thead>
                                 <tr>
                                     <th>Platform</th>
@@ -131,8 +135,12 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                             </tbody>
 
                         </table>
+                        <div className="btn btn-icon btn-add btn-icon-big btn-margins">
+                            <div className="btn-add-inner" onClick={this.addAccount.bind(this)} >{ImageProvider.getImage("add-icon")}</div>
+                        </div>
                     </div>
                 </div >
+
                 {accountSettings}
             </div>
         );

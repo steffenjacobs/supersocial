@@ -71,7 +71,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
                         <input className="textarea" placeholder="Enter Username" id="username" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.username} />
 
                         <div className="messageLabel">Password</div>
-                        <input type="password" className="textarea" placeholder="Enter Password" id="password" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
+                        <input type="password" className="textarea" placeholder="Enter Password" id="password" onKeyDown={this.signIn.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
                     </div>
                         <span>Not registered yet? Click <a href="/register">here</a> to sign up.</span>
                     <button

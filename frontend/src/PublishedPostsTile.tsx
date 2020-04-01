@@ -58,6 +58,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                             return d;
                         }), updating: false
                     }));
+                    console.log(this.state);
                 }
             });
     }
@@ -119,7 +120,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
         }
 
         return (
-            <div className="container double-container inline">
+            <div className="container double-container inline-block">
                 <div className="box-header box-header-with-icon">
                     <div className="inline-block">All Posts</div>
                     <div
@@ -130,7 +131,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                     </div>
                 </div>
                 <div className="box-content">
-                    <table>
+                    <table className="table">
                         <thead>
                             <tr>
                                 <th>Status</th>

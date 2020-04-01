@@ -45,6 +45,11 @@
     fill: rgb(182, 48, 48);
 }
 
+.btn-margins {
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+
 .monospace-font {
     font-family: "Courier New", Courier, monospace;
 }
@@ -156,4 +161,8 @@ table tr:nth-child(odd) {
     height: 1em;
     margin-left: .25em;
     margin-right: .25em;
+}
+
+.table {
+    background-color: white;
 }
