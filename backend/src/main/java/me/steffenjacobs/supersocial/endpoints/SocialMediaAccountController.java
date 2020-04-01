@@ -50,7 +50,7 @@ public class SocialMediaAccountController {
 
 	@PutMapping(path = "/api/socialmediaaccount", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SocialMediaAccountDTO> createOrUpdateSocialMediaAccount(@RequestBody SocialMediaAccountDTO creationDto) throws Exception {
-		LOG.info("Creating new social media account {}", creationDto);
+		LOG.info("Creating or updating social media account {}", creationDto);
 		try {
 			final Pair<Boolean, SocialMediaAccountDTO> acc = socialMediaAccountService.createOrUpdateSocialMediaAccount(creationDto);
 			return new ResponseEntity<>(acc.getB(), acc.getA() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);

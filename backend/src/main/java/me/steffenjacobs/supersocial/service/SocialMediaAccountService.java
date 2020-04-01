@@ -50,14 +50,15 @@ public class SocialMediaAccountService {
 
 	public Pair<Boolean, SocialMediaAccountDTO> createOrUpdateSocialMediaAccount(SocialMediaAccountDTO creationDto) {
 		Optional<SocialMediaAccount> optAccount = Optional.empty();
-		boolean created = false;
 		if (creationDto.getId() != null) {
 			optAccount = socialMediaAccountRepository.findById(creationDto.getId());
 			optAccount.ifPresent(a -> securityService.checkIfCurrentUserIsPermitted(a, SecuredAction.UPDATE));
 		}
 		SocialMediaAccount acc = optAccount.orElse(createNewSocialMediaAccount(Platform.fromId(creationDto.getPlatformId()), creationDto.getDisplayName()));
-		created = acc.getId() == null;
-		return new Pair<>(created, createPrunedDTO(acc));
+		acc.setDisplayName(creationDto.getDisplayName());
+		acc.setPlatform(Platform.fromId(creationDto.getPlatformId()));
+		boolean created = acc.getId() == null;
+		return new Pair<>(created, createPrunedDTO(socialMediaAccountRepository.save(acc)));
 	}
 
 	private SocialMediaAccount createNewSocialMediaAccount(Platform platform, String displayName) {
