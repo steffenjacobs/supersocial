@@ -1,12 +1,16 @@
-.credentialLabel {
+.credential-label {
     width: 8em;
     display: inline-block;
     font-size: 9pt;
 }
 
-.credentialField {
+.credential-field {
     width: 35em;
     display: inline-block;
+}
+
+.credential-field-select {
+    width: 36em;
 }
 
 .btn-credentials {

@@ -1,7 +1,7 @@
 .btn {
     background-color: white;
     color: #3498db;
-    border-radius: 0.3125rem;
+    border-radius: .25rem;
     box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.2);
     height: 2em;
     cursor: pointer;
@@ -48,6 +48,18 @@
 .btn-margins {
     margin-top: .5em;
     margin-bottom: .5em;
+}
+
+.btn-small{
+    color: #545c60;
+    fill: #545c60;
+    cursor: pointer;
+    transition: 200ms;
+}
+
+.btn-small:hover{
+    color: #111;
+    fill: #111;
 }
 
 .monospace-font {
@@ -163,6 +175,32 @@ table tr:nth-child(odd) {
     margin-right: .25em;
 }
 
+.table-icon{    
+    margin-left:.25em;
+    margin-right:.25em;
+}
+
+.table-icon > span > svg{
+    cursor: pointer;
+    width: 1.25em;
+    height: 1.25em;
+    fill: #555;
+}
+.table-icon > span :hover{
+    fill: #111;
+}
+.table-icon-del > span > svg{
+    fill: rgb(185, 139, 139);
+    transition: 200ms;
+}
+.table-icon-del > span :hover{
+    fill: #d94f4f;
+}
+
 .table {
     background-color: white;
+}
+
+.table-text-column {
+    min-width: 15em;
 }

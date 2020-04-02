@@ -78,6 +78,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                 .then(response => {
                     if (!response.ok) {
                         ToastManager.showErrorToast(response);
+                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     } else {
                         ToastManager.showSuccessToast("Created unpublished toast.");
                         response.json().then(data => {
@@ -105,6 +106,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                 .then(response => {
                     if (!response.ok) {
                         ToastManager.showErrorToast(response);
+                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     } else {
                         ToastManager.showSuccessToast("Created and immediately published post.");
                         response.json().then(data => {
@@ -128,6 +130,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
             .then(response => {
                 if (!response.ok) {
                     ToastManager.showErrorToast(response);
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                 } else {
                     response.json().then(data => {
                         console.log("Schedule result: " + data);
@@ -225,7 +228,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         const accounts = this.state.accounts.sort(
             (a1, a2) => a1.id.localeCompare(a2.id))
             .map(elem => (<div>
-                {this.createCheckbox(elem.id, this.state.sendTextForm.accountIds.includes(elem.id))}
+                {this.createCheckbox(elem.id, this.state.sendTextForm.accountIds && this.state.sendTextForm.accountIds.includes(elem.id))}
                 <span className="icon-intext">{ImageProvider.getSocialmediaIcon(elem.platformId)}</span>
                 <span>Distribute via {elem.displayName}</span>
             </div>)

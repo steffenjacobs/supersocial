@@ -1,6 +1,6 @@
 import * as React from "react";
 import './PublishMessageTile.css';
-import './CredentialSettingsTile.css';
+import './AccountDetailsTile.css';
 import './UiTile.css';
 import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
@@ -9,8 +9,9 @@ import { ImageProvider } from "./ImageProvider";
 import { SocialMediaAccount, SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
 import { SSL_OP_PKCS1_CHECK_1 } from "constants";
 import { ToastManager } from "./ToastManager";
+import { EntityUtil } from "./EntityUtil";
 
-export interface CredentialSetting {
+export interface AccountDetailsProps {
     account: SocialMediaAccount,
     eventBus: EventBus
 }
@@ -24,8 +25,8 @@ export interface Credential {
 }
 
 /** Contains a form to publish new messages. */
-export class CredentialSettingsTile extends React.Component<CredentialSetting, CredentialSetting>{
-    constructor(props: CredentialSetting) {
+export class AccountDetailsTile extends React.Component<AccountDetailsProps, AccountDetailsProps>{
+    constructor(props: AccountDetailsProps) {
         super(props);
         this.state = { eventBus: props.eventBus, account: props.account };
         this.fetchCredentials();
@@ -33,12 +34,17 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
     }
 
     private updateSelected(type: EventBusEventType, data: any) {
-        this.setState({
-            account: data
-        });
+        if (data && data.id === this.state.account.id) {
+            this.setState({
+                account: data
+            });
+        }
     }
 
     private fetchCredentials() {
+        if (EntityUtil.isGeneratedId(this.state.account.id)) {
+            return;
+        }
         fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount/' + this.state.account.id, {
             method: 'GET',
             credentials: 'include',
@@ -58,6 +64,15 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
     }
 
     private saveCredential(credentialId: string) {
+        if (EntityUtil.isGeneratedId(this.state.account.id)) {
+            this.saveDisplayName(() => this.saveCredentialNoCheck(credentialId));
+        } else {
+            this.saveCredentialNoCheck(credentialId);
+        }
+
+    }
+
+    private saveCredentialNoCheck(credentialId: string) {
         this.state.account.credentials.filter(cr => cr.id === credentialId).forEach(c => {
             fetch(DeploymentManager.getUrl() + 'api/credential', {
                 method: 'PUT',
@@ -69,7 +84,7 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
                     descriptor: c.descriptor,
                     value: c.value,
                     accountId: this.state.account.id,
-                    id: c.id.startsWith("fe_id_") ? "" : c.id
+                    id: EntityUtil.isGeneratedId(c.id) ? "" : c.id
                 })
             })
                 .then(response => {
@@ -84,8 +99,8 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
         });
     }
 
-    private saveDisplayName() {
-        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount/' + this.state.account.id, {
+    private saveDisplayName(callback?: any) {
+        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
             method: 'PUT',
             credentials: 'include',
 
@@ -93,7 +108,7 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
                 'Content-Type': 'application/json'
             }),
             body: JSON.stringify({
-                id: this.state.account.id,
+                id: EntityUtil.isGeneratedId(this.state.account.id) ? "" : this.state.account.id,
                 displayName: this.state.account.displayName,
                 platformId: this.state.account.platformId
             })
@@ -108,6 +123,10 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
                             eventBus: this.state.eventBus,
                             account: data
                         });
+                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, undefined);
+                        if (callback) {
+                            callback();
+                        }
                     });
                 }
             })
@@ -129,22 +148,33 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
             });
     }
 
-    private updateStateIfNecessary(property: string, id: string, value: string) {
-        if (!id.startsWith(property)) {
-            if (id === "displayName") {
-                this.setState({
-                    account: {
-                        credentials: this.state.account.credentials,
-                        id: this.state.account.id,
-                        platformId: this.state.account.platformId,
-                        displayName: value,
-                        error: this.state.account.error
-                    }
-                });
-            }
-            return;
-        }
 
+    private updateProperty(id: string, value: string) {
+        if (id === "displayName") {
+            this.setState({
+                account: {
+                    credentials: this.state.account.credentials,
+                    id: this.state.account.id,
+                    platformId: this.state.account.platformId,
+                    displayName: value,
+                    error: this.state.account.error
+                }
+            });
+        } else if (id === "platformId") {
+            this.setState({
+                account: {
+                    credentials: this.state.account.credentials,
+                    id: this.state.account.id,
+                    platformId: Number.parseInt(value),
+                    displayName: this.state.account.displayName,
+                    error: this.state.account.error
+                }
+            });
+
+        }
+    }
+
+    private updateStateIfNecessary(property: string, id: string, value: string) {
         let identifier = id.substring(property.length + 1);
         let cred = this.state.account.credentials.find(c => c.id === identifier);
 
@@ -174,7 +204,7 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
 
     private addCredential() {
         const newCreds = Object.assign([], this.state.account.credentials);
-        newCreds.push({ id: this.makeString(), value: "", descriptor: "", omitted: false, created: new Date() });
+        newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: "", omitted: false, created: new Date() });
         this.setState({
             eventBus: this.state.eventBus,
             account: {
@@ -187,34 +217,26 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
         });
     }
 
-    /** @return a random string to be used as an identifier in the UI. This will not be the identifier used in the back end. */
-    makeString(): string {
-        let outString: string = 'fe_id_';
-        let inOptions: string = 'abcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < 32; i++) {
-            outString += inOptions.charAt(Math.floor(Math.random() * inOptions.length));
-        }
-        return outString;
+    public close() {
+        this.state.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
     }
 
     public render() {
-        console.log(this.state.account.credentials);
         const elems = this.state.account.credentials.sort((c1, c2) => new Date(c1.created).getTime() - new Date(c2.created).getTime()).map(cred => {
             const credentialsField = cred.omitted ?
-                <input className="credentialField textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder="(omitted)" value="" />
-                : <input className="credentialField textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
+                <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder="(omitted)" value="" />
+                : <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
 
             const saveButton = cred.omitted ? undefined : <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveCredential(cred.id)}>{ImageProvider.getImage("save-icon")}</div>;
             return (
                 <div className="box-content">
                     <div className="credential">
-                        <div className="credentialLabel">Descriptor: </div>
-                        <input className="credentialField textarea monospace-font" onChange={o => this.updateStateIfNecessary("descriptor", o.currentTarget.id, o.currentTarget.value)} id={"descriptor_" + cred.id} type="text" value={cred.descriptor} />
+                        <div className="credential-label">Descriptor: </div>
+                        <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("descriptor", o.currentTarget.id, o.currentTarget.value)} id={"descriptor_" + cred.id} type="text" value={cred.descriptor} />
                         <div className="btn-icon btn-icon-delete btn-credentials" onClick={o => this.removeCredential(cred.id)}>{ImageProvider.getImage("none")} </div>
                     </div>
                     <div className="credential">
-                        <div className="credentialLabel">Value: </div>
+                        <div className="credential-label">Value: </div>
                         {credentialsField}
                         {saveButton}
                     </div>
@@ -223,15 +245,27 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
             );
         });
         return (
-            <div className="container double-container" >
-                <div className="box-header">
-                    Account Details for {this.state.account.displayName}
+            <div className="container double-container container-top-margin" >
+                <div className="box-header box-header-with-icon">
+                    <div className="inline-block"> Account Details for {this.state.account.displayName}</div>
+                    <div className="btn-small" onClick={this.close.bind(this)}>✖︎</div>
                 </div>
                 <div className="box-content">
-                    <div className="credential">
-                        <div className="credentialLabel">Display Name: </div>
-                        <input className="credentialField textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id="displayName" type="text" value={this.state.account.displayName} />
-                        <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
+                    <div className="box-content">
+                        <div className="credential">
+                            <div className="credential-label">Display Name: </div>
+                            <input placeholder="Enter a display name." className="credential-field textarea monospace-font credential-field-select" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)} id="displayName" type="text" value={this.state.account.displayName} />
+                            <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
+                        </div>
+                        <div className="credential">
+                            <div className="credential-label">Platform: </div>
+                            <select value={this.state.account.platformId} placeholder="Enter a platform." id="platformId" className="credential-field textarea monospace-font" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)}>
+                                <option value="0">&nbsp;</option>
+                                <option value="1">Facebook</option>
+                                <option value="2">Twitter</option>
+                            </select>
+                            <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
+                        </div>
                     </div>
                     <div className="displayName">Credentials: </div>
                     {elems}

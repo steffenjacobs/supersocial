@@ -1,6 +1,5 @@
 import * as React from "react";
 import { EventBus } from "./EventBus";
-import { CredentialSettingsTile } from "./CredentialSettingsTile";
 import { SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
 
 export interface Props {

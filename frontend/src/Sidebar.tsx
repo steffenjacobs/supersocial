@@ -75,7 +75,6 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         });
 
         const selectedComponent = this.state.components.find(c => c.selected);
-        console.log(this.state.loginManager.getLoginStatus());
         //1. create the menu
         //2. create the header
         //3. add the page

@@ -24,7 +24,7 @@ export interface PublishedPost {
     accountId: string
 }
 
-export interface PublishedPosts {
+export interface PublishedPostsProps {
     posts: PublishedPost[]
     updating?: boolean
     eventBus: EventBus
@@ -34,8 +34,8 @@ export interface PublishedPosts {
 /** Lists the already published posts. */
 
 //TODO: make table scrollable and pageable.
-export class PublishedPostsTile extends React.Component<PublishedPosts, PublishedPosts>{
-    constructor(props: PublishedPosts, state: PublishedPosts) {
+export class PublishedPostsTile extends React.Component<PublishedPostsProps, PublishedPostsProps>{
+    constructor(props: PublishedPostsProps, state: PublishedPostsProps) {
         super(props);
         this.state = { posts: props.posts, updating: props.updating, eventBus: props.eventBus, requireLogin: props.requireLogin };
 
@@ -95,7 +95,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                     if (elem.postUrl) {
                         status = <td onClick={o => this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
                     } else {
-                        const statusMsg = elem.scheduled ? "This post is scheduled for " + moment(elem.scheduled).format("YYYY-MM-DD HH:mm") : "This post is not posted and not scheduled yet.";
+                        const statusMsg = elem.scheduled ? "This post is scheduled for " + moment(elem.scheduled).format("YYYY-MM-DD HH:mm") : "This post is neither published nor scheduled yet.";
                         const statusIcons = elem.scheduled ? [ImageProvider.getImage("check"), ImageProvider.getImage("clock")] : ImageProvider.getImage("check");
                         status = <td className="checkmark checkmark-gray centered tooltip">{statusIcons}<span className="tooltiptext">{statusMsg}</span></td>
                     }
@@ -115,7 +115,7 @@ export class PublishedPostsTile extends React.Component<PublishedPosts, Publishe
                 );
             });
 
-        let classUpdating = ["inline-block", "btn-icon"]
+        let classUpdating = ["inline-block", "btn-icon", "btn-small"]
         if (this.state.updating) {
             classUpdating.push("crossRotate");
         }
