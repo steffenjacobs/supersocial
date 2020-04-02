@@ -93,6 +93,21 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             });
     }
 
+    private unschedulePost(post: PublishedPost){
+        fetch(DeploymentManager.getUrl() + 'api/schedule/post/' + post.id, {
+            method: 'delete',
+            credentials: 'include',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    ToastManager.showSuccessToast("Unscheduled post.");
+                    this.refreshPosts();
+                }
+            });
+    }
+
     private goToPost(post: PublishedPost) {
         window.open(post.postUrl, "_blank")
     }
@@ -111,7 +126,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                         status = <td onClick={o => this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
                     } else {
                         const statusMsg = elem.scheduled ? "This post is scheduled for " + moment(elem.scheduled).format("YYYY-MM-DD HH:mm") : "This post is neither published nor scheduled yet.";
-                        const statusIcons = elem.scheduled ? [ImageProvider.getImage("check"), ImageProvider.getImage("clock")] : ImageProvider.getImage("check");
+                        const statusIcons = elem.scheduled ? [ImageProvider.getImage("check"), ImageProvider.getImage("clock-small")] : ImageProvider.getImage("check");
                         status = <td className="checkmark checkmark-gray centered tooltip">{statusIcons}<span className="tooltiptext">{statusMsg}</span></td>
                     }
                 }
@@ -128,6 +143,12 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                                 <span className="tooltiptext">Delete the post from the system without unpublishing it.</span>
                             </span>
                         </span>
+                        {elem.scheduled &&
+                        <span className="table-icon table-icon-del">
+                            <span className="tooltip" onClick={() => this.unschedulePost(elem)}>{ImageProvider.getImage("clock")}
+                            <span className="tooltiptext">Unschedule the post. It will remain in the system but not automatically posted.</span>
+                            </span>
+                        </span>}
                     </div>);
 
                 const published = elem.published ? <Moment format="YYYY-MM-DD">{elem.published}</Moment> : "";

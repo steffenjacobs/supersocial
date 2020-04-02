@@ -58,7 +58,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         this.setState({
             sendTextForm: {
                 message: eventData.text,
-                accountIds: eventData.accountIds,
+                accountIds: [eventData.accountId],
                 schedule: eventData.scheduled ? true : false,
                 scheduled: eventData.scheduled ? eventData.scheduled : new Date()
             }
@@ -239,6 +239,8 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} />
         }
 
+        console.log(this.state.sendTextForm.accountIds);
+        
         const accounts = this.state.accounts.sort(
             (a1, a2) => a1.id.localeCompare(a2.id))
             .map(elem => (<div>
