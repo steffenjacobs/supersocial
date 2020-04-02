@@ -50,7 +50,7 @@ public class PostPersistenceManager {
 	}
 
 	public Stream<Post> getAllPosts() {
-		return StreamSupport.stream(postRepository.findAll().spliterator(), true);
+		return StreamSupport.stream(postRepository.findAll().spliterator(), false);
 	}
 
 	public Post findPostById(UUID id) {

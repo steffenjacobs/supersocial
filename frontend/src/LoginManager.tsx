@@ -62,6 +62,22 @@ export class LoginManager {
             });
     }
 
+    public logOut(){
+        fetch(DeploymentManager.getUrl() + 'logout', {
+            method: 'get',
+            credentials: 'include',
+        })
+            .then(response => {
+                if (response.ok) {
+                    response.json().then(data => {
+                        this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });
+                    });
+                } else {
+                    this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });
+                }
+            });
+    }
+
     /** @return the loginStatus object containing a username and a loggedIn value */
     public getLoginStatus() {
         if (!this.loginStatus.loggedIn) {

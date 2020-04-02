@@ -31,6 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.anyRequest().authenticated();//
 		if("true".equals(env.getProperty("security.standalone"))) {
 			http.httpBasic();
+			http.logout().logoutUrl("/logout");
 			http.csrf().disable();
 		}
 		else {

@@ -54,6 +54,10 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         </div>);
     }
 
+    private performLogout(){
+        this.state.loginManager.logOut();
+    }
+
     public render() {
         //Create the menu items
         const components = this.state.components.map((elem) => {
@@ -86,7 +90,7 @@ console.log(this.state.loginManager.getLoginStatus());
                     <div className="navbar-header-left">
                         {this.getTitleComponent(selectedComponent)}
                     </div>
-                    <div className="navbar-header-userdetails">
+                    <div onClick={this.performLogout.bind(this)} className="navbar-header-userdetails">
                         Hello {this.state.loginManager.getLoginStatus().username}!
                     </div>
                 </div>
