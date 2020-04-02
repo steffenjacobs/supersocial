@@ -247,19 +247,19 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         return (
             <div className="container double-container container-top-margin" >
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block"> Account Details for {this.state.account.displayName}</div>
+                    <div className="inline-block"> Account Details for {this.state.account.displayName?this.state.account.displayName:"<unnamed>"}</div>
                     <div className="btn-small" onClick={this.close.bind(this)}>✖︎</div>
                 </div>
                 <div className="box-content">
                     <div className="box-content">
                         <div className="credential">
                             <div className="credential-label">Display Name: </div>
-                            <input placeholder="Enter a display name." className="credential-field textarea monospace-font credential-field-select" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)} id="displayName" type="text" value={this.state.account.displayName} />
+                            <input placeholder="Enter a display name." className="credential-field textarea monospace-font credential-field" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)} id="displayName" type="text" value={this.state.account.displayName} />
                             <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
                         </div>
                         <div className="credential">
                             <div className="credential-label">Platform: </div>
-                            <select value={this.state.account.platformId} placeholder="Enter a platform." id="platformId" className="credential-field textarea monospace-font" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)}>
+                            <select value={this.state.account.platformId} placeholder="Enter a platform." id="platformId" className="credential-field-select textarea monospace-font" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)}>
                                 <option value="0">&nbsp;</option>
                                 <option value="1">Facebook</option>
                                 <option value="2">Twitter</option>

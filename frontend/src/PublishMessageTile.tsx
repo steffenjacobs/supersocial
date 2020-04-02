@@ -66,6 +66,13 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
     }
 
     private createPost(callback?: Function) {
+        if(this.state.accounts.length === 0){
+            ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
+            return;
+        }
+        if(this.state.sendTextForm.accountIds.length === 0){
+            ToastManager.showWarnToast("Select a social media account to publish to.");
+        }
         this.state.sendTextForm.accountIds.forEach(accId => {
             fetch(DeploymentManager.getUrl() + 'api/post', {
                 method: 'PUT',
@@ -94,6 +101,13 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
     }
 
     private createAndPublishPost() {
+        if(this.state.accounts.length === 0){
+            ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
+            return;
+        }
+        if(this.state.sendTextForm.accountIds.length === 0){
+            ToastManager.showWarnToast("Select a social media account to publish to.");
+        }
         this.state.sendTextForm.accountIds.forEach(accId => {
             fetch(DeploymentManager.getUrl() + 'api/publish', {
                 method: 'POST',
@@ -258,7 +272,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                         className="btn btn-primary send-button"
                         onClick={this.send.bind(this)}
                     >
-                        Send
+                        {this.state.sendTextForm.schedule?"Schedule":"Publish"}
                     </button>
                 </div>
             </div>

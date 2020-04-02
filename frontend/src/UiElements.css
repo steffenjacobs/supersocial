@@ -156,6 +156,7 @@ table tr:nth-child(odd) {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+    transition-delay: .8s;
 }
 
 .centered {
@@ -182,8 +183,7 @@ table tr:nth-child(odd) {
 
 .table-icon > span > svg{
     cursor: pointer;
-    width: 1.25em;
-    height: 1.25em;
+    font-size: .9em;
     fill: #555;
 }
 .table-icon > span :hover{
@@ -203,4 +203,8 @@ table tr:nth-child(odd) {
 
 .table-text-column {
     min-width: 15em;
+}
+
+.table-colum-actions{
+    min-width: 8em;
 }

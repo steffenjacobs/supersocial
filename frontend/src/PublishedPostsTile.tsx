@@ -78,6 +78,21 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
     }
 
+    private deletePostLink(post: PublishedPost) {
+        fetch(DeploymentManager.getUrl() + 'api/post/' + post.id, {
+            method: 'delete',
+            credentials: 'include',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    ToastManager.showSuccessToast("Deleted post from this system.");
+                    this.refreshPosts();
+                }
+            });
+    }
+
     private goToPost(post: PublishedPost) {
         window.open(post.postUrl, "_blank")
     }
@@ -101,9 +116,23 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     }
                 }
 
+
+                const allowedActions = (
+                    <div className="inline-block">
+                        <span className="table-icon">
+                            <span onClick={() => this.selectPost(elem)}>{ImageProvider.getImage("edit")}
+                            </span>
+                        </span>
+                        <span className="table-icon table-icon-del">
+                            <span className="tooltip" onClick={() => this.deletePostLink(elem)} >{ImageProvider.getImage("none")}{ImageProvider.getImage("link")}
+                                <span className="tooltiptext">Delete the post from the system without unpublishing it.</span>
+                            </span>
+                        </span>
+                    </div>);
+
                 const published = elem.published ? <Moment format="YYYY-MM-DD">{elem.published}</Moment> : "";
                 return (
-                    <tr key={elem.id} onClick={() => this.selectPost(elem)}>
+                    <tr key={elem.id}>
                         {status}
                         <td>
                             {published}
@@ -111,6 +140,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                         {this.createPlatformElement(elem.platformId)}
                         <td>{elem.creatorName}</td>
                         <td>{elem.text}</td>
+                        <td>{allowedActions}</td>
                     </tr>
                 );
             });
@@ -121,7 +151,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         }
 
         return (
-            <div className="container double-container inline-block">
+            <div className="container dynamic-container inline-block">
                 <div className="box-header box-header-with-icon">
                     <div className="inline-block">All Posts</div>
                     <div
@@ -140,6 +170,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                                 <th>Platform</th>
                                 <th>Author</th>
                                 <th className="column-text">Post</th>
+                                <th className="table-colum-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -17,4 +17,14 @@ export class ToastManager {
             position: toast.POSITION.TOP_RIGHT
         });
     }
+    static showWarnToast(message: string) {
+        toast.warn(message, {
+            position: toast.POSITION.TOP_RIGHT
+        });
+    }
+    static showClickableInfoToast(message: string) {
+        toast.info(message, {
+            position: toast.POSITION.TOP_RIGHT
+        });
+    }
 }
