@@ -72,4 +72,8 @@ public class PostPersistenceManager {
 		return PostDTO.fromPost(post, "TBD");
 	}
 
+	public void deletePostById(UUID id) {
+		postRepository.deleteById(id);
+	}
+
 }

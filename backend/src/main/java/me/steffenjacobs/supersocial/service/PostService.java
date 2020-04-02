@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -14,10 +15,13 @@ import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
+import me.steffenjacobs.supersocial.domain.entity.ScheduledPost;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
 import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
+import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
+import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
@@ -35,10 +39,10 @@ public class PostService {
 
 	@Autowired
 	private SocialMediaAccountRepository socialMediaAccountRepository;
-	
+
 	@Autowired
 	private PostPublishingService postPublishingService;
-	
+
 	public PostDTO createAndPublishPost(MessagePublishingDTO messagePublishingDTO) {
 		return postPublishingService.publish(createPost(messagePublishingDTO));
 	}
@@ -46,14 +50,15 @@ public class PostService {
 	public PostDTO createUnpublishedPost(MessagePublishingDTO messagePublishingDto) {
 		return postPersistenceManager.toDto(createPost(messagePublishingDto));
 	}
+
 	private Post createPost(MessagePublishingDTO messagePublishingDto) {
-		if(messagePublishingDto.getAccountId() == null) {
+		if (messagePublishingDto.getAccountId() == null) {
 			throw new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId());
 		}
 		SocialMediaAccount account = socialMediaAccountRepository.findById(messagePublishingDto.getAccountId())
 				.orElseThrow(() -> new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId()));
 		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.READ);
-		Post post =  postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
+		Post post = postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
 		securityService.appendAcl(post);
 		return post;
 	}
@@ -62,7 +67,6 @@ public class PostService {
 		return securityService.filterForCurrentUser(postPersistenceManager.getAllPosts(), SecuredAction.READ).map(postPersistenceManager::toDto)
 				.map(this::addSchedulingInformationIfAvailable).collect(Collectors.toSet());
 	}
-
 
 	private PostDTO addSchedulingInformationIfAvailable(PostDTO post) {
 		if (post.getPublished() != null || !StringUtils.isEmpty(post.getErrorMessage())) {
@@ -79,10 +83,46 @@ public class PostService {
 
 	public PostDTO findPostById(UUID id) {
 		final Post post = postPersistenceManager.findPostById(id);
-		if(securityService.isCurrentUserPermitted(post, SecuredAction.READ)){
+		if (securityService.isCurrentUserPermitted(post, SecuredAction.READ)) {
 			return postPersistenceManager.toDto(post);
-		}else {
+		} else {
 			throw new AuthorizationException("post", SecuredAction.READ);
+		}
+	}
+
+	public void deletePostById(UUID id) {
+
+		try {
+			// check the post itself
+			Post p = postPersistenceManager.findPostById(id);
+			securityService.checkIfCurrentUserIsPermitted(p, SecuredAction.DELETE);
+
+			try {
+				// is there a scheduled post this post is linked to? if so ->
+				// delete
+				ScheduledPost sp = scheduledPostPersistenceManager.findOriginalByPostId(id);
+				securityService.checkIfCurrentUserIsPermitted(sp, SecuredAction.DELETE);
+				scheduledPostPersistenceManager.deleteScheduledPost(sp.getId());
+			} catch (ScheduledPostNotFoundException e) {
+				// ignore
+			}
+
+			try {
+				postPersistenceManager.deletePostById(id);
+			} catch (EmptyResultDataAccessException e) {
+				throw new PostNotFoundException(id);
+			}
+		} catch (PostNotFoundException e) {
+			// this could also be the UUID of a scheduled post.
+			ScheduledPost sp = scheduledPostPersistenceManager.findById(id).orElseThrow(() -> new PostNotFoundException(id));
+			securityService.checkIfCurrentUserIsPermitted(sp, SecuredAction.DELETE);
+
+			Post p = sp.getPost();
+			securityService.checkIfCurrentUserIsPermitted(p, SecuredAction.DELETE);
+			
+			scheduledPostPersistenceManager.deleteScheduledPost(sp.getId());
+			postPersistenceManager.deletePostById(p.getId());
+			
 		}
 	}
 }

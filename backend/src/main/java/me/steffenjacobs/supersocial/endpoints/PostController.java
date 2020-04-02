@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,7 +44,18 @@ public class PostController {
 		try {
 			return new ResponseEntity<>(postService.findPostById(id), HttpStatus.OK);
 		} catch (PostNotFoundException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new PostDTO(e.getMessage()),HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@DeleteMapping(path = "/api/post/{id}")
+	public ResponseEntity<PostDTO> deletePost(@PathVariable(name = "id") UUID id) {
+		LOG.info("Deleting post with id {}", id);
+		try {
+			postService.deletePostById(id);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (PostNotFoundException e) {
+			return new ResponseEntity<>(new PostDTO(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 

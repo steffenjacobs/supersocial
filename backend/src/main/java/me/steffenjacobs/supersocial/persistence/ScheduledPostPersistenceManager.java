@@ -40,7 +40,7 @@ public class ScheduledPostPersistenceManager {
 		try {
 			scheduledPostRepository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
-			throw new ScheduledPostNotFoundException("Scheduled post with this id was not found", e);
+			throw new ScheduledPostNotFoundException(id);
 		}
 	}
 
@@ -51,6 +51,10 @@ public class ScheduledPostPersistenceManager {
 
 	public Optional<ScheduledPostDTO> findByPostId(UUID id) {
 		return ScheduledPostDTO.fromScheduledPost(scheduledPostRepository.findByPostId(id));
+	}
+	
+	public ScheduledPost findOriginalByPostId(UUID id) {
+		return scheduledPostRepository.findByPostId(id).orElseThrow(()-> new ScheduledPostNotFoundException(id));
 	}
 
 	public Pair<ScheduledPost, Boolean> updateScheduledPost(ScheduledPost sPost, Post actualPost, Date scheduled, SupersocialUser creator) {

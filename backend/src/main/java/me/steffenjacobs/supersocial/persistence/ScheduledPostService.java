@@ -57,7 +57,7 @@ public class ScheduledPostService {
 	}
 
 	public void deleteScheduledPost(UUID id) {
-		ScheduledPost post = scheduledPostPersistenceManager.findById(id).orElseThrow(() -> new ScheduledPostNotFoundException("Scheduled post with this id was not found"));
+		ScheduledPost post = scheduledPostPersistenceManager.findById(id).orElseThrow(() -> new ScheduledPostNotFoundException(id));
 		securityService.checkIfCurrentUserIsPermitted(post, SecuredAction.DELETE);
 		scheduledPostPersistenceManager.deleteScheduledPost(id);
 
