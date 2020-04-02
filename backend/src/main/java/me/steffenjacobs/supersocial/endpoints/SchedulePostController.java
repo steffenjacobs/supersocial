@@ -48,7 +48,7 @@ public class SchedulePostController {
 
 	@DeleteMapping(path = "/api/schedule/post/{id}")
 	public ResponseEntity<ScheduledPostDTO> deleteScheduledPost(@PathVariable(name = "id") UUID id) throws Exception {
-		LOG.info("Deleting scheduled post post {}", id);
+		LOG.info("Deleting scheduled post {}", id);
 		try {
 			scheduledPostService.deleteScheduledPost(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);

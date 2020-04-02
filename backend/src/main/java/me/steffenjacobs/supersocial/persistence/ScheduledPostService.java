@@ -60,7 +60,6 @@ public class ScheduledPostService {
 		ScheduledPost post = scheduledPostPersistenceManager.findById(id).orElseThrow(() -> new ScheduledPostNotFoundException(id));
 		securityService.checkIfCurrentUserIsPermitted(post, SecuredAction.DELETE);
 		scheduledPostPersistenceManager.deleteScheduledPost(id);
-
 	}
 
 }

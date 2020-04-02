@@ -82,9 +82,13 @@ public class PostService {
 	}
 
 	public PostDTO findPostById(UUID id) {
+		return postPersistenceManager.toDto(this.findOriginalPostById(id));
+	}
+	
+	public Post findOriginalPostById(UUID id) {
 		final Post post = postPersistenceManager.findPostById(id);
 		if (securityService.isCurrentUserPermitted(post, SecuredAction.READ)) {
-			return postPersistenceManager.toDto(post);
+			return post;
 		} else {
 			throw new AuthorizationException("post", SecuredAction.READ);
 		}
