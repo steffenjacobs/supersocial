@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /** @author Steffen Jacobs */
-public class CredentialDTO {
+public class CredentialDTO implements WithErrorDTO{
 	private UUID id;
 	private String value;
 	private String descriptor;

@@ -6,7 +6,7 @@ import java.util.UUID;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 
 /** @author Steffen Jacobs */
-public class SocialMediaAccountDTO {
+public class SocialMediaAccountDTO implements WithErrorDTO {
 
 	private UUID id;
 	private String displayName;

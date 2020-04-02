@@ -6,7 +6,7 @@ import java.util.UUID;
 import me.steffenjacobs.supersocial.domain.entity.Post;
 
 /** @author Steffen Jacobs */
-public class PostDTO {
+public class PostDTO implements WithErrorDTO {
 
 	private UUID id;
 
