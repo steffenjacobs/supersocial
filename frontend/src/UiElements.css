@@ -196,6 +196,13 @@ table tr:nth-child(odd) {
 .table-icon-del > span :hover{
     fill: #d94f4f;
 }
+.table-icon-green > span > svg {
+    fill: #baddbe
+}
+
+.table-icon-green > span :hover {
+    fill: #4fd961
+}
 
 .table {
     background-color: white;

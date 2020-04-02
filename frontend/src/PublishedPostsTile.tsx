@@ -66,7 +66,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
     private createPlatformElement(platformId: number) {
         if (platformId === 0) {
-            return <td className="centered tooltip x-gray">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
+            return <td className="centered tooltip x-gray icon-medium">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
         }
         else {
             return <td className="centered icon-medium">{ImageProvider.getSocialmediaIcon(platformId)}</td>;
@@ -93,7 +93,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             });
     }
 
-    private unschedulePost(post: PublishedPost){
+    private unschedulePost(post: PublishedPost) {
         fetch(DeploymentManager.getUrl() + 'api/schedule/post/' + post.id, {
             method: 'delete',
             credentials: 'include',
@@ -112,13 +112,31 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         window.open(post.postUrl, "_blank")
     }
 
+    private publishPost(post: PublishedPost) {
+        fetch(DeploymentManager.getUrl() + 'api/publishnow/' + post.id, {
+            method: 'POST',
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                } else {
+                    ToastManager.showSuccessToast("Created and immediately published post.");
+                    response.json().then(data => {
+                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                    });
+                }
+            });
+    }
+
     public render() {
         const posts = this.state.posts.sort(
             (p1: PublishedPost, p2: PublishedPost) => p2.created.getTime() - p1.created.getTime())
             .map(elem => {
                 var status;
                 if (elem.errorMessage) {
-                    status = <td className="tooltip centered">{ImageProvider.getImage("none-logo")}
+                    status = <td className="tooltip centered icon-medium">{ImageProvider.getImage("none-logo")}
                         <span className="tooltiptext">{elem.errorMessage}</span></td>
 
                 } else {
@@ -144,11 +162,17 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                             </span>
                         </span>
                         {elem.scheduled &&
-                        <span className="table-icon table-icon-del">
-                            <span className="tooltip" onClick={() => this.unschedulePost(elem)}>{ImageProvider.getImage("clock")}
-                            <span className="tooltiptext">Unschedule the post. It will remain in the system but not automatically posted.</span>
-                            </span>
-                        </span>}
+                            <span className="table-icon table-icon-del">
+                                <span className="tooltip" onClick={() => this.unschedulePost(elem)}>{ImageProvider.getImage("clock")}
+                                    <span className="tooltiptext">Unschedule the post. It will remain in the system but not automatically posted.</span>
+                                </span>
+                            </span>}
+                        {!elem.published &&
+                            <span className="table-icon table-icon-green">
+                                <span className="tooltip" onClick={() => this.publishPost(elem)}>{ImageProvider.getImage("play")}
+                                    <span className="tooltiptext">Publish this post right away.</span>
+                                </span>
+                            </span>}
                     </div>);
 
                 const published = elem.published ? <Moment format="YYYY-MM-DD">{elem.published}</Moment> : "";
