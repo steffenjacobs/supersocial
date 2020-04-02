@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ import me.steffenjacobs.supersocial.domain.dto.SocialMediaAccountDTO;
 import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundException;
 import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
 import me.steffenjacobs.supersocial.service.SocialMediaAccountService;
+import me.steffenjacobs.supersocial.service.exception.CouldNotDeleteEntityException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -69,6 +71,17 @@ public class SocialMediaAccountController {
 			return new ResponseEntity<>(new SocialMediaAccountDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		} catch (AuthorizationException e) {
 			return new ResponseEntity<>(new SocialMediaAccountDTO(e.getMessage()), HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	@DeleteMapping(path = "/api/socialmediaaccount/{id}")
+	public ResponseEntity<SocialMediaAccountDTO> createOrUpdateSocialMediaAccount(@PathVariable(name = "id") UUID id) throws Exception {
+		LOG.info("Deleting social media account {}", id);
+		try {
+			socialMediaAccountService.deleteSocialMediaAccount(id);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (SocialMediaAccountNotFoundException | CouldNotDeleteEntityException e) {
+			return new ResponseEntity<>(new SocialMediaAccountDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 

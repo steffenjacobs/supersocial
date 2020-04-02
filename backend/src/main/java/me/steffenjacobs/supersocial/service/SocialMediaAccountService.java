@@ -19,6 +19,7 @@ import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager;
 import me.steffenjacobs.supersocial.security.SecurityService;
+import me.steffenjacobs.supersocial.service.exception.CouldNotDeleteEntityException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -54,15 +55,17 @@ public class SocialMediaAccountService {
 			optAccount = socialMediaAccountRepository.findById(creationDto.getId());
 			optAccount.ifPresent(a -> securityService.checkIfCurrentUserIsPermitted(a, SecuredAction.UPDATE));
 		}
-		SocialMediaAccount acc = optAccount.orElse(createNewSocialMediaAccount(Platform.fromId(creationDto.getPlatformId()), creationDto.getDisplayName()));
+		SocialMediaAccount acc = optAccount.orElse(new SocialMediaAccount());
+		boolean created = acc.getId() == null;
+		if(created) {
+			createNewSocialMediaAccount(acc, Platform.fromId(creationDto.getPlatformId()), creationDto.getDisplayName());
+		}
 		acc.setDisplayName(creationDto.getDisplayName());
 		acc.setPlatform(Platform.fromId(creationDto.getPlatformId()));
-		boolean created = acc.getId() == null;
 		return new Pair<>(created, createPrunedDTO(socialMediaAccountRepository.save(acc)));
 	}
 
-	private SocialMediaAccount createNewSocialMediaAccount(Platform platform, String displayName) {
-		SocialMediaAccount account = new SocialMediaAccount();
+	private SocialMediaAccount createNewSocialMediaAccount(SocialMediaAccount account, Platform platform, String displayName) {
 		account.setDisplayName(displayName);
 		account.setPlatform(platform);
 		account = socialMediaAccountRepository.save(account);
@@ -94,6 +97,17 @@ public class SocialMediaAccountService {
 		});
 
 		return SocialMediaAccountDTO.fromSocialMediaAccount(account, credentials);
+	}
+
+	public void deleteSocialMediaAccount(UUID id) {
+		SocialMediaAccount account = socialMediaAccountRepository.findById(id).orElseThrow(() -> new SocialMediaAccountNotFoundException(id));
+		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.DELETE);
+		try {
+			socialMediaAccountRepository.deleteById(id);
+		} catch (Exception e) {
+			throw new CouldNotDeleteEntityException(
+					"Could not delete social media account because there are still posts scheduled to be posted via this account. Please revise them before deleting the account.");
+		}
 	}
 
 }
