@@ -1,6 +1,8 @@
 import React from "react";
 import './Sidebar.css';
 import { LoginManager } from "./LoginManager";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export interface PageComponents {
     components: PageComponent[]
@@ -21,7 +23,7 @@ export interface PageComponent {
 export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
-        this.state = {components: props.components, loginManager: props.loginManager, selected:props.selected};
+        this.state = { components: props.components, loginManager: props.loginManager, selected: props.selected };
         this.setActivePage(this.state.selected);
     }
 
@@ -54,7 +56,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         </div>);
     }
 
-    private performLogout(){
+    private performLogout() {
         this.state.loginManager.logOut();
     }
 
@@ -73,12 +75,13 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         });
 
         const selectedComponent = this.state.components.find(c => c.selected);
-console.log(this.state.loginManager.getLoginStatus());
+        console.log(this.state.loginManager.getLoginStatus());
         //1. create the menu
         //2. create the header
         //3. add the page
         return (
             <div>
+            <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500}/>
                 <div className="navbar">
                     <div className="navbar-logo">
                         <img src="/logo192.png" alt="Logo" />

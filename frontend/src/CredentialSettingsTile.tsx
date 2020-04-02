@@ -8,6 +8,7 @@ import { DeploymentManager } from "./DeploymentManager";
 import { ImageProvider } from "./ImageProvider";
 import { SocialMediaAccount, SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
 import { SSL_OP_PKCS1_CHECK_1 } from "constants";
+import { ToastManager } from "./ToastManager";
 
 export interface CredentialSetting {
     account: SocialMediaAccount,
@@ -43,13 +44,16 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
             credentials: 'include',
         })
             .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                this.setState({
-                    eventBus: this.state.eventBus,
-                    account: data
-                });
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    response.json().then(data => {
+                        this.setState({
+                            eventBus: this.state.eventBus,
+                            account: data
+                        });
+                    });
+                }
             });
     }
 
@@ -68,9 +72,14 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
                     id: c.id.startsWith("fe_id_") ? "" : c.id
                 })
             })
-                .then(data => {
-                    this.fetchCredentials();
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
+                .then(response => {
+                    if (!response.ok) {
+                        ToastManager.showErrorToast(response);
+                    } else {
+                        ToastManager.showSuccessToast("Saved credential '" + c.descriptor + "'.");
+                        this.fetchCredentials();
+                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
+                    }
                 });
         });
     }
@@ -90,14 +99,19 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
             })
         })
             .then(response => {
-                return response.json();
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    response.json().then(data => {
+                        ToastManager.showSuccessToast("Updated social media account properties.");
+                        this.setState({
+                            eventBus: this.state.eventBus,
+                            account: data
+                        });
+                    });
+                }
             })
-            .then(data => {
-                this.setState({
-                    eventBus: this.state.eventBus,
-                    account: data
-                });
-            });
+
     }
 
     private removeCredential(credentialId: string) {
@@ -105,8 +119,13 @@ export class CredentialSettingsTile extends React.Component<CredentialSetting, C
             method: 'DELETE',
             credentials: 'include'
         })
-            .then(data => {
-                this.fetchCredentials();
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    ToastManager.showSuccessToast("Updated social media account properties.");
+                    this.fetchCredentials();
+                }
             });
     }
 

@@ -8,6 +8,8 @@ import { DeploymentManager } from "./DeploymentManager";
 import Datetime from 'react-datetime';
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 import { ImageProvider } from "./ImageProvider";
+import { toast } from "react-toastify";
+import { ToastManager } from "./ToastManager";
 
 export interface PublishMessageTileState {
     sendTextForm: SendTextForm
@@ -39,8 +41,8 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
             credentials: 'include',
         })
             .then(response => {
-                if (response.status === 401) {
-                    console.error("Could not fetch data: 401");
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
                 } else {
                     response.json().then(data => this.setState({
                         accounts: data
@@ -74,15 +76,19 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                 body: JSON.stringify({ message: this.state.sendTextForm.message, accountId: accId })
             })
                 .then(response => {
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Result: " + data);
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
-                    if (callback) {
-                        callback(data.id);
+                    if (!response.ok) {
+                        ToastManager.showErrorToast(response);
+                    } else {
+                        ToastManager.showSuccessToast("Created unpublished toast.");
+                        response.json().then(data => {
+                            this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                            if (callback) {
+                                callback(data.id);
+                            }
+                        });
                     }
                 });
+
         });
     }
 
@@ -97,12 +103,16 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                 body: JSON.stringify({ message: this.state.sendTextForm.message, accountId: accId })
             })
                 .then(response => {
-                    response.json();
-                })
-                .then(data => {
-                    console.log("Result: " + data);
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                    if (!response.ok) {
+                        ToastManager.showErrorToast(response);
+                    } else {
+                        ToastManager.showSuccessToast("Created and immediately published post.");
+                        response.json().then(data => {
+                            this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                        });
+                    }
                 });
+
         })
     }
 
@@ -116,12 +126,16 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
             body: JSON.stringify({ postId: postId, scheduled: this.state.sendTextForm.scheduled })
         })
             .then(response => {
-                response.json();
-            })
-            .then(data => {
-                console.log("Schedule result: " + data);
-                this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    response.json().then(data => {
+                        console.log("Schedule result: " + data);
+                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                    });
+                }
             });
+
     }
 
     /** Send the request to the back end triggerin a post on the selected platforms. */
