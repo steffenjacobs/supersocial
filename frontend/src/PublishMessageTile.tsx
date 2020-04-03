@@ -8,7 +8,6 @@ import { DeploymentManager } from "./DeploymentManager";
 import Datetime from 'react-datetime';
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 import { ImageProvider } from "./ImageProvider";
-import { toast } from "react-toastify";
 import { ToastManager } from "./ToastManager";
 
 export interface PublishMessageTileState {
@@ -147,7 +146,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                     this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                 } else {
                     response.json().then(data => {
-                        console.log("Schedule result: " + data);
+                        ToastManager.showSuccessToast("Scheduled post for " + data.scheduled + ".");
                         this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     });
                 }
@@ -238,12 +237,10 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
 
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} />
         }
-
-        console.log(this.state.sendTextForm.accountIds);
         
         const accounts = this.state.accounts.sort(
             (a1, a2) => a1.id.localeCompare(a2.id))
-            .map(elem => (<div>
+            .map(elem => (<div key={elem.id}>
                 {this.createCheckbox(elem.id, this.state.sendTextForm.accountIds && this.state.sendTextForm.accountIds.includes(elem.id))}
                 <span className="icon-intext">{ImageProvider.getSocialmediaIcon(elem.platformId)}</span>
                 <span>Distribute via {elem.displayName}</span>

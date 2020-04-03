@@ -185,13 +185,13 @@ table tr:nth-child(odd) {
     cursor: pointer;
     font-size: .9em;
     fill: #555;
+    transition: 200ms;
 }
 .table-icon > span :hover{
     fill: #111;
 }
 .table-icon-del > span > svg{
     fill: rgb(185, 139, 139);
-    transition: 200ms;
 }
 .table-icon-del > span :hover{
     fill: #d94f4f;

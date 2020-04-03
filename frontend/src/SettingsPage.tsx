@@ -2,15 +2,15 @@ import * as React from "react";
 import { EventBus } from "./EventBus";
 import { SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
 
-export interface Props {
+export interface SettingsProps {
     eventBus: EventBus
 }
 
 /** Message overview page. Contains the message publishing tile (PublishMessageTile.tsx) and the list of published posts (PublishedPostsTile.tsx). */
-export class SettingsPage extends React.Component<Props, Props>{
-    constructor(props: Props, state: Props) {
+export class SettingsPage extends React.Component<SettingsProps, SettingsProps>{
+    constructor(props: SettingsProps) {
         super(props);
-        this.state = props;
+        this.state = {eventBus: props.eventBus};
     }
 
     public render() {

@@ -6,14 +6,15 @@ import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { DeploymentManager } from "./DeploymentManager";
 import { ImageProvider } from "./ImageProvider";
-import { SocialMediaAccount, SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
-import { SSL_OP_PKCS1_CHECK_1 } from "constants";
+import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 import { ToastManager } from "./ToastManager";
 import { EntityUtil } from "./EntityUtil";
 
 export interface AccountDetailsProps {
     account: SocialMediaAccount,
     eventBus: EventBus
+    displayNameLastSaved?: string
+    platformIdLastSaved?: number
 }
 
 export interface Credential {
@@ -28,7 +29,7 @@ export interface Credential {
 export class AccountDetailsTile extends React.Component<AccountDetailsProps, AccountDetailsProps>{
     constructor(props: AccountDetailsProps) {
         super(props);
-        this.state = { eventBus: props.eventBus, account: props.account };
+        this.state = { eventBus: props.eventBus, account: props.account, displayNameLastSaved: props.account.displayName, platformIdLastSaved: props.account.platformId };
         this.fetchCredentials();
         this.state.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, this.updateSelected.bind(this));
     }
@@ -36,7 +37,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     private updateSelected(type: EventBusEventType, data: any) {
         if (data && data.id === this.state.account.id) {
             this.setState({
-                account: data
+                account: data,
+                displayNameLastSaved: data.displayName,
+                platformIdLastSaved: data.platformId
             });
         }
     }
@@ -56,20 +59,32 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                     response.json().then(data => {
                         this.setState({
                             eventBus: this.state.eventBus,
-                            account: data
+                            account: this.mergeCredentials(data),
+                            displayNameLastSaved: data.displayName,
+                            platformIdLastSaved: data.platformId
                         });
                     });
+                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
                 }
             });
     }
 
+    private mergeCredentials(account: SocialMediaAccount): SocialMediaAccount {
+        this.state.account.credentials.forEach(c => {
+            if (account.credentials.filter(x => x.descriptor === c.descriptor).length === 0) {
+                account.credentials.push(c);
+            }
+        })
+        return account;
+    }
+
     private saveCredential(credentialId: string) {
+        console.log(this.state.account.id)
         if (EntityUtil.isGeneratedId(this.state.account.id)) {
-            this.saveDisplayName(() => this.saveCredentialNoCheck(credentialId));
+            this.saveAccountDetails(() => this.saveCredentialNoCheck(credentialId));
         } else {
             this.saveCredentialNoCheck(credentialId);
         }
-
     }
 
     private saveCredentialNoCheck(credentialId: string) {
@@ -99,7 +114,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         });
     }
 
-    private saveDisplayName(callback?: any) {
+    private saveAccountDetails(callback?: any) {
         fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
             method: 'PUT',
             credentials: 'include',
@@ -121,7 +136,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                         ToastManager.showSuccessToast("Updated social media account properties.");
                         this.setState({
                             eventBus: this.state.eventBus,
-                            account: data
+                            account: this.mergeCredentials(data),
+                            displayNameLastSaved: data.displayName,
+                            platformIdLastSaved: data.platformId
                         });
                         this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, undefined);
                         if (callback) {
@@ -129,23 +146,34 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                         }
                     });
                 }
-            })
-
+            });
     }
 
     private removeCredential(credentialId: string) {
-        fetch(DeploymentManager.getUrl() + 'api/credential/' + credentialId, {
-            method: 'DELETE',
-            credentials: 'include'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    ToastManager.showErrorToast(response);
-                } else {
-                    ToastManager.showSuccessToast("Updated social media account properties.");
-                    this.fetchCredentials();
-                }
-            });
+        this.setState({
+            account: {
+                id: this.state.account.id,
+                displayName: this.state.account.displayName,
+                platformId: this.state.account.platformId,
+                credentials: this.state.account.credentials.filter(x => x.id !== credentialId)
+            }
+        }, () => {
+            if(EntityUtil.isGeneratedId(credentialId)){
+                return;
+            }
+            fetch(DeploymentManager.getUrl() + 'api/credential/' + credentialId, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        ToastManager.showErrorToast(response);
+                    } else {
+                        ToastManager.showSuccessToast("Removed credential.");
+                        this.fetchCredentials();
+                    }
+                });
+        });
     }
 
 
@@ -170,7 +198,25 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                     error: this.state.account.error
                 }
             });
+        }
+    }
 
+    private prepareCredentials(platformId: string) {
+        if (platformId === "1") {
+            this.addCredentialIfNotPresent("facebook.page.id", () =>
+                this.addCredentialIfNotPresent("facebook.page.accesstoken", () =>
+                    this.updateProperty("platformId", platformId)
+                ));
+        }
+        else if (platformId === "2") {
+            this.addCredentialIfNotPresent("twitter.api.key", () =>
+                this.addCredentialIfNotPresent("twitter.api.secret", () =>
+                    this.addCredentialIfNotPresent("twitter.api.accesstoken", () =>
+                        this.addCredentialIfNotPresent("twitter.api.accesstoken.secret", () =>
+                            this.updateProperty("platformId", platformId)
+                        ))));
+        } else {
+            this.updateProperty("platformId", platformId);
         }
     }
 
@@ -201,10 +247,19 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
             cred.omitted = true;
         }
     }
+    private addCredentialIfNotPresent(descriptor: string, callback?: any) {
+        if (this.state.account.credentials.filter(c => c.descriptor === descriptor).length === 0) {
+            this.addCredential(descriptor, callback);
+        } else {
+            if (callback) {
+                callback();
+            }
+        }
+    }
 
-    private addCredential() {
+    private addCredential(descriptor?: string, callback?: any) {
         const newCreds = Object.assign([], this.state.account.credentials);
-        newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: "", omitted: false, created: new Date() });
+        newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
         this.setState({
             eventBus: this.state.eventBus,
             account: {
@@ -214,7 +269,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                 error: this.state.account.error,
                 platformId: this.state.account.platformId
             }
-        });
+        }, callback);
     }
 
     public close() {
@@ -222,14 +277,14 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     }
 
     public render() {
-        const elems = this.state.account.credentials.sort((c1, c2) => new Date(c1.created).getTime() - new Date(c2.created).getTime()).map(cred => {
+        const credentialElements = this.state.account.credentials.sort((c1, c2) => c1.descriptor.localeCompare(c2.descriptor)).map(cred => {
             const credentialsField = cred.omitted ?
                 <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder="(omitted)" value="" />
                 : <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
 
             const saveButton = cred.omitted ? undefined : <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveCredential(cred.id)}>{ImageProvider.getImage("save-icon")}</div>;
             return (
-                <div className="box-content">
+                <div key={cred.id} className="box-content">
                     <div className="credential">
                         <div className="credential-label">Descriptor: </div>
                         <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("descriptor", o.currentTarget.id, o.currentTarget.value)} id={"descriptor_" + cred.id} type="text" value={cred.descriptor} />
@@ -244,10 +299,13 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                 </div>
             );
         });
+
+        const displayNameSaveButton = this.state.displayNameLastSaved !== this.state.account.displayName && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save-icon")}</div>;
+        const platformSaveButton = this.state.platformIdLastSaved !== this.state.account.platformId && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save-icon")}</div>;
         return (
             <div className="container double-container container-top-margin" >
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block"> Account Details for {this.state.account.displayName?this.state.account.displayName:"<unnamed>"}</div>
+                    <div className="inline-block"> Account Details for {this.state.account.displayName ? this.state.account.displayName : "<unnamed>"}</div>
                     <div className="btn-small" onClick={this.close.bind(this)}>✖︎</div>
                 </div>
                 <div className="box-content">
@@ -255,22 +313,22 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                         <div className="credential">
                             <div className="credential-label">Display Name: </div>
                             <input placeholder="Enter a display name." className="credential-field textarea monospace-font credential-field" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)} id="displayName" type="text" value={this.state.account.displayName} />
-                            <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
+                            {displayNameSaveButton}
                         </div>
                         <div className="credential">
                             <div className="credential-label">Platform: </div>
-                            <select value={this.state.account.platformId} placeholder="Enter a platform." id="platformId" className="credential-field-select textarea monospace-font" onChange={o => this.updateProperty(o.currentTarget.id, o.currentTarget.value)}>
+                            <select value={this.state.account.platformId} placeholder="Enter a platform." id="platformId" className="credential-field-select textarea monospace-font" onChange={o => this.prepareCredentials(o.currentTarget.value)}>
                                 <option value="0">&nbsp;</option>
                                 <option value="1">Facebook</option>
                                 <option value="2">Twitter</option>
                             </select>
-                            <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveDisplayName()}>{ImageProvider.getImage("save-icon")}</div>
+                            {platformSaveButton}
                         </div>
                     </div>
                     <div className="displayName">Credentials: </div>
-                    {elems}
-                    <div className="btn btn-icon btn-add btn-icon-big">
-                        <div className="btn-add-inner" onClick={this.addCredential.bind(this)} >{ImageProvider.getImage("add-icon")}</div>
+                    {credentialElements}
+                    <div className="btn btn-icon btn-add btn-icon-big" onClick={(_e) => this.addCredential()}>
+                        <div className="btn-add-inner">{ImageProvider.getImage("add-icon")}</div>
                     </div>
                 </div>
             </div >

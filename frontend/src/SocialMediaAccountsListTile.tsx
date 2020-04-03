@@ -32,14 +32,19 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         super(props);
         this.state = { accounts: props.accounts, updating: props.updating, eventBus: props.eventBus };
 
-        this.refreshAccounts();
+        this.refreshAccounts(true);
         this.state.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, (eventType, eventData) => this.refreshAccounts());
         this.state.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, (eventType, eventData) => this.selectAccount(eventData));
     }
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
-    private refreshAccounts() {
-        this.setState({ accounts: this.state.accounts, updating: true });
+    private refreshAccounts(notMounted?: boolean) {
+        if (notMounted) {
+            this.state = { accounts: this.state.accounts, updating: true, eventBus: this.state.eventBus, selected: this.state.selected };
+        }
+        else {
+            this.setState({ accounts: this.state.accounts, updating: true });
+        }
         fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
             method: 'get',
             credentials: 'include',
@@ -125,7 +130,6 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
     }
 
     public render() {
-        console.log("render");
         const accounts = this.state.accounts.sort(
             (p1, p2) => p1.displayName.localeCompare(p2.displayName)).map(elem => {
 
@@ -164,7 +168,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                         <div className="inline-block">All Accounts</div>
                         <div
                             className={classUpdating.join(" ")}
-                            onClick={this.refreshAccounts.bind(this)}
+                            onClick={e => this.refreshAccounts()}
                         >
                             {ImageProvider.getImage("refresh")}
                         </div>
@@ -184,12 +188,11 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                             </tbody>
 
                         </table>
-                        <div className="btn btn-icon btn-add btn-icon-big btn-margins">
-                            <div className="btn-add-inner" onClick={this.addAccount.bind(this)} >{ImageProvider.getImage("add-icon")}</div>
+                        <div onClick={this.addAccount.bind(this)} className="btn btn-icon btn-add btn-icon-big btn-margins">
+                            <div className="btn-add-inner" >{ImageProvider.getImage("add-icon")}</div>
                         </div>
                     </div>
                 </div >
-
                 {accountSettings}
             </div>
         );

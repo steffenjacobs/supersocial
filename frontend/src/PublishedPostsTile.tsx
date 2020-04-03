@@ -7,7 +7,6 @@ import { EventBus, EventBusEventType } from "./EventBus";
 import { ImageProvider } from "./ImageProvider";
 import { DeploymentManager } from "./DeploymentManager";
 import moment from "moment";
-import { toast } from "react-toastify";
 import { ToastManager } from "./ToastManager";
 
 export interface PublishedPost {
@@ -39,13 +38,18 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         super(props);
         this.state = { posts: props.posts, updating: props.updating, eventBus: props.eventBus, requireLogin: props.requireLogin };
 
-        this.refreshPosts();
+        this.refreshPosts(true);
         this.state.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
     }
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
-    private refreshPosts() {
-        this.setState({ posts: this.state.posts, updating: true });
+    private refreshPosts(notMounted?: boolean) {
+        if (notMounted) {
+            this.state = { posts: this.state.posts, eventBus: this.state.eventBus, requireLogin: this.state.requireLogin, updating: true };
+        }
+        else {
+            this.setState({ posts: this.state.posts, updating: true });
+        }
         fetch(DeploymentManager.getUrl() + 'api/post', {
             method: 'get',
             credentials: 'include',
@@ -122,7 +126,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     ToastManager.showErrorToast(response);
                     this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                 } else {
-                    ToastManager.showSuccessToast("Created and immediately published post.");
+                    ToastManager.showSuccessToast("Published post.");
                     response.json().then(data => {
                         this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     });
@@ -136,16 +140,16 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             .map(elem => {
                 var status;
                 if (elem.errorMessage) {
-                    status = <td className="tooltip centered icon-medium">{ImageProvider.getImage("none-logo")}
+                    status = <td key={elem.id} className="tooltip centered icon-medium">{ImageProvider.getImage("none-logo")}
                         <span className="tooltiptext">{elem.errorMessage}</span></td>
 
                 } else {
                     if (elem.postUrl) {
-                        status = <td onClick={o => this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
+                        status = <td key={elem.id} onClick={o => this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
                     } else {
                         const statusMsg = elem.scheduled ? "This post is scheduled for " + moment(elem.scheduled).format("YYYY-MM-DD HH:mm") : "This post is neither published nor scheduled yet.";
                         const statusIcons = elem.scheduled ? [ImageProvider.getImage("check"), ImageProvider.getImage("clock-small")] : ImageProvider.getImage("check");
-                        status = <td className="checkmark checkmark-gray centered tooltip">{statusIcons}<span className="tooltiptext">{statusMsg}</span></td>
+                        status = <td key={elem.id} className="checkmark checkmark-gray centered tooltip">{statusIcons}<span className="tooltiptext">{statusMsg}</span></td>
                     }
                 }
 
@@ -201,7 +205,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     <div className="inline-block">All Posts</div>
                     <div
                         className={classUpdating.join(" ")}
-                        onClick={this.refreshPosts.bind(this)}
+                        onClick={e => this.refreshPosts()}
                     >
                         {ImageProvider.getImage("refresh")}
                     </div>

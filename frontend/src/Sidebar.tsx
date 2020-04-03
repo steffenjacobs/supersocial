@@ -24,11 +24,11 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
         this.state = { components: props.components, loginManager: props.loginManager, selected: props.selected };
-        this.setActivePage(this.state.selected);
+        this.setActivePage(this.state.selected, true);
     }
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
-    private setActivePage(pageId: number) {
+    private setActivePage(pageId: number, notMounted?: boolean) {
         var newComponents: PageComponent[] = [];
         for (let c = 0; c < this.state.components.length; c++) {
             let comp = this.state.components[c];
@@ -42,7 +42,11 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
             }
         }
 
-        this.setState({ components: newComponents, loginManager: this.state.loginManager, selected: pageId });
+        if(notMounted){
+            this.state = {components: newComponents, loginManager: this.state.loginManager, selected: pageId};
+        }else{
+            this.setState({ components: newComponents, selected: pageId });
+        }
         //TODO: set title and url in browser window
     }
 
