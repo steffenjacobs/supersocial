@@ -79,7 +79,6 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     }
 
     private saveCredential(credentialId: string) {
-        console.log(this.state.account.id)
         if (EntityUtil.isGeneratedId(this.state.account.id)) {
             this.saveAccountDetails(() => this.saveCredentialNoCheck(credentialId));
         } else {

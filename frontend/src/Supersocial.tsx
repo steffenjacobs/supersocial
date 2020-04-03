@@ -7,6 +7,7 @@ import { LoginManager } from './LoginManager';
 import { ImageProvider } from './ImageProvider';
 import { SettingsPage } from './SettingsPage';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { AnalyticsPage } from './AnalyticsPage';
 
 export interface EventBusParams {
     eventBus: EventBus
@@ -32,12 +33,18 @@ export class Supersocial extends React.Component<EventBusParams> {
             path: "/overview"
         }, {
             id: 1,
+            title: 'Analytics',
+            page: <AnalyticsPage eventBus={this.props.eventBus} />,
+            icon: ImageProvider.getImage("analytics"),
+            path: "/analytics"
+        }, {
+            id: 2,
             title: 'Settings',
             page: <SettingsPage eventBus={this.props.eventBus} />,
             icon: ImageProvider.getImage("settings-icon"),
             path: "/settings"
         }, {
-            id: 2,
+            id: 3,
             title: 'About',
             page: <AboutPage />,
             icon: ImageProvider.getImage("info-icon"),

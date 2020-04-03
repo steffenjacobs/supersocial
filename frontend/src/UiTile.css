@@ -10,11 +10,20 @@
     width: 42em;
 }
 
+.container-two-thirds{
+    width: 15.375em;
+}
+
 .dynamic-container {
     width: auto;
 }
 .container-top-margin {
     margin-top: .5em;
+}
+
+.container-margins {
+    margin-right: .5em;
+    margin-bottom: .5em;
 }
 
 .inline {
