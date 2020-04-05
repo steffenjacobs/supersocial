@@ -1,107 +1,47 @@
-version: '2'
+version: '3'
 services:
-
-  traefik:
-    image: "traefik:v2.1"
-    container_name: "traefik"
-    command:
-      #- "--log.level=DEBUG"
-      - "--accesslog"
-      - "--api"
-      - "--api.dashboard"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-    ports:
-      - "80:80"
-      - "8090:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-
   backend:
-    build: backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`backend.localhost`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-    environment:
-      - DISCOURSE_SSO_DISCOURSE_URL=http://discourse.localhost/session/sso_provider
-      - DISCOURSE_SSO_SECRET=supersecret
+    build: ../backend
     ports:
-    - 8081:8080
+    - 9001:8080
+    networks:
+      - network-back
+    depends_on:
+      - "postgres-db"
 
   frontend:
-    build: frontend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-    ports:
-    - 8082:80
-
-
-  discourse:
-    image: 'bitnami/discourse:2'
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.discourse.rule=Host(`discourse.localhost`)"
-      - "traefik.http.routers.discourse.entrypoints=web"
-    ports:
-      - '81:3000'
-    depends_on:
-      - postgresql
-      - redis
+    build: ../frontend
+    ports: 
+    - 9002:80
+    networks:
+      - network-front
+      - network-back
+ 
+  postgres-db:
+    image: postgres:12.2
+    container_name: postgres-db
+    expose:
+      - "5432"
     volumes:
-      - 'discourse_data:/bitnami'
+      - "db-data:/var/lib/postgresql/data"
+    networks:
+      - network-back
     environment:
-      - POSTGRESQL_HOST=postgresql
-      - POSTGRESQL_ROOT_USER=postgres
-      - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_application
-      - POSTGRESQL_CLIENT_CREATE_DATABASE_USERNAME=bn_discourse
-      - POSTGRESQL_CLIENT_CREATE_DATABASE_PASSWORD=bitnami1
-      - DISCOURSE_POSTGRESQL_NAME=bitnami_application
-      - DISCOURSE_POSTGRESQL_USERNAME=bn_discourse
-      - DISCOURSE_POSTGRESQL_PASSWORD=bitnami1
-      - DISCOURSE_HOSTNAME=discourse.localhost
-      - DISCOURSE_USERNAME=admin
-      - DISCOURSE_PASSWORD=admingeheim123
+      POSTGRES_DB: supersocial
+      POSTGRES_USER: supersocial
+      POSTGRES_PASSWORD: supersocial
 
-  postgresql:
-    image: 'bitnami/postgresql:11'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - 'postgresql_data:/bitnami/postgresql'
-
-  redis:
-    image: 'bitnami/redis:5.0'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - 'redis_data:/bitnami'
-
-  sidekiq:
-    image: 'bitnami/discourse:2'
-    depends_on:
-      - discourse
-    volumes:
-      - 'sidekiq_data:/bitnami'
-    command: 'nami start --foreground discourse-sidekiq'
-    environment:
-      - DISCOURSE_POSTGRESQL_NAME=bitnami_application
-      - DISCOURSE_POSTGRESQL_USERNAME=bn_discourse
-      - DISCOURSE_POSTGRESQL_PASSWORD=bitnami1
-      - DISCOURSE_HOST=discourse
-      - DISCOURSE_PORT=3000
-      - DISCOURSE_HOSTNAME=discourse.localhost
 
 volumes:
   postgresql_data:
     driver: local
-  redis_data:
-    driver: local
-  discourse_data:
-    driver: local
-  sidekiq_data:
-    driver: local
+
+networks:
+  network-front:
+    driver: bridge
+  network-back:
+    driver: bridge
+ 
+volumes:
+  db-data:
+      
