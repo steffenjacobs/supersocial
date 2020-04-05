@@ -215,3 +215,7 @@ table tr:nth-child(odd) {
 .table-colum-actions{
     min-width: 8em;
 }
+
+.info-label {
+    margin-left: 10em;
+}
