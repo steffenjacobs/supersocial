@@ -1,6 +1,7 @@
 FROM node:13.11.0-alpine as build
 WORKDIR /app/
 COPY src src
+COPY .htaccess .htaccess
 COPY public public
 COPY package.json package.json
 COPY tsconfig.json tsconfig.json
