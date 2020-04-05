@@ -9,6 +9,7 @@ import { ImageProvider } from "./ImageProvider";
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 import { ToastManager } from "./ToastManager";
 import { EntityUtil } from "./EntityUtil";
+import { SnippetManager } from "./SnippetManager";
 
 export interface AccountDetailsProps {
     account: SocialMediaAccount,
@@ -274,12 +275,8 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     public close() {
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
     }
-
     private createInfo(url: string){
-        return <span className="info-label">Find out more about how to get the API keys and secrets&nbsp;
-        <a target="blank" href={url}>here</a>.&nbsp;
-        <a target="blank" href={url}>{ImageProvider.getImage("info-text")}</a>
-        </span>        
+        return SnippetManager.createInfo(url, "Find out more about how to get the API keys and secrets ", "margin-left-big");
     }
 
     public render() {

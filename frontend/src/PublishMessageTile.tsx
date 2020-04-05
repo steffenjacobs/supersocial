@@ -9,6 +9,7 @@ import Datetime from 'react-datetime';
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 import { ImageProvider } from "./ImageProvider";
 import { ToastManager } from "./ToastManager";
+import { SnippetManager } from "./SnippetManager";
 
 export interface PublishMessageTileState {
     sendTextForm: SendTextForm
@@ -65,11 +66,11 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
     }
 
     private createPost(callback?: Function) {
-        if(this.state.accounts.length === 0){
+        if (this.state.accounts.length === 0) {
             ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
             return;
         }
-        if(this.state.sendTextForm.accountIds.length === 0){
+        if (this.state.sendTextForm.accountIds.length === 0) {
             ToastManager.showWarnToast("Select a social media account to publish to.");
         }
         this.state.sendTextForm.accountIds.forEach(accId => {
@@ -100,11 +101,11 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
     }
 
     private createAndPublishPost() {
-        if(this.state.accounts.length === 0){
+        if (this.state.accounts.length === 0) {
             ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
             return;
         }
-        if(this.state.sendTextForm.accountIds.length === 0){
+        if (this.state.sendTextForm.accountIds.length === 0) {
             ToastManager.showWarnToast("Select a social media account to publish to.");
         }
         this.state.sendTextForm.accountIds.forEach(accId => {
@@ -237,7 +238,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
 
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} />
         }
-        
+
         const accounts = this.state.accounts.sort(
             (a1, a2) => a1.id.localeCompare(a2.id))
             .map(elem => (<div key={elem.id}>
@@ -263,15 +264,18 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                     <div className="messageLabel">Schedule Publishing</div>
                     {checkBoxSchedule}
                     <Datetime dateFormat="YYYY-MM-DD" timeFormat="HH:mm" closeOnSelect={true} onChange={this.onDateChange} value={this.state.sendTextForm.scheduled} />
-                    <div className="channel-selection">
-                        <div className="messageLabel">Distribution Channels</div>
-                        {accounts}
-                    </div>
+                    {this.state.accounts.length > 0 &&
+                        <div className="channel-selection">
+                            <div className="messageLabel">Distribution Channels</div>
+                            {accounts}
+                        </div>
+                    }
+                    {this.state.accounts.length === 0 && SnippetManager.createInfo("https://confluence.supersocial.cloud/display/SP/How+to+add+a+Social+Media+Account", "Find out how to link your social media accounts ")}
                     <button
                         className="btn btn-primary send-button"
-                        onClick={this.send.bind(this)}
+                        onClick={this.send.bind(this)} disabled={this.state.accounts.length === 0}
                     >
-                        {this.state.sendTextForm.schedule?"Schedule":"Publish"}
+                        {this.state.sendTextForm.schedule ? "Schedule" : "Publish"}
                     </button>
                 </div>
             </div>

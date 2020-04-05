@@ -217,5 +217,6 @@ table tr:nth-child(odd) {
 }
 
 .info-label {
-    margin-left: 10em;
+    display: block;
+    padding-left: .25em;
 }
