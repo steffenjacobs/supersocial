@@ -106,6 +106,7 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
                         <div className="messageLabel">Password</div>
                         <input type="password" className="textarea" placeholder="Enter Password" id="password" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
                     </div>
+                        <span>Already have an account? Click <a href="/login">here</a> to sign in.</span>
                     <button
                         className="btn btn-primary send-button"
                         onClick={this.signUp.bind(this)}
