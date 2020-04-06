@@ -42,9 +42,9 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
             }
         }
 
-        if(notMounted){
-            this.state = {components: newComponents, loginManager: this.state.loginManager, selected: pageId};
-        }else{
+        if (notMounted) {
+            this.state = { components: newComponents, loginManager: this.state.loginManager, selected: pageId };
+        } else {
             this.setState({ components: newComponents, selected: pageId });
         }
         //TODO: set title and url in browser window
@@ -60,6 +60,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         </div>);
     }
 
+    /**Log out the user. */
     private performLogout() {
         this.state.loginManager.logOut();
     }
@@ -84,7 +85,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         //3. add the page
         return (
             <div>
-            <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500}/>
+                <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500} />
                 <div className="navbar">
                     <div className="navbar-logo">
                         <img src="/logo192.png" alt="Logo" />

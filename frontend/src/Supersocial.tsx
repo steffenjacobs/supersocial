@@ -17,6 +17,7 @@ export interface EventBusParams {
 /** This class holds the different pages that are later rendered in the side bar.  */
 export class Supersocial extends React.Component<EventBusParams> {
 
+    /**Change the selected page. */
     private selectComponent(components, selected: number) {
         return (<div className="App">
             <Sidebar components={components} loginManager={this.props.loginManager} selected={selected} />
@@ -51,7 +52,7 @@ export class Supersocial extends React.Component<EventBusParams> {
             path: "/about"
         }];
 
-        const routes = components.forEach(c=>{
+        const routes = components.forEach(c => {
             return <Route path={c.path} render={(props) => this.selectComponent(components, c.id)} />;
         });
 

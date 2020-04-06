@@ -26,7 +26,7 @@ export interface Credential {
     created: Date;
 }
 
-/** Contains a form to publish new messages. */
+/** Contains a form to create and update account proerties like name and social media network. Allows to create, update and delete associated credentials. */
 export class AccountDetailsTile extends React.Component<AccountDetailsProps, AccountDetailsProps>{
     constructor(props: AccountDetailsProps) {
         super(props);
@@ -35,6 +35,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         this.state.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, this.updateSelected.bind(this));
     }
 
+    /*Refresh the details view with a new selected account. */
     private updateSelected(type: EventBusEventType, data: any) {
         if (data && data.id === this.state.account.id) {
             this.setState({
@@ -45,6 +46,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }
     }
 
+    /**Fetch the credentials for the currently selected social media account from the backend. 
+     * Refreshes all accounts afterwards.
+    */
     private fetchCredentials() {
         if (EntityUtil.isGeneratedId(this.state.account.id)) {
             return;
@@ -70,6 +74,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
             });
     }
 
+    /** Merges the credentials of the new account with the unsaved ones to avoid losing unsaved changes. 
+     * This would happen because the account is refreshed on save. 
+     * Refreshes the selected account afterwards.*/
     private mergeCredentials(account: SocialMediaAccount): SocialMediaAccount {
         this.state.account.credentials.forEach(c => {
             if (account.credentials.filter(x => x.descriptor === c.descriptor).length === 0) {
@@ -79,6 +86,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         return account;
     }
 
+    /** Save the given credential to the currently selected account. This will also save the account details (name and platform),
+     *  if the account was newly created. 
+     * Refreshes the selected account afterwards. */
     private saveCredential(credentialId: string) {
         if (EntityUtil.isGeneratedId(this.state.account.id)) {
             this.saveAccountDetails(() => this.saveCredentialNoCheck(credentialId));
@@ -87,6 +97,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }
     }
 
+    /**Saves the credentials without checking if the account was just created. 
+     * Refreshes the selected account afterwards.
+    */
     private saveCredentialNoCheck(credentialId: string) {
         this.state.account.credentials.filter(cr => cr.id === credentialId).forEach(c => {
             fetch(DeploymentManager.getUrl() + 'api/credential', {
@@ -114,6 +127,8 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         });
     }
 
+    /** Saves the account details (display name and selected platform).
+     * Refreshes all accounts afterwards.*/
     private saveAccountDetails(callback?: any) {
         fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
             method: 'PUT',
@@ -149,6 +164,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
             });
     }
 
+    /**Remove a given credential from a social media account.
+     * Refreshes the credentials for the given account afterwards.
+     */
     private removeCredential(credentialId: string) {
         this.setState({
             account: {
@@ -176,7 +194,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         });
     }
 
-
+    /**Update the current state of a given property without persisting it to the backend. */
     private updateProperty(id: string, value: string) {
         if (id === "displayName") {
             this.setState({
@@ -201,6 +219,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }
     }
 
+    /** Realize a template of credentials necessary to integrate a given social media platform. */
     private prepareCredentials(platformId: string) {
         if (platformId === "1") {
             this.addCredentialIfNotPresent("facebook.page.id", () =>
@@ -220,6 +239,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }
     }
 
+    /** Update the current state of a given credential without persisting it to the backend. */
     private updateStateIfNecessary(property: string, id: string, value: string) {
         let identifier = id.substring(property.length + 1);
         let cred = this.state.account.credentials.find(c => c.id === identifier);
@@ -240,6 +260,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         });
     }
 
+    /** Update the ommited state of a given credential. Indicates if there are unsaved changes in the credential.*/
     private updateOmittedState(cred: Credential, value: string) {
         if (value) {
             cred.omitted = false;
@@ -247,6 +268,10 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
             cred.omitted = true;
         }
     }
+
+    /** Insert a new credential with a given descriptor if none is already present. 
+     * Used to insert template credentials for social media platforms without duplication.
+     */
     private addCredentialIfNotPresent(descriptor: string, callback?: any) {
         if (this.state.account.credentials.filter(c => c.descriptor === descriptor).length === 0) {
             this.addCredential(descriptor, callback);
@@ -257,6 +282,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }
     }
 
+    /**Add a credential to a social media account without persisting it to the backend. */
     private addCredential(descriptor?: string, callback?: any) {
         const newCreds = Object.assign([], this.state.account.credentials);
         newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
@@ -272,19 +298,22 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }, callback);
     }
 
+    /**Close the details view. */
     public close() {
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
     }
-    private createInfo(url: string){
+    private createInfo(url: string) {
         return SnippetManager.createInfo(url, "Find out more about how to get the API keys and secrets ", "margin-left-big");
     }
 
     public render() {
+        //table of credentials for the currently selected social media account
         const credentialElements = this.state.account.credentials.sort((c1, c2) => c1.descriptor.localeCompare(c2.descriptor)).map(cred => {
             const credentialsField = cred.omitted ?
                 <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder="(omitted)" value="" />
                 : <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
 
+            //save button: is omitted if no change occured.
             const saveButton = cred.omitted ? undefined : <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveCredential(cred.id)}>{ImageProvider.getImage("save-icon")}</div>;
             return (
                 <div key={cred.id} className="box-content">
@@ -303,6 +332,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
             );
         });
 
+        //save buttons for display name and platform which are only visible if there were changes.
         const displayNameSaveButton = this.state.displayNameLastSaved !== this.state.account.displayName && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save-icon")}</div>;
         const platformSaveButton = this.state.platformIdLastSaved !== this.state.account.platformId && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save-icon")}</div>;
         return (
@@ -328,9 +358,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                             {platformSaveButton}
                         </div>
                         {
-                            this.state.account.platformId && this.state.account.platformId == 1 ? this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Facebook+Page"):
+                            this.state.account.platformId && this.state.account.platformId == 1 ? this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Facebook+Page") :
                                 (this.state.account.platformId == 2 &&
-                                this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Twitter+Account"))
+                                    this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Twitter+Account"))
                         }
                     </div>
                     <div className="displayName">Credentials: </div>

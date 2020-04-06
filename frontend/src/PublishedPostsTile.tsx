@@ -68,6 +68,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             });
     }
 
+    /** Create a table cell with the platform icon. */
     private createPlatformElement(platformId: number) {
         if (platformId === 0) {
             return <td className="centered tooltip x-gray icon-medium">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
@@ -82,6 +83,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
     }
 
+    /** Delete the post from the system without unpublishing it. */
     private deletePostLink(post: PublishedPost) {
         fetch(DeploymentManager.getUrl() + 'api/post/' + post.id, {
             method: 'delete',
@@ -97,6 +99,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             });
     }
 
+    /** Remove scheduling information for a scheduled, not yet posted post. */
     private unschedulePost(post: PublishedPost) {
         fetch(DeploymentManager.getUrl() + 'api/schedule/post/' + post.id, {
             method: 'delete',
@@ -112,10 +115,12 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             });
     }
 
+    /** Open the post on the native platform in a new tab. */
     private goToPost(post: PublishedPost) {
         window.open(post.postUrl, "_blank")
     }
 
+    /** Publish an unpublished and/or scheduled post right away. */
     private publishPost(post: PublishedPost) {
         fetch(DeploymentManager.getUrl() + 'api/publishnow/' + post.id, {
             method: 'POST',
@@ -135,9 +140,11 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
     }
 
     public render() {
+        //rows with posts
         const posts = this.state.posts.sort(
             (p1: PublishedPost, p2: PublishedPost) => p2.created.getTime() - p1.created.getTime())
             .map(elem => {
+                //status: first column with checkmark or error with error description.
                 var status;
                 if (elem.errorMessage) {
                     status = <td key={elem.id} className="tooltip centered icon-medium">{ImageProvider.getImage("none-logo")}
@@ -153,7 +160,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     }
                 }
 
-
+                //actions for the current post
                 const allowedActions = (
                     <div className="inline-block">
                         <span className="table-icon">
@@ -179,6 +186,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                             </span>}
                     </div>);
 
+                //Publication date if present
                 const published = elem.published ? <Moment format="YYYY-MM-DD">{elem.published}</Moment> : "";
                 return (
                     <tr key={elem.id}>
@@ -194,6 +202,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                 );
             });
 
+        //animation for refresh button
         let classUpdating = ["inline-block", "btn-icon", "btn-small"]
         if (this.state.updating) {
             classUpdating.push("crossRotate");

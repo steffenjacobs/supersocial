@@ -30,6 +30,7 @@ export class LoginManager {
         return this.loginStatus.loggedIn;
     }
 
+    /** Update the login status of the user to log in or log out.*/
     private updateLoginStatus(newLoginStatus: LoginStatus) {
         this.loginStatus = { loggedIn: newLoginStatus.loggedIn, username: newLoginStatus.username };
         this.eventBus.fireEvent(EventBusEventType.USER_CHANGE, this.loginStatus);
@@ -62,7 +63,8 @@ export class LoginManager {
             });
     }
 
-    public logOut(){
+    /** Log out the current user. */
+    public logOut() {
         fetch(DeploymentManager.getUrl() + 'logout', {
             method: 'get',
             credentials: 'include',

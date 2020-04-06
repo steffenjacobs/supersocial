@@ -12,6 +12,7 @@ export class EntityUtil {
         return outString;
     }
 
+    /**@return true if the ID was generated with EntityUtil.makeId. */
     static isGeneratedId(id: string): boolean {
         return id.startsWith(EntityUtil.prefix);
     }

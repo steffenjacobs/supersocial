@@ -24,7 +24,7 @@ export interface SocialMediaAccounts {
     selected?: SocialMediaAccount
 }
 
-/** Lists the already published posts. */
+/** Lists the social media accounts the current user has access to. */
 
 //TODO: make table scrollable and pageable.
 export class SocialMediaAccountsListTile extends React.Component<SocialMediaAccounts, SocialMediaAccounts>{
@@ -76,6 +76,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         }
     }
 
+    /**Create a table cell with the social media platform icon. */
     private createPlatformElement(platformId: number) {
         if (platformId === 0) {
             return <td className="centered tooltip x-gray">{ImageProvider.getImage("none")}<span className="tooltiptext">No Platform selected yet.</span></td>;
@@ -85,7 +86,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         }
     }
 
-    /** Fire an event to change the selected post. Lets all listeners on the event bus (e.g. PublishMessageTile.tsx) know to update accordingly. */
+    /** Select a new social media account to be displayed in the AccountDetailsTile.tsx. */
     private selectAccount(account: SocialMediaAccount) {
         if (!account) {
             this.setState({
@@ -103,6 +104,9 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         });
     }
 
+    /** Delete a given social media account in the backend.
+     * Updates the list of social media accounts afterwards.
+      */
     private deleteAccount(account: SocialMediaAccount) {
         fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount/' + account.id, {
             method: 'delete',
@@ -118,6 +122,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
             });
     }
 
+    /**Add a new social media account to the current state without persisting to the backend. */
     private addAccount() {
         this.setState({
             selected: {
@@ -130,9 +135,11 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
     }
 
     public render() {
+        //list of accounts
         const accounts = this.state.accounts.sort(
             (p1, p2) => p1.displayName.localeCompare(p2.displayName)).map(elem => {
 
+                //allowed acions for this account
                 const allowedActions = (
                     <div className="inline-block">
                         <span className="table-icon">
@@ -155,11 +162,13 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                 );
             });
 
+        //refresh button animation
         let classUpdating = ["inline-block", "btn-icon", "btn-small"]
         if (this.state.updating) {
             classUpdating.push("crossRotate");
         }
 
+        //details panel
         const accountSettings = this.state.selected ? <AccountDetailsTile eventBus={this.state.eventBus} account={this.state.selected} /> : <div />;
         return (
             <div>

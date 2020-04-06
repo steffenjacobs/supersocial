@@ -7,7 +7,7 @@ export interface AnalyticsProps {
     eventBus: EventBus
 }
 
-/** Message overview page. Contains the message publishing tile (PublishMessageTile.tsx) and the list of published posts (PublishedPostsTile.tsx). */
+/** Analytics page. Contains all sorts of analytics tiles with KPIs and graphs. */
 export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsProps>{
     constructor(props: AnalyticsProps) {
         super(props);

@@ -11,7 +11,8 @@ export interface LoginCredentials {
     loggedIn?: boolean
 }
 
-/** Login Page. Consult the LoginManger.tsx for further login logic. */
+/** Login Page. The user can login here or go to the Registration page to create a new user account. 
+ * Consult the LoginManger.tsx for further login logic. */
 export class Login extends React.Component<LoginCredentials, LoginCredentials> {
     constructor(props: LoginCredentials, state: LoginCredentials) {
         super(props);
@@ -19,6 +20,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
+    /** Called when the logged in user changed. */
     private onUserChange(eventData?: any) {
         this.setState({
             username: this.state.username, password: this.state.password,
@@ -27,10 +29,12 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
         });
     }
 
+    /** Called when the user enters a username or password. */
     private formInputFieldUpdated(event: React.ChangeEvent<HTMLInputElement>) {
         this.update(event.currentTarget.id, event.currentTarget.value);
     }
 
+    /**Update the internal state with thew new username or password from the input field. */
     private update(id: string, value: string) {
         if (id === "username") {
             this.setState({
@@ -52,6 +56,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
         }
     }
 
+    /**Sign the user in. */
     private signIn() {
         this.state.loginManager.logIn(this.state.username, this.state.password);
     }
@@ -73,7 +78,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
                         <div className="messageLabel">Password</div>
                         <input type="password" className="textarea" placeholder="Enter Password" id="password" onKeyDown={this.signIn.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
                     </div>
-                        <span>Not registered yet? Click <a href="/register">here</a> to sign up.</span>
+                    <span>Not registered yet? Click <a href="/register">here</a> to sign up.</span>
                     <button
                         className="btn btn-primary send-button"
                         onClick={this.signIn.bind(this)}

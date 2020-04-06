@@ -35,6 +35,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         this.state.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, this.refreshAccounts.bind(this));
     }
 
+    /** Refresh the list of social media accounts */
     private refreshAccounts() {
         fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
             method: 'get',
@@ -65,14 +66,21 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         });
     }
 
+    /** Store the newly created post without publishing. */
     private createPost(callback?: Function) {
+
+        //No social media accounts yet -> Show information
         if (this.state.accounts.length === 0) {
             ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
             return;
         }
+
+        //No selected account to post to -> Show information
         if (this.state.sendTextForm.accountIds.length === 0) {
             ToastManager.showWarnToast("Select a social media account to publish to.");
         }
+
+        //store post for all selected accounts
         this.state.sendTextForm.accountIds.forEach(accId => {
             fetch(DeploymentManager.getUrl() + 'api/post', {
                 method: 'PUT',
@@ -100,14 +108,21 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         });
     }
 
+    /** Create and publish a post right away in the backend. */
     private createAndPublishPost() {
+
+        //No social media accounts yet -> Show information
         if (this.state.accounts.length === 0) {
             ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
             return;
         }
+
+        //No selected account to post to -> Show information
         if (this.state.sendTextForm.accountIds.length === 0) {
             ToastManager.showWarnToast("Select a social media account to publish to.");
         }
+
+        //store post for all selected accounts
         this.state.sendTextForm.accountIds.forEach(accId => {
             fetch(DeploymentManager.getUrl() + 'api/publish', {
                 method: 'POST',
@@ -132,6 +147,8 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         })
     }
 
+    /** Schedule a post to be published later. 
+     * Does not create a new post.*/
     private createScheduledPost(postId: string) {
         fetch(DeploymentManager.getUrl() + 'api/schedule/post', {
             method: 'PUT',
@@ -155,7 +172,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
 
     }
 
-    /** Send the request to the back end triggerin a post on the selected platforms. */
+    /** Create a scheduled post. */
     private send() {
         if (this.state.sendTextForm.schedule) {
             this.createPost(this.createScheduledPost.bind(this));
@@ -172,6 +189,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         });
     }
 
+    /** Called when the user changes the post text. Updates the internal state without persisting to the backend. */
     private formTextAreaUpdated(event: React.ChangeEvent<HTMLTextAreaElement>) {
         this.setState({
             sendTextForm: {
@@ -183,6 +201,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         });
     }
 
+    /** Called when the user changes the social media accounts to publish to. Updates the internal state without persisting to the backend. */
     private formInputFieldUpdated(event: React.ChangeEvent<HTMLInputElement>) {
         var ids = Object.assign([], this.state.sendTextForm.accountIds);
         if (event.currentTarget.checked) {
@@ -203,6 +222,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         });
     }
 
+    /** Create a checkbox that is checked or not */
     private createCheckbox(id: string, checked: boolean) {
         if (checked) {
             return <input id={id} type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} checked />
@@ -210,6 +230,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
         return <input id={id} type="checkbox" onChange={this.formInputFieldUpdated.bind(this)} />
     }
 
+    /** Called when the user changes the scheduling. Updates the internal state without persisting to the backend. */
     private updateSchedulingMode(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
             sendTextForm: {
@@ -231,14 +252,15 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
     })
 
     public render() {
+        //render scheduling option
         var checkBoxSchedule;
         if (this.state.sendTextForm.schedule) {
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} checked />
         } else {
-
             checkBoxSchedule = <input type="checkbox" onChange={this.updateSchedulingMode.bind(this)} />
         }
 
+        //render checkboxes for social media accounts to publish to
         const accounts = this.state.accounts.sort(
             (a1, a2) => a1.id.localeCompare(a2.id))
             .map(elem => (<div key={elem.id}>

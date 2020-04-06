@@ -6,11 +6,11 @@ export interface SettingsProps {
     eventBus: EventBus
 }
 
-/** Message overview page. Contains the message publishing tile (PublishMessageTile.tsx) and the list of published posts (PublishedPostsTile.tsx). */
+/** Settings page. Contains the social media account management. */
 export class SettingsPage extends React.Component<SettingsProps, SettingsProps>{
     constructor(props: SettingsProps) {
         super(props);
-        this.state = {eventBus: props.eventBus};
+        this.state = { eventBus: props.eventBus };
     }
 
     public render() {

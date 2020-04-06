@@ -3,6 +3,7 @@ import { EventBus, EventBusEventType } from "./EventBus";
 import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
 import { DeploymentManager } from "./DeploymentManager";
+import { ToastManager } from "./ToastManager";
 
 export interface RegistrationCredentials {
     username: string
@@ -13,7 +14,7 @@ export interface RegistrationCredentials {
     loggedIn?: boolean
 }
 
-/** Login Page. Consult the LoginManger.tsx for further login logic. */
+/** Registration Page. The user can register here or go back to the Login Page. */
 export class Registration extends React.Component<RegistrationCredentials, RegistrationCredentials> {
     constructor(props: RegistrationCredentials, state: RegistrationCredentials) {
         super(props);
@@ -21,6 +22,7 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
+    /** Called when the logged in user changed. */
     private onUserChange(eventData?: any) {
         this.setState({
             username: this.state.username,
@@ -32,10 +34,12 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
         });
     }
 
+    /** Called when the user enters a username, password or email address. Requests an update of the internal state.*/
     private formInputFieldUpdated(event: React.ChangeEvent<HTMLInputElement>) {
         this.update(event.currentTarget.id, event.currentTarget.value);
     }
 
+    /** Update the internal state after the user entered a username, password or email address. */
     private update(id: string, value: string) {
         if (id === "username") {
             this.setState({
@@ -69,6 +73,7 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
         }
     }
 
+    /**Create a new user in the backend. */
     private signUp() {
         fetch(DeploymentManager.getUrl() + 'api/register', {
             method: 'post',
@@ -81,12 +86,13 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
                 if (response.ok) {
                     this.state.loginManager.logIn(this.state.username, this.state.password);
                 } else {
-                    //TODO: show registration failed text
+                    response.json().then(e => ToastManager.showErrorToast(e.error));
                 }
             });
     }
 
     public render() {
+        //redirect to main page if the user is already logged in.
         if (this.state.loggedIn) {
             return <Redirect to="/" />;
         }
@@ -106,7 +112,7 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
                         <div className="messageLabel">Password</div>
                         <input type="password" className="textarea" placeholder="Enter Password" id="password" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
                     </div>
-                        <span>Already have an account? Click <a href="/login">here</a> to sign in.</span>
+                    <span>Already have an account? Click <a href="/login">here</a> to sign in.</span>
                     <button
                         className="btn btn-primary send-button"
                         onClick={this.signUp.bind(this)}

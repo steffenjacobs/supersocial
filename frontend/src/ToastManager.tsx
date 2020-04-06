@@ -4,6 +4,7 @@ export interface InterfaceWithError {
     error: string
 }
 
+/**Shows different kinds of standardized toasts. */
 export class ToastManager {
     static showErrorToast(response: Response) {
         response.json().then(json => {
