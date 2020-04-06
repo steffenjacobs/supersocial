@@ -13,12 +13,17 @@ export interface LoginInfo {
 
 /** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
 class App extends React.Component<LoginInfo, LoginInfo> {
+  eventBus = new EventBus();
+  loginManager = new LoginManager(this.eventBus);
+
   constructor(props) {
     super(props);
     this.state = {
       loggedIn: false,
       username: "Not logged in"
     };
+    this.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
+
   }
 
   private onUserChange(eventData?: any) {
@@ -26,18 +31,14 @@ class App extends React.Component<LoginInfo, LoginInfo> {
   }
 
   render() {
-    let eventBus = new EventBus();
-    let loginManager = new LoginManager(eventBus);
-    eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
-
     // /login -> go to Login Page
     // everything else -> Go to Supersocial application
     return (
       <BrowserRouter>
         <Switch>  
-          <Route path="/register" render={(props) => <Registration username="" password="" email="" eventBus={eventBus} loginManager={loginManager} />} />        
-          <Route path="/login" render={(props) => <Login username="" password="" eventBus={eventBus} loginManager={loginManager} />} />
-          {this.state.loggedIn ? <Route path="/" render={(props) => <Supersocial eventBus={eventBus} loginManager={loginManager} />} /> : <Redirect to="/login" />} />}
+          <Route path="/register" render={(props) => <Registration username="" password="" email="" eventBus={this.eventBus} loginManager={this.loginManager} />} />        
+          <Route path="/login" render={(props) => <Login username="" password="" eventBus={this.eventBus} loginManager={this.loginManager} />} />
+          {this.state.loggedIn ? <Route path="/" render={(props) => <Supersocial eventBus={this.eventBus} loginManager={this.loginManager} />} /> : <Redirect to="/login" />} />}
         </Switch>
       </BrowserRouter>
     );
