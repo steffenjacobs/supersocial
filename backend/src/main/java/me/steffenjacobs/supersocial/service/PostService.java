@@ -23,7 +23,6 @@ import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
-import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
 /** @author Steffen Jacobs */
@@ -87,15 +86,11 @@ public class PostService {
 	
 	public Post findOriginalPostById(UUID id) {
 		final Post post = postPersistenceManager.findPostById(id);
-		if (securityService.isCurrentUserPermitted(post, SecuredAction.READ)) {
-			return post;
-		} else {
-			throw new AuthorizationException("post", SecuredAction.READ);
-		}
+		securityService.checkIfCurrentUserIsPermitted(post, SecuredAction.READ);
+		return post;
 	}
 
 	public void deletePostById(UUID id) {
-
 		try {
 			// check the post itself
 			Post p = postPersistenceManager.findPostById(id);

@@ -57,7 +57,7 @@ public class SocialMediaAccountService {
 		}
 		SocialMediaAccount acc = optAccount.orElse(new SocialMediaAccount());
 		boolean created = acc.getId() == null;
-		if(created) {
+		if (created) {
 			createNewSocialMediaAccount(acc, Platform.fromId(creationDto.getPlatformId()), creationDto.getDisplayName());
 		}
 		acc.setDisplayName(creationDto.getDisplayName());
@@ -106,7 +106,7 @@ public class SocialMediaAccountService {
 			socialMediaAccountRepository.deleteById(id);
 		} catch (Exception e) {
 			throw new CouldNotDeleteEntityException(
-					"Could not delete social media account because there are still posts scheduled to be posted via this account. Please revise them before deleting the account.");
+					"Could not delete social media account because there are still posts scheduled to be posted or credentials associated with this account. Please revise them before deleting the account.");
 		}
 	}
 

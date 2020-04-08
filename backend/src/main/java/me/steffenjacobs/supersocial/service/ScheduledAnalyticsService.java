@@ -1,0 +1,57 @@
+package me.steffenjacobs.supersocial.service;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.StreamSupport;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
+import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
+
+/** @author Steffen Jacobs */
+@Component
+public class ScheduledAnalyticsService {
+	private static final Logger LOG = LoggerFactory.getLogger(ScheduledAnalyticsService.class);
+
+	@Autowired
+	private PostPersistenceManager postPersistenceManager;
+
+	@Autowired
+	private StatisticService statisticService;
+
+	@Autowired
+	private SocialMediaAccountRepository socialMediaAccountRepository;
+
+	@PostConstruct
+	public void setup() {
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::refresh, 0, 1, TimeUnit.HOURS);
+	}
+
+	private void refresh() {
+		// TODO: restrict statistics to track
+		// TODO: make it possible to change the refresh interval, probably
+		// dependent on creation date or change rate.
+		LOG.info("Running analytics job...");
+		AtomicInteger postCounter = new AtomicInteger();
+		AtomicInteger accountCounter = new AtomicInteger();
+
+		postPersistenceManager.getAllPosts().parallel().forEach(p -> {
+			statisticService.fetchAll(p);
+			postCounter.incrementAndGet();
+		});
+
+		StreamSupport.stream(socialMediaAccountRepository.findAll().spliterator(), true).forEach(a -> {
+			statisticService.fetchAll(a);
+			accountCounter.incrementAndGet();
+		});
+
+		LOG.info("Finished analytics job. Fetched analytics for {} posts and {} social media accounts.", postCounter.get(), accountCounter.get());
+	}
+}

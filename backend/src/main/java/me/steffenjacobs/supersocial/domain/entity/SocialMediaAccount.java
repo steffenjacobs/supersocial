@@ -34,7 +34,7 @@ public class SocialMediaAccount implements Secured {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
-	@OneToMany(mappedBy="account")
+	@OneToMany(mappedBy = "account")
 	private Set<Credential> credentials = new HashSet<Credential>();
 
 	@OneToOne

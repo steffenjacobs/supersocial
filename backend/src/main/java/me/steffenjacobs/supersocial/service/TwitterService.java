@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.entity.Post;
+import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.TwitterException;
 import oauth.signpost.OAuthConsumer;
@@ -65,5 +66,15 @@ public class TwitterService {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
 			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
 		}
+	}
+
+	public String fetchPostStatistics(String externalId) {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String fetchAccountStatistics(SocialMediaAccount account) {
+		// TODO Auto-generated method stub
+		return "";
 	}
 }
