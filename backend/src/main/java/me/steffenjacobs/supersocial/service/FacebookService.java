@@ -11,18 +11,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.domain.entity.TrackedStatistic;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
+import me.steffenjacobs.supersocial.service.exception.FacebookPostNotFoundException;
 import net.minidev.json.JSONObject;
 
 /** @author Steffen Jacobs */
@@ -33,7 +36,7 @@ public class FacebookService {
 
 	private static final String FACEBOOK_POST_TO_PAGE_ENDPOINT = "https://graph.facebook.com/%s/feed?message=%s&access_token=%s";
 	private static final String FACEBOOK_EXCHANGE_TO_PAGE_TOKEN_ENDPOINT = "https://graph.facebook.com/%s?access_token=%s&fields=access_token";
-	private static final String FACEBOOK_POST_STATISTICS = "https://graph.facebook.com/%s_%s?fields=shares,likes.summary(true),comments.summary(true),insights.metric(post_impressions)&access_token=%s";
+	private static final String FACEBOOK_POST_STATISTICS = "https://graph.facebook.com/%s?fields=shares,likes.summary(true),comments.summary(true),insights.metric(post_impressions)&access_token=%s";
 	private static final String FACEBOOK_PAGE_STATISTICS = "https://graph.facebook.com/%s?fields=fan_count,posts,insights.metric(page_impressions,page_engaged_users)&access_token=%s";
 
 	@Autowired
@@ -82,18 +85,29 @@ public class FacebookService {
 		}
 	}
 
+	private void checkForErrors(String json) {
+		try {
+			if ("GraphMethodException".equals("" + JsonPath.read(json, "$.error.type"))) {
+				throw new FacebookPostNotFoundException("" + JsonPath.read(json, "$.error.message"));
+			}
+			throw new FacebookException("" + JsonPath.read(json, "$.error.message"));
+		} catch (PathNotFoundException e) {
+			// ignore
+		}
+	}
+
 	public JSONObject fetchPostStatistics(Post post) {
-		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_POST_STATISTICS, credentialLookupService.getCredential(post, CredentialType.FACEBOOK_PAGE_ID),
-				post.getExternalId(), credentialLookupService.getCredential(post, CredentialType.FACEBOOK_PAGE_ACCESSTOKEN)));
+		final HttpGet httpGet = new HttpGet(
+				String.format(FACEBOOK_POST_STATISTICS, post.getExternalId(), credentialLookupService.getCredential(post, CredentialType.FACEBOOK_PAGE_ACCESSTOKEN)));
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpGet);
-			JSONObject json = JsonPath.read(httpResponse.getEntity().getContent(), "$");
+			String json = EntityUtils.toString(httpResponse.getEntity());
+			checkForErrors(json);
 			JSONObject jsonResult = new JSONObject();
-			jsonResult.appendField("postId", post.getId());
 			jsonResult.appendField(TrackedStatistic.POST_LIKES.key(), JsonPath.read(json, "$.likes.summary.total_count"));
 			jsonResult.appendField(TrackedStatistic.POST_COMMENTS.key(), JsonPath.read(json, "$.comments.summary.total_count"));
-			jsonResult.appendField(TrackedStatistic.POST_SHARES.key(), JsonPath.read(json, "$.shares.count"));
-			jsonResult.appendField(TrackedStatistic.POST_VIEWS.key(), JsonPath.read(json, "$.insights.data.values.value"));
+			appendIfPresent(jsonResult, json, TrackedStatistic.POST_SHARES, "$.shares.count", 0, post.getExternalId());
+			appendIfPresent(jsonResult, json, TrackedStatistic.POST_IMPRESSIONS, "$.insights.data.values[0].value", 0, post.getExternalId());
 			return jsonResult;
 
 		} catch (UnsupportedOperationException | IOException e) {
@@ -102,12 +116,21 @@ public class FacebookService {
 		}
 	}
 
+	private void appendIfPresent(JSONObject jsonResult, String json, TrackedStatistic statistic, String jsonPath, Object defaultValue, String externalId) {
+		try {
+			jsonResult.appendField(statistic.key(), JsonPath.read(json, jsonPath));
+		} catch (PathNotFoundException e) {
+			jsonResult.appendField(statistic.key(), defaultValue);
+			LOG.warn("Statistic '{}' not found for '{}'.", statistic.key(), externalId);
+		}
+	}
+
 	public JSONObject fetchAccountStatistics(SocialMediaAccount account) {
 		final HttpGet httpGet = new HttpGet(String.format(FACEBOOK_PAGE_STATISTICS, credentialLookupService.getCredential(account, CredentialType.FACEBOOK_PAGE_ID),
 				credentialLookupService.getCredential(account, CredentialType.FACEBOOK_PAGE_ACCESSTOKEN)));
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpGet);
-			JSONObject json = JsonPath.read(httpResponse.getEntity().getContent(), "$");
+			String json = EntityUtils.toString(httpResponse.getEntity());
 			JSONObject jsonResult = new JSONObject();
 			jsonResult.appendField("accountId", account.getId());
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_FOLLOWERS.key(), JsonPath.read(json, "$.fan_count"));

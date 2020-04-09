@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.service.StatisticService;
-import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
 /** @author Steffen Jacobs */
 @RestController
@@ -30,8 +28,9 @@ public class AnalyticsEndpoint {
 		LOG.info("Retrieving all statistics for '{}'.", id);
 		try {
 			return new ResponseEntity<>(statisticService.getStatistics(id, query), HttpStatus.OK);
-		} catch (PostNotFoundException | SocialMediaAccountNotFoundException e) {
-			return new ResponseEntity<>(String.format("{\"error:\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			LOG.error("Error retrieving analytics for {} ({}): ", id, query);
+			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 

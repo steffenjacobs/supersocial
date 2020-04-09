@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
+import me.steffenjacobs.supersocial.service.exception.FacebookPostNotFoundException;
 
 /** @author Steffen Jacobs */
 @Component
@@ -42,14 +43,30 @@ public class ScheduledAnalyticsService {
 		AtomicInteger postCounter = new AtomicInteger();
 		AtomicInteger accountCounter = new AtomicInteger();
 
-		postPersistenceManager.getAllPosts().parallel().forEach(p -> {
-			statisticService.fetchAll(p);
-			postCounter.incrementAndGet();
+		postPersistenceManager.getAllPosts().forEach(p -> {
+			try {
+				if(p.getPublished() == null) {
+					return;
+				}
+				statisticService.fetchAll(p);
+				postCounter.incrementAndGet();
+				LOG.info("Fetched statistics for post '{}'", p.getId());
+			} catch (FacebookPostNotFoundException e) {
+				LOG.error("Could not fetch statistics for post {}: Post does not exist anymore.", p.getId());
+			}
+			catch (Exception e) {
+				LOG.error("Could not fetch statistics for post {}: ", p.getId(), e.getMessage(), e);
+			}
 		});
 
-		StreamSupport.stream(socialMediaAccountRepository.findAll().spliterator(), true).forEach(a -> {
-			statisticService.fetchAll(a);
-			accountCounter.incrementAndGet();
+		StreamSupport.stream(socialMediaAccountRepository.findAll().spliterator(), false).forEach(a -> {
+			try {
+				statisticService.fetchAll(a);
+				accountCounter.incrementAndGet();
+				LOG.info("Fetched statistics for account '{}'", a.getId());
+			} catch (Exception e) {
+				LOG.error("Could not fetch statistics for account {}: ", a.getId(), e.getMessage(), e);
+			}
 		});
 
 		LOG.info("Finished analytics job. Fetched analytics for {} posts and {} social media accounts.", postCounter.get(), accountCounter.get());

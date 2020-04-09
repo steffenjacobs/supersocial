@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -34,7 +35,7 @@ public class SocialMediaAccount implements Secured {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
-	@OneToMany(mappedBy = "account")
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
 	private Set<Credential> credentials = new HashSet<Credential>();
 
 	@OneToOne

@@ -16,11 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
 import me.steffenjacobs.supersocial.util.SuccessCallback;
 import me.steffenjacobs.supersocial.util.SuccessErrorCallback;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 @Component
 public class ElasticSearchConnector {
@@ -37,8 +40,8 @@ public class ElasticSearchConnector {
 
 	public void insert(String json, String index, UUID id) {
 		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
-			LOG.info("Inserting {} to {}.", json, index);
-			performInsert(restClient, json, index, id, (SuccessCallback) System.out::println);
+			LOG.info("Inserting {} into {}.", json, index);
+			performInsert(restClient, json, index, id, (SuccessCallback) e->LOG.info(e.toString()));
 		} catch (ParseException | IOException e) {
 			LOG.error("Could not insert into elasticsearch index.", e);
 		}
@@ -54,7 +57,8 @@ public class ElasticSearchConnector {
 	}
 
 	private void performSearchQuery(RestClient restClient, String searchQuery, String index, boolean pretty, SuccessErrorCallback callback) {
-		HttpEntity entity = new NStringEntity("{\"query\" : { \"match\": { " + searchQuery + "} } }", ContentType.APPLICATION_JSON);
+		String matchQuery = StringUtils.isEmpty(searchQuery)?"\"match_all\":{}":"\"match\": { " + searchQuery + "}";
+		HttpEntity entity = new NStringEntity("{\"query\" : { " + matchQuery + " } }", ContentType.APPLICATION_JSON);
 		Request request = new Request("GET", index + "/_search");
 		if (pretty) {
 			request.addParameter("pretty", "true");
@@ -69,9 +73,14 @@ public class ElasticSearchConnector {
 
 	private void performInsert(RestClient restClient, String json, String index, UUID id, SuccessErrorCallback callback) {
 		HttpEntity entity = new NStringEntity(json, ContentType.APPLICATION_JSON);
-		Request request = new Request("POST", index + "/_doc/" + id);
+		Request request = new Request("PUT", "/" + index + "/_doc/" + id);
 		request.setEntity(entity);
-		restClient.performRequestAsync(request, map(callback));
+		ResponseListener rl = map(callback);
+		try {
+			rl.onSuccess(restClient.performRequest(request));
+		} catch (IOException e) {
+			rl.onFailure(e);
+		}
 	}
 
 	private ResponseListener mapSearch(SuccessErrorCallback callback) {
@@ -97,7 +106,9 @@ public class ElasticSearchConnector {
 			@Override
 			public void onSuccess(Response response) {
 				try {
-					callback.onSuccess(JsonPath.read(response.getEntity().getContent(), "$"));
+					JSONArray arr = new JSONArray();
+					arr.add(new JSONObject(JsonPath.read(response.getEntity().getContent(), "$")));
+					callback.onSuccess(arr);
 				} catch (ParseException | IOException e) {
 					callback.onError(e);
 				}
