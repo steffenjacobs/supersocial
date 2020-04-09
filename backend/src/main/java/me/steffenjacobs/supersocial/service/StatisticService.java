@@ -26,7 +26,7 @@ import net.minidev.json.JSONObject;
 @Component
 public class StatisticService {
 	private static final Logger LOG = LoggerFactory.getLogger(StatisticService.class);
-	
+
 	private static final String POST_INDEX_TEMPLATE = "post_%s";
 	private static final String ACCOUNT_INDEX_TEMPLATE = "account_%s";
 
@@ -42,25 +42,31 @@ public class StatisticService {
 	@Autowired
 	private PostService postService;
 
-	public String getAllStatistics(String query) {
+	@Autowired
+	private SocialMediaAccountService socialMediaAccountService;
 
+	public String getAllAccountStatistics(String query) {
+		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		socialMediaAccountService.getAllSocialMediaAccounts().forEach(acc -> {
+			CompletableFuture<JSONArray> f = new CompletableFuture<>();
+			elasticSearchConnector.find(query, String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()), false, createFutureCallback(f));
+			futures.add(f);
+		});
+		return aggregateFutures(futures);
+	}
+
+	public String getAllPostStatistics(String query) {
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
 		postService.getAllPosts().stream().filter(p -> p.getPublished() != null).forEach(post -> {
 			CompletableFuture<JSONArray> f = new CompletableFuture<>();
-			elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, post.getId()), false, new SuccessCallback() {
-				@Override
-				public void onSuccess(JSONArray json) {
-					f.complete(json);
-				}
-
-				@Override
-				public void onError(Exception e) {
-					f.completeExceptionally(e);
-				}
-			});
+			elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, post.getId()), false, createFutureCallback(f));
 			futures.add(f);
 		});
+		return aggregateFutures(futures);
+	}
 
+	@SuppressWarnings("unchecked")
+	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures) {
 		LinkedHashMap<String, Double> map = new LinkedHashMap<String, Double>();
 		futures.stream().map(t -> {
 			try {
@@ -69,17 +75,17 @@ public class StatisticService {
 				LOG.error("Could not aggregate statistics.", e);
 				return Optional.<JSONArray> empty();
 			}
-		}).filter(o -> o.isPresent()).map(o -> o.get()).map(a -> (LinkedHashMap<String, ?>) a.get(0)).map(m->(LinkedHashMap<String, ?>)m.get("_source")).forEach(c -> {
+		}).filter(o -> o.isPresent()).map(o -> o.get()).map(a -> (LinkedHashMap<String, ?>) a.get(0)).map(m -> (LinkedHashMap<String, ?>) m.get("_source")).forEach(c -> {
 			for (String k : c.keySet()) {
 				Double d = 0d;
 				if (map.containsKey(k)) {
 					d = map.get(k);
 				}
-				d += Double.valueOf(""+c.get(k));
+				d += Double.valueOf("" + c.get(k));
 				map.put(k, d);
 			}
 		});
-		
+
 		JSONArray json = new JSONArray();
 		JSONObject src = new JSONObject();
 		src.appendField("_source", new JSONObject(map));
@@ -88,7 +94,21 @@ public class StatisticService {
 		return json.toString();
 	}
 
-	public String getStatistics(UUID postId, String query) {
+	private SuccessCallback createFutureCallback(CompletableFuture<JSONArray> f) {
+		return new SuccessCallback() {
+			@Override
+			public void onSuccess(JSONArray json) {
+				f.complete(json);
+			}
+
+			@Override
+			public void onError(Exception e) {
+				f.completeExceptionally(e);
+			}
+		};
+	}
+
+	public String getPostStatistics(UUID postId, String query) {
 		// permission + existence check
 		postService.findOriginalPostById(postId);
 

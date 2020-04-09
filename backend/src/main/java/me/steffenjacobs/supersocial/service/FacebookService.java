@@ -26,6 +26,7 @@ import me.steffenjacobs.supersocial.domain.entity.TrackedStatistic;
 import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
 import me.steffenjacobs.supersocial.service.exception.FacebookPostNotFoundException;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
 /** @author Steffen Jacobs */
@@ -132,13 +133,12 @@ public class FacebookService {
 			final HttpResponse httpResponse = httpClient.execute(httpGet);
 			String json = EntityUtils.toString(httpResponse.getEntity());
 			JSONObject jsonResult = new JSONObject();
-			jsonResult.appendField("accountId", account.getId());
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_FOLLOWERS.key(), JsonPath.read(json, "$.fan_count"));
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_ENGAGED_USERS.key(),
-					JsonPath.read(json, "$.insights.data[?(@.name=='page_engaged_users')][?(@.period=='days_28')].values[-1:].value"));
+					((JSONArray)JsonPath.read(json, "$.insights.data[?(@.name=='page_engaged_users')][?(@.period=='days_28')].values[-1:].value")).get(0));
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_POST_COUNT.key(), JsonPath.read(json, "$.posts.data.length()"));
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_VIEWS.key(),
-					JsonPath.read(json, "$.insights.data[?(@.name=='page_impressions')][?(@.period=='days_28')].values[-1:].value"));
+					((JSONArray)JsonPath.read(json, "$.insights.data[?(@.name=='page_impressions')][?(@.period=='days_28')].values[-1:].value")).get(0));
 			return jsonResult;
 
 		} catch (UnsupportedOperationException | IOException e) {

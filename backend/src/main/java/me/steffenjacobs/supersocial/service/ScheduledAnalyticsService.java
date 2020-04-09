@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
 import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
+import me.steffenjacobs.supersocial.service.exception.FacebookException;
 import me.steffenjacobs.supersocial.service.exception.FacebookPostNotFoundException;
 
 /** @author Steffen Jacobs */
@@ -53,6 +54,8 @@ public class ScheduledAnalyticsService {
 				LOG.info("Fetched statistics for post '{}'", p.getId());
 			} catch (FacebookPostNotFoundException e) {
 				LOG.error("Could not fetch statistics for post {}: Post does not exist anymore.", p.getId());
+			} catch (FacebookException e) {
+				LOG.error("Could not fetch statistics for post {}: {}", p.getId(), e.getMessage());
 			}
 			catch (Exception e) {
 				LOG.error("Could not fetch statistics for post {}: ", p.getId(), e.getMessage(), e);

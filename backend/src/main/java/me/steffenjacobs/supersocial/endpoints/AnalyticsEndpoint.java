@@ -27,7 +27,7 @@ public class AnalyticsEndpoint {
 	public ResponseEntity<String> getPostStatistics(@PathVariable(name = "id") UUID id, @RequestParam(name = "query") String query) throws Exception {
 		LOG.info("Retrieving all statistics for '{}'.", id);
 		try {
-			return new ResponseEntity<>(statisticService.getStatistics(id, query), HttpStatus.OK);
+			return new ResponseEntity<>(statisticService.getPostStatistics(id, query), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving analytics for {} ({}): ", id, query);
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
@@ -38,9 +38,20 @@ public class AnalyticsEndpoint {
 	public ResponseEntity<String> getAllPostStatistics(@RequestParam(name = "query") String query) throws Exception {
 		LOG.info("Retrieving all posts statistics.");
 		try {
-			return new ResponseEntity<>(statisticService.getAllStatistics(query), HttpStatus.OK);
+			return new ResponseEntity<>(statisticService.getAllPostStatistics(query), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving all post analytics ({}): ", query, e);
+			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@GetMapping(path = "/api/analytics/account", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getAllAccountStatistics(@RequestParam(name = "query") String query) throws Exception {
+		LOG.info("Retrieving all account statistics.");
+		try {
+			return new ResponseEntity<>(statisticService.getAllAccountStatistics(query), HttpStatus.OK);
+		} catch (Exception e) {
+			LOG.error("Error retrieving all account analytics ({}): ", query, e);
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
