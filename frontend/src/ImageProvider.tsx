@@ -326,7 +326,6 @@ export class ImageProvider {
                 </g>
             </svg>
 
-
             default: return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1.5em" height="1.5em" viewBox="0 0 1280.000000 1280.000000">
                 <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"

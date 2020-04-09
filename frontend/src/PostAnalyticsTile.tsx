@@ -2,6 +2,7 @@ import * as React from "react";
 import './PublishedPostsTile.css';
 import './UiTile.css';
 import './UiElements.css';
+import './PostAnalyticsTile.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { ImageProvider } from "./ImageProvider";
 
@@ -31,6 +32,7 @@ export interface PostAnalyticsNumberProps {
     label: string
     keyVal: string
     type: AnalyticsType
+    background: string
 }
 
 /** Lists the already published posts. */
@@ -39,7 +41,7 @@ export interface PostAnalyticsNumberProps {
 export class PostAnalyticsTile extends React.Component<PostAnalyticsNumberProps, PostAnalyticsNumberProps>{
     constructor(props: PostAnalyticsNumberProps) {
         super(props);
-        this.state = { analyticsNumber: props.analyticsNumber, updating: props.updating, eventBus: props.eventBus, label: props.label, keyVal: props.keyVal, type: props.type };
+        this.state = { analyticsNumber: props.analyticsNumber, updating: props.updating, eventBus: props.eventBus, label: props.label, keyVal: props.keyVal, type: props.type, background:props.background };
 
         props.eventBus.register(props.type.refreshEvent, (t, e) => this.refreshData(e));
     }
@@ -70,8 +72,12 @@ export class PostAnalyticsTile extends React.Component<PostAnalyticsNumberProps,
                         {ImageProvider.getImage("refresh")}
                     </div>
                 </div>
-                <div className="box-content">
-                    <div>{this.state.analyticsNumber.value}</div>
+                <div className="box-content block">
+                    <div className="kpi">{this.state.analyticsNumber.value}</div>
+                </div>
+                <div className="box-content block kpi_background" style={
+                    { backgroundImage: "url(icons/" + this.state.background + ".svg)" }
+                }>
                 </div>
             </div >
         );
