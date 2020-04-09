@@ -1,25 +1,36 @@
 import * as React from "react";
-import Moment from 'react-moment';
 import './PublishedPostsTile.css';
 import './UiTile.css';
 import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { ImageProvider } from "./ImageProvider";
-import { DeploymentManager } from "./DeploymentManager";
-import moment from "moment";
-import { ToastManager } from "./ToastManager";
 
-export interface PostAnalyticsNumber {
-    postId: string
-    viewCount: number
+export class AnalyticsType {
+    public static POST = new AnalyticsType("postId", EventBusEventType.REFRESH_POST_ANALYTICS, EventBusEventType.REFRESH_POST_ANALYTICS_REQ);
+    public static ACCOUNT = new AnalyticsType("accId", EventBusEventType.REFRESH_ACCOUNT_ANALYTICS, EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ);
+    constructor(identifierName: string, refreshEvent: EventBusEventType, requestRefreshEvent: EventBusEventType) {
+        this.identifierName = identifierName;
+        this.refreshEvent = refreshEvent;
+        this.requestRefreshEvent = requestRefreshEvent;
+    }
+
+    readonly identifierName: string;
+    readonly refreshEvent: EventBusEventType;
+    readonly requestRefreshEvent: EventBusEventType;
+}
+
+export interface AnalyticsNumber {
+    relId: string
+    value: number
 }
 
 export interface PostAnalyticsNumberProps {
-    post: PostAnalyticsNumber
+    analyticsNumber: AnalyticsNumber
     updating?: boolean
     eventBus: EventBus
-    endpointUrl: string
     label: string
+    keyVal: string
+    type: AnalyticsType
 }
 
 /** Lists the already published posts. */
@@ -28,32 +39,18 @@ export interface PostAnalyticsNumberProps {
 export class PostAnalyticsTile extends React.Component<PostAnalyticsNumberProps, PostAnalyticsNumberProps>{
     constructor(props: PostAnalyticsNumberProps) {
         super(props);
-        this.state = { post: props.post, updating: props.updating, eventBus: props.eventBus, endpointUrl: props.endpointUrl, label: props.label };
+        this.state = { analyticsNumber: props.analyticsNumber, updating: props.updating, eventBus: props.eventBus, label: props.label, keyVal: props.keyVal, type: props.type };
 
-        this.refreshPostViews(true);
+        props.eventBus.register(props.type.refreshEvent, (t, e) => this.refreshData(e));
     }
 
-    /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
-    private refreshPostViews(notMounted?: boolean) {
-        if (notMounted) {
-            this.state = { post: this.state.post, eventBus: this.state.eventBus, endpointUrl: this.state.endpointUrl, label: this.state.label, updating: true };
-        }
-        else {
-            this.setState({ post: this.state.post, updating: true });
-        }
-        fetch(DeploymentManager.getUrl() + this.state.endpointUrl, {
-            method: 'get',
-            credentials: 'include',
-        })
-            .then(response => {
-                if (!response.ok) {
-                    ToastManager.showErrorToast(response);
-                } else {
-                    response.json().then(data => this.setState({
-                        post: data
-                    }));
-                }
-            });
+    private refreshData(dynamicJsonData: any) {
+        this.setState({
+            analyticsNumber: {
+                relId: this.state.analyticsNumber.relId,
+                value: dynamicJsonData[0]._source[this.state.keyVal]
+            }
+        });
     }
 
     public render() {
@@ -68,13 +65,13 @@ export class PostAnalyticsTile extends React.Component<PostAnalyticsNumberProps,
                     <div className="inline-block">{this.state.label}</div>
                     <div
                         className={classUpdating.join(" ")}
-                        onClick={e => this.refreshPostViews()}
+                        onClick={e => this.state.eventBus.fireEvent(this.state.type.requestRefreshEvent, { relId: this.state.analyticsNumber.relId })}
                     >
                         {ImageProvider.getImage("refresh")}
                     </div>
                 </div>
                 <div className="box-content">
-                    <div>{this.state.post.viewCount}</div>
+                    <div>{this.state.analyticsNumber.value}</div>
                 </div>
             </div >
         );
