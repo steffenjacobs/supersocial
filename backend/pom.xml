@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>me.steffenjacobs</groupId>
 	<artifactId>supersocial</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>supersocial-webapp</name>
 	<description>Social Media Distribution Tool</description>
 
@@ -84,6 +84,16 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>application.properties</include>
+				</includes>
+			</resource>
+		</resources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
