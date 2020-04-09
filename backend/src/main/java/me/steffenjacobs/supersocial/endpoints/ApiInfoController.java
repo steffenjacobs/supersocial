@@ -12,7 +12,7 @@ import me.steffenjacobs.supersocial.security.SecurityService;
 /** @author Steffen Jacobs */
 @RestController
 @PropertySource("classpath:application.properties")
-public class LoginInfoController {
+public class ApiInfoController {
 	
 	@Autowired
 	private SecurityService securityService;
