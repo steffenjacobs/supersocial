@@ -13,21 +13,22 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsProp
     constructor(props: AnalyticsProps) {
         super(props);
         this.state = { eventBus: props.eventBus };
-        this.updateData(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, "cd8cfa00-aaf0-49b5-90f1-429d5f63dcda");
+        this.updateData(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, "");
+        this.updateData(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, "");
         props.eventBus.register(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, (t, e) => this.updateData(t, e.relId));
         props.eventBus.register(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, (t, e) => this.updateData(t, e.relId));
     }
 
     public render() {
-        let post = { relId: "cd8cfa00-aaf0-49b5-90f1-429d5f63dcda", value: 0 }
+        let post = { relId: "", value: 0 }
         return (
             <div>
                 <PostAnalyticsTile analyticsNumber={post} label="# Impressions" eventBus={this.state.eventBus} keyVal="impressions" type={AnalyticsType.POST} background="binoculars" />
                 <PostAnalyticsTile analyticsNumber={post} label="# Comments" eventBus={this.state.eventBus} keyVal="comments" type={AnalyticsType.POST} background="comment" />
-                <PostAnalyticsTile analyticsNumber={post} label="# Likes" eventBus={this.state.eventBus} keyVal="likes" type={AnalyticsType.POST} background="like"/>
+                <PostAnalyticsTile analyticsNumber={post} label="# Likes" eventBus={this.state.eventBus} keyVal="likes" type={AnalyticsType.POST} background="like" />
                 <PostAnalyticsTile analyticsNumber={post} label="# Shares" eventBus={this.state.eventBus} keyVal="shares" type={AnalyticsType.POST} background="share" />
-                <PostAnalyticsTile analyticsNumber={post} label="# Followers" eventBus={this.state.eventBus} keyVal="followers" type={AnalyticsType.ACCOUNT} background="follower" />
-                <PostAnalyticsTile analyticsNumber={post} label="# Posts" eventBus={this.state.eventBus} keyVal="posts" type={AnalyticsType.ACCOUNT} background="post" />
+                <PostAnalyticsTile analyticsNumber={post} label="# Followers" eventBus={this.state.eventBus} keyVal="acc_followers" type={AnalyticsType.ACCOUNT} background="follower" />
+                <PostAnalyticsTile analyticsNumber={post} label="# Posts" eventBus={this.state.eventBus} keyVal="acc_posts" type={AnalyticsType.ACCOUNT} background="post" />
             </div>
         );
     }
@@ -43,7 +44,7 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsProp
                     ToastManager.showErrorToast(response);
                 } else {
                     response.json().then(data =>
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POST_ANALYTICS, data)
+                        this.state.eventBus.fireEvent(eventType === EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ ? EventBusEventType.REFRESH_ACCOUNT_ANALYTICS : EventBusEventType.REFRESH_POST_ANALYTICS, data)
                     );
                 }
             });
