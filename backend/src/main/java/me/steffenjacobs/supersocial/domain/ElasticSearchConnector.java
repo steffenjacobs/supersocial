@@ -15,6 +15,7 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +27,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
 @Component
+@PropertySource("classpath:application.properties")
 public class ElasticSearchConnector {
 	private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchConnector.class);
 
