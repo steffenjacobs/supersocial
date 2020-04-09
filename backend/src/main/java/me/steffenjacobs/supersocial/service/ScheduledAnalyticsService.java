@@ -33,7 +33,7 @@ public class ScheduledAnalyticsService {
 
 	@PostConstruct
 	public void setup() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::refresh, 0, 1, TimeUnit.HOURS);
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::refresh, 1, 60, TimeUnit.MINUTES);
 	}
 
 	private void refresh() {
