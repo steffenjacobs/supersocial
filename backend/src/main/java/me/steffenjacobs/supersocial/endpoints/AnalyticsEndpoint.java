@@ -24,12 +24,23 @@ public class AnalyticsEndpoint {
 	private StatisticService statisticService;
 
 	@GetMapping(path = "/api/analytics/post/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getStatistics(@PathVariable(name = "id") UUID id, @RequestParam(name = "query") String query) throws Exception {
+	public ResponseEntity<String> getPostStatistics(@PathVariable(name = "id") UUID id, @RequestParam(name = "query") String query) throws Exception {
 		LOG.info("Retrieving all statistics for '{}'.", id);
 		try {
 			return new ResponseEntity<>(statisticService.getStatistics(id, query), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving analytics for {} ({}): ", id, query);
+			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@GetMapping(path = "/api/analytics/post", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getAllPostStatistics(@RequestParam(name = "query") String query) throws Exception {
+		LOG.info("Retrieving all posts statistics.");
+		try {
+			return new ResponseEntity<>(statisticService.getAllStatistics(query), HttpStatus.OK);
+		} catch (Exception e) {
+			LOG.error("Error retrieving all post analytics ({}): ", query, e);
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
