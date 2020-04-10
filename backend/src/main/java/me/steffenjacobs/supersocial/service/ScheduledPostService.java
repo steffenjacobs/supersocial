@@ -1,4 +1,4 @@
-package me.steffenjacobs.supersocial.persistence;
+package me.steffenjacobs.supersocial.service;
 
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +13,7 @@ import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.domain.entity.ScheduledPost;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
+import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
 import me.steffenjacobs.supersocial.persistence.exception.PostAlreadyScheduledException;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;

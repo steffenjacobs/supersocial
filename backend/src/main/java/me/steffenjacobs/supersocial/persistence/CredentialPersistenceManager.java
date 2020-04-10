@@ -21,7 +21,11 @@ import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.service.SocialMediaAccountService;
 import me.steffenjacobs.supersocial.util.Pair;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles persistence and permission checks for CRUD operations on credentials.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class CredentialPersistenceManager {
 
@@ -37,6 +41,7 @@ public class CredentialPersistenceManager {
 	@Autowired
 	private SocialMediaAccountService socialMediaAccountService;
 
+	/** Describes which information is stored in a credential. */
 	public enum CredentialType {
 		TWITTER_API_KEY("twitter.api.key"), TWITTER_API_KEY_SECRET("twitter.api.secret"), TWITTER_ACCESS_TOKEN("twitter.api.accesstoken"), TWITTER_ACCESS_TOKEN_SECRET(
 				"twitter.api.accesstoken.secret"), FACEBOOK_PAGE_ID("facebook.page.id"), FACEBOOK_PAGE_ACCESSTOKEN("facebook.page.accesstoken");
@@ -53,7 +58,8 @@ public class CredentialPersistenceManager {
 	}
 
 	/**
-	 * @return the given credential loaded from the database.
+	 * @return the given credential loaded from the database and filtered by
+	 *         READ permission for the current user.
 	 */
 	public Stream<Pair<UserGroup, Credential>> getCredentialByUserGroup(CredentialDTO credential) {
 		if ("true".equalsIgnoreCase(env.getProperty("security.encrypt_credentials"))) {
@@ -63,15 +69,23 @@ public class CredentialPersistenceManager {
 				.map(c -> new Pair<>(securityService.getFirstMatchinUserGroupForCurrentUser(c, SecuredAction.READ), c));
 	}
 
+	/**
+	 * @return all credentials filtered by READ permission for the current user.
+	 */
 	public Stream<Credential> getAll() {
 		return securityService.filterForCurrentUser(StreamSupport.stream(credentialRepository.findAll().spliterator(), false), SecuredAction.READ);
 	}
 
-	public Optional<Credential> getCredentialForUserGroup(UserGroup userGroup, CredentialType credentialType) {
-		return securityService.filterForCurrentUser(StreamSupport.stream(credentialRepository.findByDescriptor(credentialType.getKey()).spliterator(), false), SecuredAction.READ)
-				.findFirst();
-	}
-
+	/**
+	 * Update or create a credential.
+	 * 
+	 * @return {@code <credential,true>} if the credential was newly created and
+	 *         {@code <credential,false>} if it was just updated.
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not permitted to update the credential
+	 *             or the associated social media account (assuming one is
+	 *             associated).
+	 */
 	public Pair<Credential, Boolean> createOrUpdateCredential(CredentialDTO credential) {
 		// TODO: check create action
 		Optional<Credential> optCred = Optional.empty();
@@ -103,6 +117,15 @@ public class CredentialPersistenceManager {
 		return new Pair<>(cred, created);
 	}
 
+	/**
+	 * Delete a credential with a given UUID
+	 * 
+	 * @throws CredentialNotFoundException
+	 *             if the credential does not exist.
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not permitted to delete the
+	 *             credential.
+	 */
 	public void deleteCredential(UUID id) {
 		try {
 			Credential c = credentialRepository.findById(id).orElseThrow(() -> new CredentialNotFoundException(id));
@@ -113,12 +136,25 @@ public class CredentialPersistenceManager {
 		}
 	}
 
+	/**
+	 * Find a credential by it's unique identifier.
+	 * 
+	 * @return the credential.
+	 * 
+	 * @throws CredentialNotFoundException
+	 *             if the credential does not exist.
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not permitted to read the credential.
+	 */
 	public Credential findById(UUID credentialId) {
 		Credential c = credentialRepository.findById(credentialId).orElseThrow(() -> new CredentialNotFoundException(credentialId));
 		securityService.checkIfCurrentUserIsPermitted(c, SecuredAction.READ);
 		return c;
 	}
 
+	/**
+	 * Add a credential to a given social media account. No permission checks.
+	 */
 	public Credential appendToAccount(Credential credential, SocialMediaAccount account) {
 		credential.setAccount(account);
 		return credentialRepository.save(credential);

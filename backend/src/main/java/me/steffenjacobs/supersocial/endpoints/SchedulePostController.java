@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.domain.dto.LinkedScheduledPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
-import me.steffenjacobs.supersocial.persistence.ScheduledPostService;
 import me.steffenjacobs.supersocial.persistence.exception.PostAlreadyScheduledException;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
+import me.steffenjacobs.supersocial.service.ScheduledPostService;
 import me.steffenjacobs.supersocial.util.Pair;
 
 /**

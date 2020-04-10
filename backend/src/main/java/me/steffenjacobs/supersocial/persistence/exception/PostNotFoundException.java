@@ -2,7 +2,11 @@ package me.steffenjacobs.supersocial.persistence.exception;
 
 import java.util.UUID;
 
-/** @author Steffen Jacobs */
+/**
+ * Should be fired if a post with the given UUID could not be found.S
+ * 
+ * @author Steffen Jacobs
+ */
 public class PostNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = -1259114730425935604L;
 
