@@ -24,7 +24,11 @@ import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains endpoints handling scheduling of posts.
+ * 
+ * @author Steffen Jacobs
+ */
 
 @RestController
 public class SchedulePostController {
@@ -33,6 +37,10 @@ public class SchedulePostController {
 	@Autowired
 	ScheduledPostService scheduledPostService;
 
+	/**
+	 * Schedule an existing post or update the already present scheduling
+	 * information.
+	 */
 	@PutMapping(path = "/api/schedule/post", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ScheduledPostDTO> schedulePost(@RequestBody LinkedScheduledPostDTO post) throws Exception {
 		LOG.info("Scheduling new post {}", post);
@@ -46,6 +54,10 @@ public class SchedulePostController {
 		}
 	}
 
+	/**
+	 * Delete the associated scheduling information of a post without deleting
+	 * the post itself.
+	 */
 	@DeleteMapping(path = "/api/schedule/post/{id}")
 	public ResponseEntity<ScheduledPostDTO> deleteScheduledPost(@PathVariable(name = "id") UUID id) throws Exception {
 		LOG.info("Deleting scheduled post {}", id);
@@ -57,6 +69,7 @@ public class SchedulePostController {
 		}
 	}
 
+	/** Retrieve all scheduled posts. */
 	@GetMapping(path = "/api/schedule/post", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<ScheduledPostDTO>> getAllScheduledPosts() throws Exception {
 		LOG.info("Retrieving all scheduled posts.");

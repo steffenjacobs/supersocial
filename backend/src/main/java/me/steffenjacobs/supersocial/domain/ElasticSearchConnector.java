@@ -26,6 +26,11 @@ import me.steffenjacobs.supersocial.util.SuccessErrorCallback;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
+/**
+ * This class is an interface to Elasticsearch. It allows search and insert
+ * operations on elastic search indices with lucene queries and pure JSON
+ * objects.
+ */
 @Component
 @PropertySource("classpath:application.properties")
 public class ElasticSearchConnector {
@@ -40,15 +45,26 @@ public class ElasticSearchConnector {
 	@Value("${elasticsearch.protocol}")
 	private String protocol;
 
+	/**
+	 * Inserts the given {@code json} object with the given {@code id} into the
+	 * given {@code index}.
+	 */
 	public void insert(String json, String index, UUID id) {
 		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
 			LOG.info("Inserting {} into {}.", json, index);
-			performInsert(restClient, json, index, id, (SuccessCallback) e->LOG.info(e.toString()));
+			performInsert(restClient, json, index, id, (SuccessCallback) e -> LOG.info(e.toString()));
 		} catch (ParseException | IOException e) {
 			LOG.error("Could not insert into elasticsearch index.", e);
 		}
 	}
 
+	/**
+	 * Find all objects via the given {@code query} in the given {@code index}.
+	 * Calls the {@code callback} when complete.
+	 * 
+	 * @param pretty
+	 *            pretty print JSON response if set to true.
+	 */
 	public void find(String query, String index, boolean pretty, SuccessCallback callback) {
 		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
 			LOG.info("Finding {} in {}.", query, index);
@@ -58,8 +74,9 @@ public class ElasticSearchConnector {
 		}
 	}
 
+	/** Perform a query search via the given {@code restClient}. */
 	private void performSearchQuery(RestClient restClient, String searchQuery, String index, boolean pretty, SuccessErrorCallback callback) {
-		String matchQuery = StringUtils.isEmpty(searchQuery)?"\"match_all\":{}":"\"match\": { " + searchQuery + "}";
+		String matchQuery = StringUtils.isEmpty(searchQuery) ? "\"match_all\":{}" : "\"match\": { " + searchQuery + "}";
 		HttpEntity entity = new NStringEntity("{\"query\" : { " + matchQuery + " } }", ContentType.APPLICATION_JSON);
 		Request request = new Request("GET", index + "/_search");
 		if (pretty) {
@@ -73,6 +90,9 @@ public class ElasticSearchConnector {
 		}
 	}
 
+	/**
+	 * Perform an insert into the given index via the given {@code restClient}.
+	 */
 	private void performInsert(RestClient restClient, String json, String index, UUID id, SuccessErrorCallback callback) {
 		HttpEntity entity = new NStringEntity(json, ContentType.APPLICATION_JSON);
 		Request request = new Request("PUT", "/" + index + "/_doc/" + id);
@@ -85,6 +105,10 @@ public class ElasticSearchConnector {
 		}
 	}
 
+	/**
+	 * Select the original JSON from the JSON response from the elasticsearch
+	 * query.
+	 */
 	private ResponseListener mapSearch(SuccessErrorCallback callback) {
 		return new ResponseListener() {
 			@Override
@@ -103,6 +127,7 @@ public class ElasticSearchConnector {
 		};
 	}
 
+	/** Maps a {@code SuccessErrorCallback} to a {@code ResponseListener}. */
 	private ResponseListener map(SuccessErrorCallback callback) {
 		return new ResponseListener() {
 			@Override

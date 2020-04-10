@@ -21,7 +21,11 @@ import me.steffenjacobs.supersocial.service.exception.CredentialMissingException
 import me.steffenjacobs.supersocial.service.exception.PlatformNotFoundException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains endpoints which handle publishing of posts
+ * 
+ * @author Steffen Jacobs
+ */
 @RestController
 public class PublishingController {
 
@@ -29,10 +33,11 @@ public class PublishingController {
 
 	@Autowired
 	private PostService postService;
-	
+
 	@Autowired
 	private PostPublishingService postPublishingService;
 
+	/** Creates a new post and publishes it immediately. */
 	@PostMapping(path = "/api/publish", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<PostDTO> publishMessage(@RequestBody MessagePublishingDTO messagePublishingDto) {
 		LOG.info("Publish: {}", messagePublishingDto);
@@ -42,7 +47,8 @@ public class PublishingController {
 			return new ResponseEntity<>(new PostDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
+	/** Immediately publish an existing post. */
 	@PostMapping(path = "/api/publishnow/{id}")
 	public ResponseEntity<PostDTO> publishMessage(@PathVariable("id") UUID id) {
 		LOG.info("Publish: {}", id);

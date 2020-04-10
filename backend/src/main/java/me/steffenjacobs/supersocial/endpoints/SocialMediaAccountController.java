@@ -25,7 +25,11 @@ import me.steffenjacobs.supersocial.service.exception.CouldNotDeleteEntityExcept
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains endpoints with CRUD operations for social media accounts.
+ * 
+ * @author Steffen Jacobs
+ */
 @RestController
 public class SocialMediaAccountController {
 
@@ -34,12 +38,14 @@ public class SocialMediaAccountController {
 	@Autowired
 	private SocialMediaAccountService socialMediaAccountService;
 
+	/** Retrieve all social media accounts. */
 	@GetMapping(path = "/api/socialmediaaccount")
 	public Set<SocialMediaAccountDTO> getAllSocialMediaAccounts() {
 		LOG.info("Retrieving all social media accounts");
 		return socialMediaAccountService.getAllSocialMediaAccounts().collect(Collectors.toSet());
 	}
 
+	/** Retrieve a single social media account with a specific {@code id}. */
 	@GetMapping(path = "/api/socialmediaaccount/{id}")
 	public ResponseEntity<SocialMediaAccountDTO> getSocialMediaAccountById(@PathVariable(name = "id") UUID id) {
 		LOG.info("Retrieving social media account with id {}", id);
@@ -50,6 +56,7 @@ public class SocialMediaAccountController {
 		}
 	}
 
+	/** Create a new social media account. */
 	@PutMapping(path = "/api/socialmediaaccount", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SocialMediaAccountDTO> createOrUpdateSocialMediaAccount(@RequestBody SocialMediaAccountDTO creationDto) throws Exception {
 		LOG.info("Creating or updating social media account {}", creationDto);
@@ -61,6 +68,7 @@ public class SocialMediaAccountController {
 		}
 	}
 
+	/** Associate a given credential to a given social media account. */
 	@PutMapping(path = "/api/socialmediaaccount/{accountId}/{credentialId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SocialMediaAccountDTO> addCredentialToSocialMediaAccount(@PathVariable(name = "accountId") UUID accountId,
 			@PathVariable(name = "credentialId") UUID credentialId) throws Exception {
@@ -74,6 +82,7 @@ public class SocialMediaAccountController {
 		}
 	}
 
+	/** Delete a given social media account by {@code id}.s*/
 	@DeleteMapping(path = "/api/socialmediaaccount/{id}")
 	public ResponseEntity<SocialMediaAccountDTO> createOrUpdateSocialMediaAccount(@PathVariable(name = "id") UUID id) throws Exception {
 		LOG.info("Deleting social media account {}", id);

@@ -15,7 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.service.StatisticService;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains all analytics-related endpoints like retrieveing statistics for
+ * posts and social media accounts.
+ * 
+ * @author Steffen Jacobs
+ */
 @RestController
 public class AnalyticsEndpoint {
 	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsEndpoint.class);
@@ -23,6 +28,7 @@ public class AnalyticsEndpoint {
 	@Autowired
 	private StatisticService statisticService;
 
+	/** Query all statistics for a given post. */
 	@GetMapping(path = "/api/analytics/post/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getPostStatistics(@PathVariable(name = "id") UUID id, @RequestParam(name = "query") String query) throws Exception {
 		LOG.info("Retrieving all statistics for '{}'.", id);
@@ -33,7 +39,8 @@ public class AnalyticsEndpoint {
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
+	/** Query all statistics for all post. */
 	@GetMapping(path = "/api/analytics/post", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAllPostStatistics(@RequestParam(name = "query") String query) throws Exception {
 		LOG.info("Retrieving all posts statistics.");
@@ -44,7 +51,8 @@ public class AnalyticsEndpoint {
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
+	/** Query all statistics for all social media accounts. */
 	@GetMapping(path = "/api/analytics/account", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAllAccountStatistics(@RequestParam(name = "query") String query) throws Exception {
 		LOG.info("Retrieving all account statistics.");

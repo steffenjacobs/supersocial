@@ -22,7 +22,11 @@ import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.service.PostService;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains endpoints with CRUD operations for posts.
+ * 
+ * @author Steffen Jacobs
+ */
 
 @RestController
 public class PostController {
@@ -32,22 +36,28 @@ public class PostController {
 	@Autowired
 	private PostService postService;
 
+	/** Retrieve all posts. */
 	@GetMapping(path = "/api/post")
 	public Set<PostDTO> getAllPosts() {
 		LOG.info("Retrieving all posts");
 		return postService.getAllPosts();
 	}
 
+	/** Retrieve a post with a certain {@code id}. */
 	@GetMapping(path = "/api/post/{id}")
 	public ResponseEntity<PostDTO> getPublishedPostById(@PathVariable(name = "id") UUID id) {
 		LOG.info("Retrieving post with id {}", id);
 		try {
 			return new ResponseEntity<>(postService.findPostById(id), HttpStatus.OK);
 		} catch (PostNotFoundException e) {
-			return new ResponseEntity<>(new PostDTO(e.getMessage()),HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new PostDTO(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
+	/**
+	 * Delete a post with a certain {@code id}. If the post was scheduled, also
+	 * remove the scheduling information.
+	 */
 	@DeleteMapping(path = "/api/post/{id}")
 	public ResponseEntity<PostDTO> deletePost(@PathVariable(name = "id") UUID id) {
 		LOG.info("Deleting post with id {}", id);
@@ -59,6 +69,7 @@ public class PostController {
 		}
 	}
 
+	/** Create a new post without publishing it immediately. */
 	@PutMapping(path = "/api/post", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<PostDTO> createUnpublishedPost(@RequestBody MessagePublishingDTO messagePublishingDtos) throws Exception {
 		LOG.info("Creating new post {}", messagePublishingDtos);

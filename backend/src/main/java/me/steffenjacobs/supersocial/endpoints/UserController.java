@@ -11,14 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
 import me.steffenjacobs.supersocial.security.UserService;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains endpoints handling user-related actions.
+ * 
+ * @author Steffen Jacobs
+ */
 @RestController
 public class UserController {
 	private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
-	
+
 	@Autowired
 	private UserService userService;
 
+	/** Creates a new user. */
 	@PostMapping(path = "/api/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void registerUser(@RequestBody UserRegistrationDTO userRegistration) {
 		LOG.info("Registering {}", userRegistration);

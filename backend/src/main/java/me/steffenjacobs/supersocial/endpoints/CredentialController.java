@@ -23,7 +23,11 @@ import me.steffenjacobs.supersocial.persistence.exception.CredentialNotFoundExce
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains endpoints with CRUD operations for credentials.
+ * 
+ * @author Steffen Jacobs
+ */
 @RestController
 public class CredentialController {
 	private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(CredentialController.class);
@@ -31,6 +35,10 @@ public class CredentialController {
 	@Autowired
 	private CredentialPersistenceManager credentialPersistenceManager;
 
+	/**
+	 * Create a new or update an existing credential for a given social media
+	 * account.
+	 */
 	@PutMapping(path = "/api/credential", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> createOrUpdateCredential(@RequestBody CredentialDTO credential) throws Exception {
 		try {
@@ -42,6 +50,7 @@ public class CredentialController {
 		}
 	}
 
+	/** Get all credentials. */
 	@GetMapping(path = "/api/credential", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Set<CredentialDTO>> getCredentials() throws Exception {
 		LOG.info("Retrieving all credentials.");
@@ -52,6 +61,7 @@ public class CredentialController {
 		}
 	}
 
+	/** Delete a specific credential by its {@code id}. */
 	@DeleteMapping(path = "/api/credential/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CredentialDTO> deleteCredential(@PathVariable(name = "id") UUID id) {
 		LOG.info("Deleting credential {}.", id);

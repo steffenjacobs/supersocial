@@ -1,6 +1,10 @@
 package me.steffenjacobs.supersocial.domain;
 
-/** @author Steffen Jacobs */
+/**
+ * Social Media Platform. Contains a unique identifier to identify it.
+ * 
+ * @author Steffen Jacobs
+ */
 public enum Platform {
 	UNKNOWN(0), FACEBOOK(1), TWITTER(2);
 
@@ -13,7 +17,7 @@ public enum Platform {
 	public int getId() {
 		return id;
 	}
-	
+
 	public String getIdAsString() {
 		return "" + id;
 	}
