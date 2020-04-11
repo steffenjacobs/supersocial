@@ -49,6 +49,7 @@ public class ScheduledTrendingTopicFetcher {
 
 	/** Fetches the trending topics from twitter. */
 	public void refresh() {
+		createIndexIfNecessary();
 		LOG.info("Fetching trending topics from twitter...");
 		try {
 			String result = twitterService.fetchTrendingTopics(1, systemConfigurationManager.getSystemTwitterAccount());
@@ -60,6 +61,18 @@ public class ScheduledTrendingTopicFetcher {
 			LOG.error("Could not fetch trending topics: System Twitter Account does not exist.");
 		} catch (Exception e) {
 			LOG.error("Could not fetch trending topics: ", e);
+		}
+	}
+
+	private void createIndexIfNecessary() {
+		if (elasticSearchConnector.hasIndex(TRENDING_INDEX)) {
+			return;
+		}
+		try {
+			elasticSearchConnector.insertIndex("{\"mappings\": {\"properties\": {\"created\": {\"type\":  \"date\", \"format\": \"yyyy-MM-dd-HH-mm-ss\"} } } }", TRENDING_INDEX);
+			LOG.info("Created index '{}'.", TRENDING_INDEX);
+		} catch (Exception e) {
+			LOG.error("Could not create index.", e);
 		}
 	}
 }

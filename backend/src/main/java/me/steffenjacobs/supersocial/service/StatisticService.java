@@ -159,7 +159,7 @@ public class StatisticService {
 
 	public String getTrendingTopics() {
 		CompletableFuture<JSONArray> f = new CompletableFuture<>();
-		elasticSearchConnector.find("", ScheduledTrendingTopicFetcher.TRENDING_INDEX, false, createFutureCallback(f));
+		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", ScheduledTrendingTopicFetcher.TRENDING_INDEX, false, createFutureCallback(f));
 
 		try {
 			return f.get().toString();

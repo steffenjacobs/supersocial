@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
 import org.apache.http.ParseException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
@@ -59,6 +60,28 @@ public class ElasticSearchConnector {
 	}
 
 	/**
+	 * Create a new index with the given {@code json} object.
+	 */
+	public void insertIndex(String json, String index) {
+		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
+			LOG.info("Inserting index {} ({}).", index, json);
+			performIndexInsert(restClient, json, index, (SuccessCallback<JSONArray>) e -> LOG.info(e.toString()));
+		} catch (ParseException | IOException e) {
+			LOG.error("Could not insert into elasticsearch index.", e);
+		}
+	}
+
+	public boolean hasIndex(String index) {
+		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
+			Request request = new Request("HEAD", "/" + index);
+			return restClient.performRequest(request).getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+		} catch (ParseException | IOException e) {
+			LOG.error("Could not query for elasticsearch index.", e);
+		}
+		return false;
+	}
+
+	/**
 	 * Find all objects via the given {@code query} in the given {@code index}.
 	 * Calls the {@code callback} when complete.
 	 * 
@@ -76,8 +99,8 @@ public class ElasticSearchConnector {
 
 	/** Perform a query search via the given {@code restClient}. */
 	private void performSearchQuery(RestClient restClient, String searchQuery, String index, boolean pretty, SuccessErrorCallback<?> callback) {
-		String matchQuery = StringUtils.isEmpty(searchQuery) ? "\"match_all\":{}" : "\"match\": { " + searchQuery + "}";
-		HttpEntity entity = new NStringEntity("{\"query\" : { " + matchQuery + " } }", ContentType.APPLICATION_JSON);
+		String matchQuery = StringUtils.isEmpty(searchQuery) ? "{\"query\" : { \"match_all\":{}}}" : searchQuery;
+		HttpEntity entity = new NStringEntity(matchQuery, ContentType.APPLICATION_JSON);
 		Request request = new Request("GET", index + "/_search");
 		if (pretty) {
 			request.addParameter("pretty", "true");
@@ -96,6 +119,21 @@ public class ElasticSearchConnector {
 	private void performInsert(RestClient restClient, String json, String index, UUID id, SuccessErrorCallback<JSONArray> callback) {
 		HttpEntity entity = new NStringEntity(json, ContentType.APPLICATION_JSON);
 		Request request = new Request("PUT", "/" + index + "/_doc/" + id);
+		request.setEntity(entity);
+		ResponseListener rl = map(callback);
+		try {
+			rl.onSuccess(restClient.performRequest(request));
+		} catch (IOException e) {
+			rl.onFailure(e);
+		}
+	}
+
+	/**
+	 * Perform the insertion of a new index via the given {@code restClient}.
+	 */
+	private void performIndexInsert(RestClient restClient, String json, String index, SuccessErrorCallback<JSONArray> callback) {
+		HttpEntity entity = new NStringEntity(json, ContentType.APPLICATION_JSON);
+		Request request = new Request("PUT", "/" + index);
 		request.setEntity(entity);
 		ResponseListener rl = map(callback);
 		try {
