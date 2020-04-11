@@ -9,6 +9,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -33,7 +34,7 @@ public class AccessControlList {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "acl_usergroup_secured_action", joinColumns = { @JoinColumn(name = "acl_id", referencedColumnName = "id") })
 	@MapKeyColumn(name = "user_group_id")
 	@Column(name = "acl_secured_action")

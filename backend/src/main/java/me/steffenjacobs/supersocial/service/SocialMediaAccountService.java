@@ -55,7 +55,7 @@ public class SocialMediaAccountService {
 			optAccount = socialMediaAccountRepository.findById(creationDto.getId());
 			optAccount.ifPresent(a -> securityService.checkIfCurrentUserIsPermitted(a, SecuredAction.UPDATE));
 		}
-		SocialMediaAccount acc = optAccount.orElse(new SocialMediaAccount());
+		SocialMediaAccount acc = optAccount.orElseGet(SocialMediaAccount::new);
 		boolean created = acc.getId() == null;
 		if (created) {
 			createNewSocialMediaAccount(acc, Platform.fromId(creationDto.getPlatformId()), creationDto.getDisplayName());

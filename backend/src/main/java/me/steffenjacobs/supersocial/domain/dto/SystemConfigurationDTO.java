@@ -3,7 +3,7 @@ package me.steffenjacobs.supersocial.domain.dto;
 import me.steffenjacobs.supersocial.domain.entity.SystemConfiguration;
 
 /** @author Steffen Jacobs */
-public class SystemConfigurationDTO {
+public class SystemConfigurationDTO implements WithErrorDTO {
 	private String descriptor;
 	private String value;
 	private String error;
@@ -31,10 +31,7 @@ public class SystemConfigurationDTO {
 		this.value = value;
 	}
 
-	public void setError(String error) {
-		this.error = error;
-	}
-
+	@Override
 	public String getError() {
 		return error;
 	}

@@ -3,7 +3,7 @@ package me.steffenjacobs.supersocial.persistence.exception;
 import java.util.UUID;
 
 /**
- * Should be fired if a post with the given UUID could not be found.S
+ * Should be fired if a post with the given UUID could not be found.
  * 
  * @author Steffen Jacobs
  */

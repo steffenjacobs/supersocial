@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import org.hibernate.PersistentObjectException;
 import org.ollide.spring.discourse.sso.authentication.DiscoursePrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +24,7 @@ import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.StandaloneUser;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
+import me.steffenjacobs.supersocial.persistence.SystemConfigurationManager;
 import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
 
 /**
@@ -46,6 +48,9 @@ public class SecurityService {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private SystemConfigurationManager systemConfigurationManager;
 
 	/**
 	 * Fetches the currently logged in {@link SupersocialUser}. <br/>
@@ -82,11 +87,11 @@ public class SecurityService {
 		}
 
 		if (user instanceof User) {
-			return supersocialUserRepository.findByName(((User) user).getUsername()).orElse(createAnonymousUser());
+			return supersocialUserRepository.findByName(((User) user).getUsername()).orElseGet(this::createAnonymousUser);
 		}
 
 		if (user instanceof StandaloneUser) {
-			return supersocialUserRepository.findByExternalId(((StandaloneUser) user).getId().toString()).orElse(createAnonymousUser());
+			return supersocialUserRepository.findByExternalId(((StandaloneUser) user).getId().toString()).orElseGet(this::createAnonymousUser);
 		}
 
 		return createAnonymousUser();
@@ -114,10 +119,29 @@ public class SecurityService {
 	 *         the {@link SecuredAction} on the {@link Secured} object.
 	 */
 	public boolean isPermitted(SupersocialUser user, Secured securedObject, SecuredAction actionToPerform) {
-		if (securedObject == null || securedObject.getAccessControlList() == null || securedObject.getAccessControlList().getPermittedActions() == null) {
+		if (securedObject == null || securedObject.getAccessControlList() == null) {
 			return false;
 		}
-		for (Map.Entry<UserGroup, SecuredAction> entry : securedObject.getAccessControlList().getPermittedActions().entrySet()) {
+		return isPermitted(user, securedObject.getAccessControlList(), actionToPerform);
+	}
+
+	/**
+	 * Performs a permission check for the given {@link SupersocialUser} on the
+	 * object associated with the given {@link AccessControlList} for the given
+	 * {@link SecuredAction}. <br/>
+	 * Checks, whether the given user is part of any {@link UserGroup} that has
+	 * the required permission to perform the given action on the given secured
+	 * object.
+	 * 
+	 * @return true if the {@link SupersocialUser user } is permitted to perform
+	 *         the {@link SecuredAction} on the object associated with the given
+	 *         {@link AccessControlList}.
+	 */
+	public boolean isPermitted(SupersocialUser user, AccessControlList acl, SecuredAction actionToPerform) {
+		if (acl.getPermittedActions() == null) {
+			return false;
+		}
+		for (Map.Entry<UserGroup, SecuredAction> entry : acl.getPermittedActions().entrySet()) {
 			if (entry.getKey().getUsers().contains(user)) {
 				if (implies(entry.getValue(), actionToPerform)) {
 					return true;
@@ -147,6 +171,27 @@ public class SecurityService {
 	 */
 	@Transactional
 	public void appendAcl(Secured securedObject) {
+		// TODO: rename to appendCurrentUserAcl
+		appendAclForUserGroup(securedObject, getCurrentUser().getDefaultUserGroup());
+	}
+
+	/**
+	 * Append a fully-fledged {@link AccessControlList} to an existing
+	 * {@link Secured} object. The system user group will have all permissions
+	 * for this object.
+	 */
+	@Transactional
+	public void appendSystemAcl(Secured securedObject) {
+		appendAclForUserGroup(securedObject, systemConfigurationManager.getSystemUser().getDefaultUserGroup());
+	}
+
+	/**
+	 * Append a fully-fledged {@link AccessControlList} to an existing
+	 * {@link Secured} object. The given {@link UserGroup} will have all
+	 * permissions for this object.
+	 */
+	@Transactional
+	public void appendAclForUserGroup(Secured securedObject, UserGroup userGroup) {
 		// retrieve or create ACL
 		AccessControlList acl = securedObject.getAccessControlList();
 		if (acl == null) {
@@ -158,13 +203,18 @@ public class SecurityService {
 		if (permittedActions == null) {
 			permittedActions = new HashMap<UserGroup, SecuredAction>();
 		}
-		permittedActions.put(getCurrentUser().getDefaultUserGroup(), SecuredAction.ALL);
+		permittedActions.put(userGroup, SecuredAction.ALL);
 		acl.setPermittedActions(permittedActions);
 		accessControlListRepository.save(acl);
 
 		// assign ACL to secured object
 		securedObject.setAccessControlList(acl);
-		entityManager.persist(securedObject);
+		try {
+			entityManager.persist(securedObject);
+		} catch (PersistentObjectException e) {
+			entityManager.merge(securedObject);
+		}
+		entityManager.flush();
 	}
 
 	/**
@@ -182,18 +232,48 @@ public class SecurityService {
 
 	/**
 	 * Performs the permission check
+	 * {@link SecurityService.isPermitted(SupersocialUser, AccessControlList,
+	 * SecuredAction} for the current user.
+	 * 
+	 * @return true if the current user is permitted to perform the given
+	 *         {@link SecuredAction} on the secured object associated with the
+	 *         given {@link AccessControlList}.
+	 */
+	public boolean isCurrentUserPermitted(AccessControlList acl, SecuredAction actionToPerform) {
+		return isPermitted(getCurrentUser(), acl, actionToPerform);
+	}
+
+	/**
+	 * Performs the permission check
 	 * {@link SecurityService.isPermitted(SupersocialUser, Secured,
 	 * SecuredAction} for the current user and throws an exception if the check
 	 * failed.
 	 * 
 	 * @throws AuthorizationException
-	 *             if the current user ist not permitted to perform the given
+	 *             if the current user is not permitted to perform the given
 	 *             {@link SecuredAction action} on the given {@link Secured
 	 *             secured object}.
 	 */
 	public void checkIfCurrentUserIsPermitted(Secured securedObject, SecuredAction actionToPerform) {
 		if (!isCurrentUserPermitted(securedObject, actionToPerform)) {
 			throw new AuthorizationException(securedObject.getClass().getSimpleName(), actionToPerform);
+		}
+	}
+
+	/**
+	 * Performs the permission check
+	 * {@link SecurityService.isPermitted(SupersocialUser, AccessControlList,
+	 * SecuredAction} for the current user and throws an exception if the check
+	 * failed.
+	 * 
+	 * @throws AuthorizationException
+	 *             if the current user is not permitted to perform the given
+	 *             {@link SecuredAction action} on the secured object associated
+	 *             to the given given {@link AccessControlList}.
+	 */
+	public void checkIfCurrentUserIsPermitted(AccessControlList acl, SecuredAction actionToPerform) {
+		if (!isCurrentUserPermitted(acl, actionToPerform)) {
+			throw new AuthorizationException(acl.getClass().getSimpleName(), actionToPerform);
 		}
 	}
 

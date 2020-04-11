@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -15,7 +16,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 /** @author Steffen Jacobs */
 @Entity
-public class SystemConfiguration {
+public class SystemConfiguration implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -33,6 +34,9 @@ public class SystemConfiguration {
 
 	@Column
 	private String descriptor;
+
+	@OneToOne
+	private AccessControlList accessControlList;
 
 	public String getValue() {
 		return value;
@@ -58,4 +62,18 @@ public class SystemConfiguration {
 		return created;
 	}
 
+	@Override
+	public SecuredType getSecuredType() {
+		return SecuredType.SupersocialUser;
+	}
+
+	@Override
+	public AccessControlList getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public void setAccessControlList(AccessControlList accessControlList) {
+		this.accessControlList = accessControlList;
+	}
 }

@@ -100,7 +100,7 @@ public class CredentialPersistenceManager {
 			securityService.checkIfCurrentUserIsPermitted(socialMediaAccountService.findByIdNonDto(credential.getAccountId()), SecuredAction.UPDATE);
 		}
 
-		Credential cred = optCred.orElse(new Credential());
+		Credential cred = optCred.orElseGet(Credential::new);
 		boolean created = credential.getId() == null;
 
 		cred.setDescriptor(credential.getDescriptor());

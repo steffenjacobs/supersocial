@@ -39,7 +39,7 @@ public class ScheduledPostService {
 	}
 
 	public Pair<ScheduledPostDTO, Boolean> scheduleOrUpdateScheduledPost(LinkedScheduledPostDTO post) {
-		ScheduledPost sPost = post.getId() == null ? new ScheduledPost() : scheduledPostPersistenceManager.findById(post.getId()).orElse(new ScheduledPost());
+		ScheduledPost sPost = post.getId() == null ? new ScheduledPost() : scheduledPostPersistenceManager.findById(post.getId()).orElseGet(ScheduledPost::new);
 		if (sPost.getId() != null) {
 			securityService.checkIfCurrentUserIsPermitted(sPost, SecuredAction.UPDATE);
 		}else {
