@@ -44,7 +44,7 @@ public class CredentialPersistenceManager {
 	/** Describes which information is stored in a credential. */
 	public enum CredentialType {
 		TWITTER_API_KEY("twitter.api.key"), TWITTER_API_KEY_SECRET("twitter.api.secret"), TWITTER_ACCESS_TOKEN("twitter.api.accesstoken"), TWITTER_ACCESS_TOKEN_SECRET(
-				"twitter.api.accesstoken.secret"), FACEBOOK_PAGE_ID("facebook.page.id"), FACEBOOK_PAGE_ACCESSTOKEN("facebook.page.accesstoken");
+				"twitter.api.accesstoken.secret"), TWITTER_ACCOUNT_NAME("twitter.api.accountname"), FACEBOOK_PAGE_ID("facebook.page.id"), FACEBOOK_PAGE_ACCESSTOKEN("facebook.page.accesstoken");
 
 		private final String key;
 

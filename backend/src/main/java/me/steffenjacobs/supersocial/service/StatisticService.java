@@ -133,7 +133,7 @@ public class StatisticService {
 	public void fetchAll(Post p) {
 		switch (p.getSocialMediaAccountToPostWith().getPlatform()) {
 		case TWITTER:
-			// twitterService.fetchPostStatistics(p.getExternalId()).forEach(trackedStatisticRepository::save);
+					elasticSearchConnector.insert(twitterService.fetchPostStatistics(p).toString(), String.format(POST_INDEX_TEMPLATE, p.getId()), UUID.randomUUID());
 			break;
 		case FACEBOOK:
 			elasticSearchConnector.insert(facebookService.fetchPostStatistics(p).toString(), String.format(POST_INDEX_TEMPLATE, p.getId()), UUID.randomUUID());
@@ -146,7 +146,7 @@ public class StatisticService {
 	public void fetchAll(SocialMediaAccount account) {
 		switch (account.getPlatform()) {
 		case TWITTER:
-			// twitterService.fetchAccountStatistics(account).forEach(trackedStatisticRepository::save);
+			elasticSearchConnector.insert(twitterService.fetchAccountStatistics(account).toString(), String.format(ACCOUNT_INDEX_TEMPLATE, account.getId()), UUID.randomUUID());
 			break;
 		case FACEBOOK:
 			elasticSearchConnector.insert(facebookService.fetchAccountStatistics(account).toString(), String.format(ACCOUNT_INDEX_TEMPLATE, account.getId()), UUID.randomUUID());
