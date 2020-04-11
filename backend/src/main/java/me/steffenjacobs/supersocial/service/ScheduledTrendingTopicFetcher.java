@@ -31,7 +31,7 @@ public class ScheduledTrendingTopicFetcher {
 	private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("YYYY-MM-dd-HH-mm-ss");
 
 	public static final String TRENDING_INDEX = "twitter_trending";
-	public static final String TRENDING_INDEX_PATTERN = "{\"trends\": %s, \"created\": \"%s\"}";
+	public static final String TRENDING_INDEX_DOCUMENT_PATTERN = "{\"trends\": %s, \"created\": \"%s\"}";
 
 	@Autowired
 	private TwitterService twitterService;
@@ -53,7 +53,7 @@ public class ScheduledTrendingTopicFetcher {
 		LOG.info("Fetching trending topics from twitter...");
 		try {
 			String result = twitterService.fetchTrendingTopics(1, systemConfigurationManager.getSystemTwitterAccount());
-			elasticSearchConnector.insert(String.format(TRENDING_INDEX_PATTERN, result, DATE_TIME_FORMAT.format(new Date())), TRENDING_INDEX, UUID.randomUUID());
+			elasticSearchConnector.insert(String.format(TRENDING_INDEX_DOCUMENT_PATTERN, result, DATE_TIME_FORMAT.format(new Date())), TRENDING_INDEX, UUID.randomUUID());
 			LOG.info("Fetched trending topics from twitter: '{}'", result);
 		} catch (SystemConfigurationNotFoundException e) {
 			LOG.error("Could not fetch trending topics: System Twitter Account not set.");
