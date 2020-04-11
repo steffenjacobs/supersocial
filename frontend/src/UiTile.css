@@ -4,6 +4,7 @@
     background-color: #eef8ff;
     width: 20.5em;
     position: relative;
+    vertical-align: top;
 }
 
 .double-container {

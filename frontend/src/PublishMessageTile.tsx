@@ -271,7 +271,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
             );
 
         return (
-            <div className="container">
+            <div className="container inline-block">
                 <div className="box-header">
                     Publish Message
                 </div>

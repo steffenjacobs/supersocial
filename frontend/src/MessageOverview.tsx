@@ -2,6 +2,7 @@ import * as React from "react";
 import { PublishMessageTile } from "./PublishMessageTile";
 import { PublishedPostsTile } from "./PublishedPostsTile";
 import { EventBus } from "./EventBus";
+import { TrendingTile } from "./TrendingTile";
 
 export interface Props {
     eventBus: EventBus
@@ -20,6 +21,8 @@ export class MessageOverview extends React.Component<Props, Props>{
                 <PublishMessageTile eventBus={this.state.eventBus} accounts={[]} sendTextForm={{
                     message: "", accountIds: [], schedule: false, scheduled: new Date()
                 }} />
+                <div className="hspacer inline-block" />
+                <TrendingTile eventBus={this.state.eventBus}/>
                 <div className="vspacer" />
                 <PublishedPostsTile posts={[]} eventBus={this.state.eventBus} />
             </div>
