@@ -4,27 +4,24 @@ import { PublishedPostsTile } from "./PublishedPostsTile";
 import { EventBus } from "./EventBus";
 import { TrendingTile } from "./TrendingTile";
 
-export interface Props {
+export interface MessageOverviewProps {
     eventBus: EventBus
 }
 
 /** Message overview page. Contains the message publishing tile (PublishMessageTile.tsx) and the list of published posts (PublishedPostsTile.tsx). */
-export class MessageOverview extends React.Component<Props, Props>{
-    constructor(props: Props, state: Props) {
+export class MessageOverview extends React.Component<MessageOverviewProps>{
+    constructor(props: MessageOverviewProps) {
         super(props);
-        this.state = { eventBus: props.eventBus };
     }
 
     public render() {
         return (
             <div>
-                <PublishMessageTile eventBus={this.state.eventBus} accounts={[]} sendTextForm={{
-                    message: "", accountIds: [], schedule: false, scheduled: new Date()
-                }} />
+                <PublishMessageTile eventBus={this.props.eventBus} />
                 <div className="hspacer inline-block" />
-                <TrendingTile eventBus={this.state.eventBus}/>
+                <TrendingTile eventBus={this.props.eventBus}/>
                 <div className="vspacer" />
-                <PublishedPostsTile posts={[]} eventBus={this.state.eventBus} />
+                <PublishedPostsTile eventBus={this.props.eventBus} />
             </div>
         );
     }

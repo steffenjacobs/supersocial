@@ -5,20 +5,22 @@ import { Redirect } from "react-router-dom";
 import { DeploymentManager } from "./DeploymentManager";
 import { ToastManager } from "./ToastManager";
 
-export interface RegistrationCredentials {
+export interface RegistrationProps {
+    eventBus: EventBus
+    loginManager: LoginManager
+}
+interface RegistrationCredentials {
     username: string
     password: string
     email: string
-    eventBus: EventBus
-    loginManager: LoginManager
     loggedIn?: boolean
 }
 
 /** Registration Page. The user can register here or go back to the Login Page. */
-export class Registration extends React.Component<RegistrationCredentials, RegistrationCredentials> {
-    constructor(props: RegistrationCredentials, state: RegistrationCredentials) {
+export class Registration extends React.Component<RegistrationProps, RegistrationCredentials> {
+    constructor(props: RegistrationProps) {
         super(props);
-        this.state = { username: props.username, password: props.password, email: props.email, eventBus: props.eventBus, loginManager: props.loginManager, loggedIn: props.loginManager.isLoggedIn() };
+        this.state = { username: "", password: "", email: "", loggedIn: props.loginManager.isLoggedIn() };
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
@@ -28,8 +30,6 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
             username: this.state.username,
             password: this.state.password,
             email: this.state.email,
-            eventBus: this.state.eventBus,
-            loginManager: this.state.loginManager,
             loggedIn: eventData.loggedIn
         });
     }
@@ -46,8 +46,6 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
                 username: value,
                 password: this.state.password,
                 email: this.state.email,
-                eventBus: this.state.eventBus,
-                loginManager: this.state.loginManager,
                 loggedIn: this.state.loggedIn
             });
         }
@@ -56,8 +54,6 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
                 username: this.state.username,
                 password: value,
                 email: this.state.email,
-                eventBus: this.state.eventBus,
-                loginManager: this.state.loginManager,
                 loggedIn: this.state.loggedIn
             });
         }
@@ -66,8 +62,6 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
                 username: this.state.username,
                 password: this.state.password,
                 email: value,
-                eventBus: this.state.eventBus,
-                loginManager: this.state.loginManager,
                 loggedIn: this.state.loggedIn
             });
         }
@@ -84,7 +78,7 @@ export class Registration extends React.Component<RegistrationCredentials, Regis
         })
             .then(response => {
                 if (response.ok) {
-                    this.state.loginManager.logIn(this.state.username, this.state.password);
+                    this.props.loginManager.logIn(this.state.username, this.state.password);
                 } else {
                     response.json().then(e => ToastManager.showErrorToast(e.error));
                 }

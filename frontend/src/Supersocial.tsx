@@ -9,13 +9,13 @@ import { SettingsPage } from './SettingsPage';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { AnalyticsPage } from './AnalyticsPage';
 
-export interface EventBusParams {
+export interface SupersocialProps {
     eventBus: EventBus
     loginManager: LoginManager
 }
 
 /** This class holds the different pages that are later rendered in the side bar.  */
-export class Supersocial extends React.Component<EventBusParams> {
+export class Supersocial extends React.Component<SupersocialProps> {
 
     /**Change the selected page. */
     private selectComponent(components, selected: number) {

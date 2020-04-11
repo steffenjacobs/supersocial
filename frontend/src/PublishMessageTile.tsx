@@ -11,10 +11,13 @@ import { ImageProvider } from "./ImageProvider";
 import { ToastManager } from "./ToastManager";
 import { SnippetManager } from "./SnippetManager";
 
-export interface PublishMessageTileState {
+export interface PublishMessageTileProps {
+    eventBus: EventBus
+}
+
+interface CurrentMessageToPublish {
     sendTextForm: SendTextForm
     accounts: SocialMediaAccount[]
-    eventBus: EventBus
 }
 
 export interface SendTextForm {
@@ -25,14 +28,14 @@ export interface SendTextForm {
 }
 
 /** Contains a form to publish new messages. */
-export class PublishMessageTile extends React.Component<PublishMessageTileState, PublishMessageTileState>{
-    constructor(props: PublishMessageTileState, state: PublishMessageTileState) {
+export class PublishMessageTile extends React.Component<PublishMessageTileProps, CurrentMessageToPublish>{
+    constructor(props: PublishMessageTileProps) {
         super(props);
-        this.state = { sendTextForm: props.sendTextForm, accounts: props.accounts, eventBus: props.eventBus };
+        this.state = { sendTextForm: { message: "", accountIds: [], schedule: false, scheduled: new Date() }, accounts: [] };
 
-        this.state.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData?) => this.selectPost(eventData));
+        this.props.eventBus.register(EventBusEventType.SELECTED_POST_CHANGED, (eventType, eventData?) => this.selectPost(eventData));
         this.refreshAccounts();
-        this.state.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, this.refreshAccounts.bind(this));
+        this.props.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, this.refreshAccounts.bind(this));
     }
 
     /** Refresh the list of social media accounts */
@@ -93,11 +96,11 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                 .then(response => {
                     if (!response.ok) {
                         ToastManager.showErrorToast(response);
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     } else {
                         ToastManager.showSuccessToast("Created unpublished toast.");
                         response.json().then(data => {
-                            this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                            this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                             if (callback) {
                                 callback(data.id);
                             }
@@ -135,11 +138,11 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
                 .then(response => {
                     if (!response.ok) {
                         ToastManager.showErrorToast(response);
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     } else {
                         ToastManager.showSuccessToast("Created and immediately published post.");
                         response.json().then(data => {
-                            this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                            this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                         });
                     }
                 });
@@ -161,11 +164,11 @@ export class PublishMessageTile extends React.Component<PublishMessageTileState,
             .then(response => {
                 if (!response.ok) {
                     ToastManager.showErrorToast(response);
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                 } else {
                     response.json().then(data => {
                         ToastManager.showSuccessToast("Scheduled post for " + data.scheduled + ".");
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     });
                 }
             });

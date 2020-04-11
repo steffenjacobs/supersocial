@@ -16,7 +16,7 @@ class App extends React.Component<LoginInfo, LoginInfo> {
   eventBus = new EventBus();
   loginManager = new LoginManager(this.eventBus);
 
-  constructor(props) {
+  constructor(props: LoginInfo) {
     super(props);
     this.state = {
       loggedIn: false,
@@ -36,8 +36,8 @@ class App extends React.Component<LoginInfo, LoginInfo> {
     return (
       <BrowserRouter>
         <Switch>  
-          <Route path="/register" render={(props) => <Registration username="" password="" email="" eventBus={this.eventBus} loginManager={this.loginManager} />} />        
-          <Route path="/login" render={(props) => <Login username="" password="" eventBus={this.eventBus} loginManager={this.loginManager} />} />
+          <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />        
+          <Route path="/login" render={(props) => <Login eventBus={this.eventBus} loginManager={this.loginManager} />} />
           {this.state.loggedIn ? <Route path="/" render={(props) => <Supersocial eventBus={this.eventBus} loginManager={this.loginManager} />} /> : <Redirect to="/login" />} />}
         </Switch>
       </BrowserRouter>

@@ -9,7 +9,11 @@ import { DeploymentManager } from "./DeploymentManager";
 import moment from "moment";
 import { ToastManager } from "./ToastManager";
 
-export interface PublishedPost {
+export interface PublishedPostsProps {
+    eventBus: EventBus
+}
+
+interface PublishedPost {
     id: string
     text: string
     platformId: number
@@ -23,29 +27,28 @@ export interface PublishedPost {
     accountId: string
 }
 
-export interface PublishedPostsProps {
+interface PublishedPostsState {
     posts: PublishedPost[]
     updating?: boolean
-    eventBus: EventBus
     requireLogin?: boolean
 }
 
 /** Lists the already published posts. */
 
 //TODO: make table scrollable and pageable.
-export class PublishedPostsTile extends React.Component<PublishedPostsProps, PublishedPostsProps>{
-    constructor(props: PublishedPostsProps, state: PublishedPostsProps) {
+export class PublishedPostsTile extends React.Component<PublishedPostsProps, PublishedPostsState>{
+    constructor(props: PublishedPostsProps) {
         super(props);
-        this.state = { posts: props.posts, updating: props.updating, eventBus: props.eventBus, requireLogin: props.requireLogin };
+        this.state = { posts: [] };
 
         this.refreshPosts(true);
-        this.state.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
+        this.props.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
     }
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
     private refreshPosts(notMounted?: boolean) {
         if (notMounted) {
-            this.state = { posts: this.state.posts, eventBus: this.state.eventBus, requireLogin: this.state.requireLogin, updating: true };
+            this.state = { posts: this.state.posts, requireLogin: this.state.requireLogin, updating: true };
         }
         else {
             this.setState({ posts: this.state.posts, updating: true });
@@ -80,7 +83,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
     /** Fire an event to change the selected post. Lets all listeners on the event bus (e.g. PublishMessageTile.tsx) know to update accordingly. */
     private selectPost(post: PublishedPost) {
-        this.state.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
+        this.props.eventBus.fireEvent(EventBusEventType.SELECTED_POST_CHANGED, post);
     }
 
     /** Delete the post from the system without unpublishing it. */
@@ -129,11 +132,11 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
             .then(response => {
                 if (!response.ok) {
                     ToastManager.showErrorToast(response);
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                 } else {
                     ToastManager.showSuccessToast("Published post.");
                     response.json().then(data => {
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     });
                 }
             });

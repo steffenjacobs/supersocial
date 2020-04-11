@@ -9,6 +9,10 @@ import { Credential, AccountDetailsTile } from "./AccountDetailsTile";
 import { ToastManager } from "./ToastManager";
 import { EntityUtil } from "./EntityUtil";
 
+export interface SocialMediaAccountsListTileProps {
+    eventBus: EventBus
+}
+
 export interface SocialMediaAccount {
     id: string
     displayName: string
@@ -17,30 +21,29 @@ export interface SocialMediaAccount {
     error?: string
 }
 
-export interface SocialMediaAccounts {
+interface SocialMediaAccounts {
     accounts: SocialMediaAccount[]
     updating?: boolean
-    eventBus: EventBus
     selected?: SocialMediaAccount
 }
 
 /** Lists the social media accounts the current user has access to. */
 
 //TODO: make table scrollable and pageable.
-export class SocialMediaAccountsListTile extends React.Component<SocialMediaAccounts, SocialMediaAccounts>{
-    constructor(props: SocialMediaAccounts, state: SocialMediaAccounts) {
+export class SocialMediaAccountsListTile extends React.Component<SocialMediaAccountsListTileProps, SocialMediaAccounts>{
+    constructor(props: SocialMediaAccountsListTileProps, state: SocialMediaAccounts) {
         super(props);
-        this.state = { accounts: props.accounts, updating: props.updating, eventBus: props.eventBus };
+        this.state = { accounts: [] };
 
         this.refreshAccounts(true);
-        this.state.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, (eventType, eventData) => this.refreshAccounts());
-        this.state.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, (eventType, eventData) => this.selectAccount(eventData));
+        this.props.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, (eventType, eventData) => this.refreshAccounts());
+        this.props.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, (eventType, eventData) => this.selectAccount(eventData));
     }
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
     private refreshAccounts(notMounted?: boolean) {
         if (notMounted) {
-            this.state = { accounts: this.state.accounts, updating: true, eventBus: this.state.eventBus, selected: this.state.selected };
+            this.state = { accounts: this.state.accounts, updating: true, selected: this.state.selected };
         }
         else {
             this.setState({ accounts: this.state.accounts, updating: true });
@@ -55,7 +58,6 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                 } else {
                     response.json().then(data => this.setState({
                         accounts: data,
-                        eventBus: this.state.eventBus,
                         updating: false,
                         selected: data.filter(a => a.id === (this.state.selected ? this.state.selected.id : undefined)) ? this.state.selected : undefined
                     }));
@@ -169,7 +171,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         }
 
         //details panel
-        const accountSettings = this.state.selected ? <AccountDetailsTile eventBus={this.state.eventBus} account={this.state.selected} /> : <div />;
+        const accountSettings = this.state.selected ? <AccountDetailsTile eventBus={this.props.eventBus} account={this.state.selected} /> : <div />;
         return (
             <div>
                 <div className="container double-container inline-block">

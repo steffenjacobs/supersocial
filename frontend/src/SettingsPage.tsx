@@ -7,16 +7,15 @@ export interface SettingsProps {
 }
 
 /** Settings page. Contains the social media account management. */
-export class SettingsPage extends React.Component<SettingsProps, SettingsProps>{
+export class SettingsPage extends React.Component<SettingsProps>{
     constructor(props: SettingsProps) {
         super(props);
-        this.state = { eventBus: props.eventBus };
     }
 
     public render() {
         return (
             <div>
-                <SocialMediaAccountsListTile accounts={[]} eventBus={this.state.eventBus} />
+                <SocialMediaAccountsListTile eventBus={this.props.eventBus} />
             </div>
         );
     }

@@ -3,20 +3,22 @@ import { EventBus, EventBusEventType } from "./EventBus";
 import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
 
-export interface LoginCredentials {
-    username: string
-    password: string
+export interface LoginProps {
     eventBus: EventBus
     loginManager: LoginManager
+}
+interface LoginCredentials {
+    username: string
+    password: string
     loggedIn?: boolean
 }
 
 /** Login Page. The user can login here or go to the Registration page to create a new user account. 
  * Consult the LoginManger.tsx for further login logic. */
-export class Login extends React.Component<LoginCredentials, LoginCredentials> {
-    constructor(props: LoginCredentials, state: LoginCredentials) {
+export class Login extends React.Component<LoginProps, LoginCredentials> {
+    constructor(props: LoginProps) {
         super(props);
-        this.state = { username: props.username, password: props.password, eventBus: props.eventBus, loginManager: props.loginManager, loggedIn: props.loginManager.isLoggedIn() };
+        this.state = { username: "", password: "", loggedIn: props.loginManager.isLoggedIn() };
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
@@ -24,8 +26,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
     private onUserChange(eventData?: any) {
         this.setState({
             username: this.state.username, password: this.state.password,
-            eventBus: this.state.eventBus,
-            loginManager: this.state.loginManager, loggedIn: eventData.loggedIn
+            loggedIn: eventData.loggedIn
         });
     }
 
@@ -40,8 +41,6 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
             this.setState({
                 username: value,
                 password: this.state.password,
-                eventBus: this.state.eventBus,
-                loginManager: this.state.loginManager,
                 loggedIn: this.state.loggedIn
             });
         }
@@ -49,8 +48,6 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
             this.setState({
                 username: this.state.username,
                 password: value,
-                eventBus: this.state.eventBus,
-                loginManager: this.state.loginManager,
                 loggedIn: this.state.loggedIn
             });
         }
@@ -58,7 +55,7 @@ export class Login extends React.Component<LoginCredentials, LoginCredentials> {
 
     /**Sign the user in. */
     private signIn() {
-        this.state.loginManager.logIn(this.state.username, this.state.password);
+        this.props.loginManager.logIn(this.state.username, this.state.password);
     }
 
     public render() {
