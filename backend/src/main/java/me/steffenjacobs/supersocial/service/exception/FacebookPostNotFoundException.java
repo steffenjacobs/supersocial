@@ -1,6 +1,11 @@
 package me.steffenjacobs.supersocial.service.exception;
 
-/** @author Steffen Jacobs */
+/**
+ * Should be fired if a given facebook post is no longer available on the social
+ * network.
+ * 
+ * @author Steffen Jacobs
+ */
 public class FacebookPostNotFoundException extends FacebookException {
 	private static final long serialVersionUID = -1433386750230354687L;
 

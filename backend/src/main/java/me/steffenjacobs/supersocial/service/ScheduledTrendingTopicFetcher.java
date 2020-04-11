@@ -44,11 +44,11 @@ public class ScheduledTrendingTopicFetcher {
 
 	@PostConstruct
 	public void setup() {
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::refresh, 1, 15, TimeUnit.MINUTES);
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::fetchTrendingTopics, 1, 15, TimeUnit.MINUTES);
 	}
 
 	/** Fetches the trending topics from twitter. */
-	public void refresh() {
+	public void fetchTrendingTopics() {
 		createIndexIfNecessary();
 		LOG.info("Fetching trending topics from twitter...");
 		try {
@@ -64,6 +64,7 @@ public class ScheduledTrendingTopicFetcher {
 		}
 	}
 
+	/** Create an elasticsearch index for the trends if none exists yet. */
 	private void createIndexIfNecessary() {
 		if (elasticSearchConnector.hasIndex(TRENDING_INDEX)) {
 			return;

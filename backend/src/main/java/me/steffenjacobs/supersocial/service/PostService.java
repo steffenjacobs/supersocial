@@ -25,7 +25,12 @@ import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundE
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles management of Posts. Relies on the {@link PostPublishingService} to
+ * actually publish posts.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class PostService {
 	@Autowired
@@ -42,14 +47,31 @@ public class PostService {
 	@Autowired
 	private PostPublishingService postPublishingService;
 
+	/**
+	 * Create and publish a post from the newly created
+	 * {@link MessagePublishingDTO}.
+	 */
 	public PostDTO createAndPublishPost(MessagePublishingDTO messagePublishingDTO) {
 		return postPublishingService.publish(createPost(messagePublishingDTO));
 	}
 
+	/**
+	 * Create a post from the newly created {@link MessagePublishingDTO} without
+	 * publishing.
+	 */
 	public PostDTO createUnpublishedPost(MessagePublishingDTO messagePublishingDto) {
 		return postPersistenceManager.toDto(createPost(messagePublishingDto));
 	}
 
+	/**
+	 * Create a post from the newly created {@link MessagePublishingDTO}, do
+	 * permission checks and store it to the database.
+	 * 
+	 * @throws SocialMediaAccountNotFoundException
+	 *             if the associated {@link SocialMediaAccount} could not be
+	 *             found or the current user is not permitted to see it.
+	 * 
+	 */
 	private Post createPost(MessagePublishingDTO messagePublishingDto) {
 		if (messagePublishingDto.getAccountId() == null) {
 			throw new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId());
@@ -62,11 +84,19 @@ public class PostService {
 		return post;
 	}
 
+	/**
+	 * Retrieve all scheduled, non-scheduled, published and unpublished posts
+	 * filtered by the current user's READ permission.
+	 */
 	public Set<PostDTO> getAllPosts() {
 		return securityService.filterForCurrentUser(postPersistenceManager.getAllPosts(), SecuredAction.READ).map(postPersistenceManager::toDto)
 				.map(this::addSchedulingInformationIfAvailable).collect(Collectors.toSet());
 	}
 
+	/**
+	 * Enrich the given {@link PostDTO} with scheduling information if this post
+	 * is scheduled.
+	 */
 	private PostDTO addSchedulingInformationIfAvailable(PostDTO post) {
 		if (post.getPublished() != null || !StringUtils.isEmpty(post.getErrorMessage())) {
 			return post;
@@ -80,16 +110,48 @@ public class PostService {
 		return post;
 	}
 
+	/**
+	 * Find the post by ID.
+	 * 
+	 * @return a {@link PostDTO} with the given ID
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the post does not exist.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to view the post.
+	 */
 	public PostDTO findPostById(UUID id) {
 		return postPersistenceManager.toDto(this.findOriginalPostById(id));
 	}
-	
+
+	/**
+	 * Find the post by ID but return a {@link Post} instead of a
+	 * {@link PostDTO}.
+	 * 
+	 * @return a {@link Post} with the given ID
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the post does not exist.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to view the post.
+	 */
 	public Post findOriginalPostById(UUID id) {
 		final Post post = postPersistenceManager.findPostById(id);
 		securityService.checkIfCurrentUserIsPermitted(post, SecuredAction.READ);
 		return post;
 	}
 
+	/**
+	 * Delete the {@link Post} by the given id.
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the post does not exist.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to delete the post.
+	 */
 	public void deletePostById(UUID id) {
 		try {
 			// check the post itself
@@ -118,10 +180,10 @@ public class PostService {
 
 			Post p = sp.getPost();
 			securityService.checkIfCurrentUserIsPermitted(p, SecuredAction.DELETE);
-			
+
 			scheduledPostPersistenceManager.deleteScheduledPost(sp.getId());
 			postPersistenceManager.deletePostById(p.getId());
-			
+
 		}
 	}
 }

@@ -17,7 +17,12 @@ import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
 import me.steffenjacobs.supersocial.service.exception.FacebookPostNotFoundException;
 
-/** @author Steffen Jacobs */
+/**
+ * Automatically fetches analytics data for all published posts and social media
+ * accounts hourly.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class ScheduledAnalyticsService {
 	private static final Logger LOG = LoggerFactory.getLogger(ScheduledAnalyticsService.class);
@@ -44,6 +49,37 @@ public class ScheduledAnalyticsService {
 		AtomicInteger postCounter = new AtomicInteger();
 		AtomicInteger accountCounter = new AtomicInteger();
 
+		fetchPostAnalytics(postCounter);
+		fetchSocialMediaAccountAnalytics(accountCounter);
+
+		LOG.info("Finished analytics job. Fetched analytics for {} posts and {} social media accounts.", postCounter.get(), accountCounter.get());
+	}
+
+	/**
+	 * Fetch analytics data for all
+	 * {@link me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount
+	 * social media accounts} and store them into an elasticsearch index
+	 */
+	private void fetchSocialMediaAccountAnalytics(AtomicInteger accountCounter) {
+		StreamSupport.stream(socialMediaAccountRepository.findAll().spliterator(), false).forEach(a -> {
+			try {
+				statisticService.fetchAll(a);
+				accountCounter.incrementAndGet();
+				LOG.info("Fetched statistics for account '{}'", a.getId());
+			} catch (FacebookException e) {
+				LOG.error("Could not fetch statistics for account {}: {}", a.getId(), e.getMessage());
+			} catch (Exception e) {
+				LOG.error("Could not fetch statistics for account {}: ", a.getId(), e.getMessage(), e);
+			}
+		});
+	}
+
+	/**
+	 * Fetch analytics data for all published
+	 * {@link me.steffenjacobs.supersocial.domain.entity.Post posts} and store
+	 * them into an elasticsearch index.
+	 */
+	private void fetchPostAnalytics(AtomicInteger postCounter) {
 		postPersistenceManager.getAllPosts().forEach(p -> {
 			try {
 				if (p.getPublished() == null) {
@@ -60,19 +96,5 @@ public class ScheduledAnalyticsService {
 				LOG.error("Could not fetch statistics for post {}: {} ", p.getId(), e.getMessage(), e);
 			}
 		});
-
-		StreamSupport.stream(socialMediaAccountRepository.findAll().spliterator(), false).forEach(a -> {
-			try {
-				statisticService.fetchAll(a);
-				accountCounter.incrementAndGet();
-				LOG.info("Fetched statistics for account '{}'", a.getId());
-			} catch (FacebookException e) {
-				LOG.error("Could not fetch statistics for account {}: {}", a.getId(), e.getMessage());
-			} catch (Exception e) {
-				LOG.error("Could not fetch statistics for account {}: ", a.getId(), e.getMessage(), e);
-			}
-		});
-
-		LOG.info("Finished analytics job. Fetched analytics for {} posts and {} social media accounts.", postCounter.get(), accountCounter.get());
 	}
 }

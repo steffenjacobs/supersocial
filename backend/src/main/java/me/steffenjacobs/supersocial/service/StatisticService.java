@@ -22,7 +22,12 @@ import me.steffenjacobs.supersocial.util.SuccessCallback;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles statistics for {@link Post posts} and {@link SocialMediaAccount
+ * social media accounts}.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class StatisticService {
 	private static final Logger LOG = LoggerFactory.getLogger(StatisticService.class);
@@ -45,6 +50,13 @@ public class StatisticService {
 	@Autowired
 	private SocialMediaAccountService socialMediaAccountService;
 
+	/**
+	 * Retrieve all statistics associated to all {@link SocialMediaAccount
+	 * social media accounts} the current user is allowed to view and aggregates
+	 * them.
+	 * 
+	 * @return the aggregated JSON.
+	 */
 	public String getAllAccountStatistics(String query) {
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
 		socialMediaAccountService.getAllSocialMediaAccounts().forEach(acc -> {
@@ -55,6 +67,12 @@ public class StatisticService {
 		return aggregateFutures(futures);
 	}
 
+	/**
+	 * Retrieve all statistics associated to all {@link Post posts} the current
+	 * user is allowed to view and aggregates them.
+	 * 
+	 * @return the aggregated JSON.
+	 */
 	public String getAllPostStatistics(String query) {
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
 		postService.getAllPosts().stream().filter(p -> p.getPublished() != null).forEach(post -> {
@@ -65,6 +83,7 @@ public class StatisticService {
 		return aggregateFutures(futures);
 	}
 
+	/** Aggregates the JSON properties returned by all the futures. */
 	@SuppressWarnings("unchecked")
 	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures) {
 		LinkedHashMap<String, Double> map = new LinkedHashMap<String, Double>();
@@ -94,6 +113,10 @@ public class StatisticService {
 		return json.toString();
 	}
 
+	/**
+	 * Completes the {@link CompletableFuture} as soon as the
+	 * {@link SuccessCallback} is finished.
+	 */
 	private SuccessCallback<JSONArray> createFutureCallback(CompletableFuture<JSONArray> f) {
 		return new SuccessCallback<JSONArray>() {
 			@Override
@@ -108,6 +131,7 @@ public class StatisticService {
 		};
 	}
 
+	/** Retrieve all statistics queried for a single post. */
 	public String getPostStatistics(UUID postId, String query) {
 		// permission + existence check
 		postService.findOriginalPostById(postId);
@@ -130,10 +154,14 @@ public class StatisticService {
 		}
 	}
 
+	/**
+	 * Fetch all statistics for the given {@link Post} and store them in an
+	 * elasticsearch index.
+	 */
 	public void fetchAll(Post p) {
 		switch (p.getSocialMediaAccountToPostWith().getPlatform()) {
 		case TWITTER:
-					elasticSearchConnector.insert(twitterService.fetchPostStatistics(p).toString(), String.format(POST_INDEX_TEMPLATE, p.getId()), UUID.randomUUID());
+			elasticSearchConnector.insert(twitterService.fetchPostStatistics(p).toString(), String.format(POST_INDEX_TEMPLATE, p.getId()), UUID.randomUUID());
 			break;
 		case FACEBOOK:
 			elasticSearchConnector.insert(facebookService.fetchPostStatistics(p).toString(), String.format(POST_INDEX_TEMPLATE, p.getId()), UUID.randomUUID());
@@ -143,6 +171,10 @@ public class StatisticService {
 		}
 	}
 
+	/**
+	 * Fetch all statistics for the given {@link SocialMediaAccount account} and
+	 * store them in an elasticsearch index.
+	 */
 	public void fetchAll(SocialMediaAccount account) {
 		switch (account.getPlatform()) {
 		case TWITTER:
@@ -157,9 +189,18 @@ public class StatisticService {
 
 	}
 
+	/**
+	 * Retrieve the currently trending topics from Twitter from the
+	 * elasticsearch index.
+	 * 
+	 * @throws AnalyticsException
+	 *             if the index was not yet created or there was another error
+	 *             with the elasticsearch.
+	 */
 	public String getTrendingTopics() {
 		CompletableFuture<JSONArray> f = new CompletableFuture<>();
-		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", ScheduledTrendingTopicFetcher.TRENDING_INDEX, false, createFutureCallback(f));
+		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", ScheduledTrendingTopicFetcher.TRENDING_INDEX, false,
+				createFutureCallback(f));
 
 		try {
 			return f.get().toString();

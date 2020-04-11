@@ -20,7 +20,13 @@ import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundE
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.util.Pair;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles management of {@link ScheduledPost scheduled posts}. Relies on the
+ * {@link PostPublishingService} to actually publish posts and
+ * {@link PostService} to manage the associated {@link Post posts} themselves.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class ScheduledPostService {
 
@@ -33,16 +39,29 @@ public class ScheduledPostService {
 	@Autowired
 	private SecurityService securityService;
 
+	/**
+	 * Retrieve all scheduled posts filtered by READ permission for the current
+	 * user.
+	 * 
+	 * @return a set of {@link ScheduledPostDTO} objects.
+	 */
 	public Set<ScheduledPostDTO> getAllScheduledPosts() {
 		return securityService.filterForCurrentUser(scheduledPostPersistenceManager.getAllScheduledPosts(), SecuredAction.READ).map(ScheduledPostDTO::fromScheduledPost)
 				.collect(Collectors.toSet());
 	}
 
+	/**
+	 * Schedule or update the already existing scheduling information for an
+	 * unpublishd post.
+	 * 
+	 * @return {@code <post,true>} if the scheduling information was created and
+	 *         {@code <post,false>} if it was updated.
+	 */
 	public Pair<ScheduledPostDTO, Boolean> scheduleOrUpdateScheduledPost(LinkedScheduledPostDTO post) {
 		ScheduledPost sPost = post.getId() == null ? new ScheduledPost() : scheduledPostPersistenceManager.findById(post.getId()).orElseGet(ScheduledPost::new);
 		if (sPost.getId() != null) {
 			securityService.checkIfCurrentUserIsPermitted(sPost, SecuredAction.UPDATE);
-		}else {
+		} else {
 			securityService.appendCurrentUserAcl(sPost);
 		}
 
@@ -57,6 +76,14 @@ public class ScheduledPostService {
 		return new Pair<>(ScheduledPostDTO.fromScheduledPost(result.getA()), result.getB());
 	}
 
+	/**
+	 * Unschedule a post.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to unschedule the post.
+	 * @throws ScheduledPostNotFoundException
+	 *             if there is no post scheduled with this identifier.
+	 */
 	public void deleteScheduledPost(UUID id) {
 		ScheduledPost post = scheduledPostPersistenceManager.findById(id).orElseThrow(() -> new ScheduledPostNotFoundException(id));
 		securityService.checkIfCurrentUserIsPermitted(post, SecuredAction.DELETE);

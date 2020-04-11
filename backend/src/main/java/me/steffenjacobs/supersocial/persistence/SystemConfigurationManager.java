@@ -37,7 +37,16 @@ import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFound
 import me.steffenjacobs.supersocial.util.Pair;
 
 /**
- * Manages CRUD operations for system configuration objects.
+ * Manages CRUD operations for system configuration objects.<br/>
+ * <br/>
+ * 
+ * There is a system user that is created on first startup. The password is
+ * printed on the console once and never printed again.<br/>
+ * <br/>
+ * 
+ * There is a sytem acl created on first startup and reset if it is no longer
+ * valid.<br/>
+ * <br/>
  * 
  * @author Steffen Jacobs
  */

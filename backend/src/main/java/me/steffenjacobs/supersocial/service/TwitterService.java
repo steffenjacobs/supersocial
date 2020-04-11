@@ -32,7 +32,11 @@ import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles all interactions with the Twitter-APIs.
+ * 
+ * @author Steffen Jacobs
+ */
 
 @Component
 public class TwitterService {
@@ -47,8 +51,8 @@ public class TwitterService {
 	private CredentialLookupService credentialLookupService;
 
 	/**
-	 * Tweets {@code tweetText} with the credentials requested from the
-	 * credential service.
+	 * Tweets the given {@link Post} with the credentials associated to the
+	 * {@link SocialMediaAccount} associated to the given {@link Post}.
 	 */
 	public String tweet(Post post) {
 		try {
@@ -60,6 +64,13 @@ public class TwitterService {
 		}
 	}
 
+	/**
+	 * Attempt to perform an authorized request against the Twitter API via the
+	 * given {@code account}.
+	 * 
+	 * @throws TwitterException
+	 *             if something goes wrong with the API call.
+	 */
 	private String attemptAuthorizedRequest(HttpUriRequest request, SocialMediaAccount account)
 			throws UnsupportedOperationException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
 		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialLookupService.getCredential(account, CredentialType.TWITTER_API_KEY),
@@ -76,10 +87,15 @@ public class TwitterService {
 		}
 	}
 
+	/** Convert the body of the given {@link HttpEntity} to a string. */
 	private String stringify(HttpEntity entity) throws UnsupportedOperationException, IOException {
 		return IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
 	}
 
+	/**
+	 * Fetch the trending topics from Twitter for the given {@code region} with
+	 * the given {@link SocialMediaAccount}.
+	 */
 	public String fetchTrendingTopics(long regionId, SocialMediaAccount account) {
 		try {
 			final String result = attemptAuthorizedRequest(new HttpGet(String.format(TWITTER_TRENDS_ENDPOINT_TEMPLATE, regionId)), account);
@@ -90,6 +106,12 @@ public class TwitterService {
 		}
 	}
 
+	/**
+	 * Fetch the statistics for the given {@link Post} from the Twitter API.
+	 * 
+	 * @return a cleaned-up JSON object with the retrieved
+	 *         {@link TrackedStatistic tracked statistics} in it.
+	 */
 	public JSONObject fetchPostStatistics(Post post) {
 		try {
 			String json = attemptAuthorizedRequest(new HttpGet(String.format(TWITTER_TWEET_STATS_ENDPOINT_TEMPLATE, post.getExternalId())), post.getSocialMediaAccountToPostWith());
@@ -105,6 +127,13 @@ public class TwitterService {
 		}
 	}
 
+	/**
+	 * Fetch the statistics for the given {@link SocialMediaAccount} from the
+	 * Twitter API.
+	 * 
+	 * @return a cleaned-up JSON object with the retrieved
+	 *         {@link TrackedStatistic tracked statistics} in it.
+	 */
 	public JSONObject fetchAccountStatistics(SocialMediaAccount account) {
 		try {
 			String json = attemptAuthorizedRequest(
