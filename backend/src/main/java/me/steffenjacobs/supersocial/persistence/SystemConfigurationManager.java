@@ -94,6 +94,7 @@ public class SystemConfigurationManager {
 		LOG.info("Initialization of system complete.");
 	}
 
+	/** Initializes the system user if necessary. */
 	private void initializeSystemUserIfNecessary() {
 		try {
 			getSystemUser();
@@ -111,6 +112,15 @@ public class SystemConfigurationManager {
 		}
 	}
 
+	/**
+	 * Initializes the system ACL if necessary. This happens if:
+	 * <ul>
+	 * <li>there is no system ACL</li>
+	 * <li>the last used system ACL was deleted</li>
+	 * <li>the current system ACL is empty</li>
+	 * <li>no user group on the current system ACL has update permission</li>
+	 * </ul>
+	 */
 	private void initializeSystemAclIfNecessary() {
 		try {
 			// check if there is at least one user who on the ACL who can update
@@ -132,6 +142,7 @@ public class SystemConfigurationManager {
 		}
 	}
 
+	/** Create a new system ACL with the system user on it. */
 	private void setupInitialAcl() {
 		AccessControlList acl = new AccessControlList();
 		Map<UserGroup, SecuredAction> permittedActions = new HashMap<>();

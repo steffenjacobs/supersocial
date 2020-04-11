@@ -165,6 +165,7 @@ public class UserService implements UserDetailsService {
 		return aclSupersocialUser;
 	}
 
+	/** Create and save the default user group for a given user. */
 	private UserGroup createDefaultUserGroup(SupersocialUser supersocialUser) {
 		UserGroup defaultUserGroup = new UserGroup();
 		Set<SupersocialUser> users = new HashSet<>();
