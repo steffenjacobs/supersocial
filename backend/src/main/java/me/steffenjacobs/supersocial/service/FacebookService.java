@@ -132,8 +132,9 @@ public class FacebookService {
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpGet);
 			String json = EntityUtils.toString(httpResponse.getEntity());
+			checkForErrors(json);
 			JSONObject jsonResult = new JSONObject();
-			jsonResult.appendField(TrackedStatistic.ACCOUNT_FOLLOWERS.key(), JsonPath.read(json, "$.fan_count"));
+			appendIfPresent(jsonResult, json, TrackedStatistic.ACCOUNT_FOLLOWERS, "$.fan_count", 0, account.getId().toString());
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_ENGAGED_USERS.key(),
 					((JSONArray)JsonPath.read(json, "$.insights.data[?(@.name=='page_engaged_users')][?(@.period=='days_28')].values[-1:].value")).get(0));
 			jsonResult.appendField(TrackedStatistic.ACCOUNT_POST_COUNT.key(), JsonPath.read(json, "$.posts.data.length()"));

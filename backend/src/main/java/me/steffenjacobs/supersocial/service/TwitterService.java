@@ -6,15 +6,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.jayway.jsonpath.JsonPath;
 
 import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
@@ -32,39 +35,49 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 public class TwitterService {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterService.class);
 
-	private static final String TWITTER_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/update.json?status=";
+	private static final String TWITTER_STATUS_ENDPOINT_TEMPLATE = "https://api.twitter.com/1.1/statuses/update.json?status=%s";
+	private static final String TWITTER_TRENDS_ENDPOINT_TEMPLATE = "https://api.twitter.com/1.1/trends/place.json?id=%s";
 
 	@Autowired
 	private CredentialLookupService credentialLookupService;
 
 	/**
-	 * Tweets {@code tweetText} with the credentials given in the
-	 * credentials.properties file.
+	 * Tweets {@code tweetText} with the credentials requested from the
+	 * credential service.
 	 */
 	public String tweet(Post post) {
 		try {
-			return attemptTweet(post, credentialLookupService.getCredential(post, CredentialType.TWITTER_ACCESS_TOKEN),
-					credentialLookupService.getCredential(post, CredentialType.TWITTER_ACCESS_TOKEN_SECRET));
+			return attemptAuthorizedRequest(new HttpPost(String.format(TWITTER_STATUS_ENDPOINT_TEMPLATE, URLEncoder.encode(post.getText(), StandardCharsets.UTF_16))),
+					post.getSocialMediaAccountToPostWith());
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
 			LOG.error("Could not send tweet");
 			throw new TwitterException("Could not send tweet.", e);
 		}
 	}
 
-	/**
-	 * Attempt to tweet {@code tweetText} with the given {@code accessToken} and
-	 * {@code accessTokenSecret}.
-	 */
-	private String attemptTweet(Post post, String accessToken, String accessTokenSecret)
-			throws ClientProtocolException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialLookupService.getCredential(post, CredentialType.TWITTER_API_KEY),
-				credentialLookupService.getCredential(post, CredentialType.TWITTER_API_KEY_SECRET));
-		oAuthConsumer.setTokenWithSecret(accessToken, accessTokenSecret);
-		final HttpPost httpPost = new HttpPost(TWITTER_STATUS_ENDPOINT + URLEncoder.encode(post.getText(), StandardCharsets.UTF_16));
-		oAuthConsumer.sign(httpPost);
+	private String attemptAuthorizedRequest(HttpUriRequest request, SocialMediaAccount account)
+			throws UnsupportedOperationException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
+		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialLookupService.getCredential(account, CredentialType.TWITTER_API_KEY),
+				credentialLookupService.getCredential(account, CredentialType.TWITTER_API_KEY_SECRET));
+		oAuthConsumer.setTokenWithSecret(credentialLookupService.getCredential(account, CredentialType.TWITTER_ACCESS_TOKEN),
+				credentialLookupService.getCredential(account, CredentialType.TWITTER_ACCESS_TOKEN_SECRET));
+		oAuthConsumer.sign(request);
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-			final HttpResponse httpResponse = httpClient.execute(httpPost);
-			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
+			return stringify(httpClient.execute(request).getEntity());
+		}
+	}
+
+	private String stringify(HttpEntity entity) throws UnsupportedOperationException, IOException {
+		return IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
+	}
+
+	public String fetchTrendingTopics(long regionId, SocialMediaAccount account) {
+		try {
+			final String result = attemptAuthorizedRequest(new HttpGet(String.format(TWITTER_TRENDS_ENDPOINT_TEMPLATE, regionId)), account);
+			return JsonPath.read(result, "$..['name','tweet_volume']").toString();
+		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
+			LOG.error("Could not fetch trending topics");
+			throw new TwitterException("Could not fetch trending topics.", e);
 		}
 	}
 

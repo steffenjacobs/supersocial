@@ -64,4 +64,16 @@ public class AnalyticsEndpoint {
 		}
 	}
 
+	/** Get trending topics from twitter. */
+	@GetMapping(path = "/api/analytics/trending", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getTrendingTopics() throws Exception {
+		LOG.info("Retrieving trending topics.");
+		try {
+			return new ResponseEntity<>(statisticService.getTrendingTopics(), HttpStatus.OK);
+		} catch (Exception e) {
+			LOG.error("Error retrieving trending topics: ", e);
+			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+		}
+	}
+
 }

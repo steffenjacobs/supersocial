@@ -94,8 +94,8 @@ public class StatisticService {
 		return json.toString();
 	}
 
-	private SuccessCallback createFutureCallback(CompletableFuture<JSONArray> f) {
-		return new SuccessCallback() {
+	private SuccessCallback<JSONArray> createFutureCallback(CompletableFuture<JSONArray> f) {
+		return new SuccessCallback<JSONArray>() {
 			@Override
 			public void onSuccess(JSONArray json) {
 				f.complete(json);
@@ -113,17 +113,7 @@ public class StatisticService {
 		postService.findOriginalPostById(postId);
 
 		CompletableFuture<JSONArray> f = new CompletableFuture<>();
-		elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, postId), false, new SuccessCallback() {
-
-			@Override
-			public void onSuccess(JSONArray json) {
-				f.complete(json);
-			}
-
-			public void onError(Exception e) {
-				f.completeExceptionally(e);
-			};
-		});
+		elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, postId), false, createFutureCallback(f));
 
 		try {
 			return f.get().toString();
@@ -165,5 +155,24 @@ public class StatisticService {
 			break;
 		}
 
+	}
+
+	public String getTrendingTopics() {
+		CompletableFuture<JSONArray> f = new CompletableFuture<>();
+		elasticSearchConnector.find("", ScheduledTrendingTopicFetcher.TRENDING_INDEX, false, createFutureCallback(f));
+
+		try {
+			return f.get().toString();
+		} catch (InterruptedException | ExecutionException e) {
+			if (e.getCause() instanceof ResponseException) {
+				if (e.getCause().getMessage().contains("index_not_found_exception")) {
+					throw new AnalyticsException(String.format("Error retrieving analytics data: No trending topics yet."), e);
+				}
+				if (e.getCause().getMessage().contains("json_parse_exception")) {
+					throw new AnalyticsException(String.format("Error retrieving analytics data: Invalid query."), e);
+				}
+			}
+			throw new AnalyticsException(String.format("Error retrieving analytics data: %s.", e.getMessage()), e);
+		}
 	}
 }

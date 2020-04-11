@@ -46,7 +46,7 @@ public class ScheduledAnalyticsService {
 
 		postPersistenceManager.getAllPosts().forEach(p -> {
 			try {
-				if(p.getPublished() == null) {
+				if (p.getPublished() == null) {
 					return;
 				}
 				statisticService.fetchAll(p);
@@ -56,9 +56,8 @@ public class ScheduledAnalyticsService {
 				LOG.error("Could not fetch statistics for post {}: Post does not exist anymore.", p.getId());
 			} catch (FacebookException e) {
 				LOG.error("Could not fetch statistics for post {}: {}", p.getId(), e.getMessage());
-			}
-			catch (Exception e) {
-				LOG.error("Could not fetch statistics for post {}: ", p.getId(), e.getMessage(), e);
+			} catch (Exception e) {
+				LOG.error("Could not fetch statistics for post {}: {} ", p.getId(), e.getMessage(), e);
 			}
 		});
 
@@ -67,6 +66,8 @@ public class ScheduledAnalyticsService {
 				statisticService.fetchAll(a);
 				accountCounter.incrementAndGet();
 				LOG.info("Fetched statistics for account '{}'", a.getId());
+			} catch (FacebookException e) {
+				LOG.error("Could not fetch statistics for account {}: {}", a.getId(), e.getMessage());
 			} catch (Exception e) {
 				LOG.error("Could not fetch statistics for account {}: ", a.getId(), e.getMessage(), e);
 			}
