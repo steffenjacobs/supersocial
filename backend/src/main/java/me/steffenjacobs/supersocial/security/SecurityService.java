@@ -170,8 +170,7 @@ public class SecurityService {
 	 * this object.
 	 */
 	@Transactional
-	public void appendAcl(Secured securedObject) {
-		// TODO: rename to appendCurrentUserAcl
+	public void appendCurrentUserAcl(Secured securedObject) {
 		appendAclForUserGroup(securedObject, getCurrentUser().getDefaultUserGroup());
 	}
 

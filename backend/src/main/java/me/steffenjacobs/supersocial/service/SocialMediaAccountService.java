@@ -69,7 +69,7 @@ public class SocialMediaAccountService {
 		account.setDisplayName(displayName);
 		account.setPlatform(platform);
 		account = socialMediaAccountRepository.save(account);
-		securityService.appendAcl(account);
+		securityService.appendCurrentUserAcl(account);
 		return account;
 	}
 

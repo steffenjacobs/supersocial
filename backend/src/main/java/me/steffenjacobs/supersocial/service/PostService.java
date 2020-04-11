@@ -58,7 +58,7 @@ public class PostService {
 				.orElseThrow(() -> new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId()));
 		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.READ);
 		Post post = postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
-		securityService.appendAcl(post);
+		securityService.appendCurrentUserAcl(post);
 		return post;
 	}
 

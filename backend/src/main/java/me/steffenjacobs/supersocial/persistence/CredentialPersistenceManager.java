@@ -107,7 +107,7 @@ public class CredentialPersistenceManager {
 		cred.setValue(credential.getValue());
 		cred = this.credentialRepository.save(cred);
 		if (created) {
-			securityService.appendAcl(cred);
+			securityService.appendCurrentUserAcl(cred);
 		}
 
 		if (credential.getAccountId() != null) {

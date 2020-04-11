@@ -42,7 +42,7 @@ public class PostPersistenceManager {
 		p.setText(postText);
 		p.setCreator(securityService.getCurrentUser());
 		p.setSocialMediaAccountToPostWith(account);
-		securityService.appendAcl(p);
+		securityService.appendCurrentUserAcl(p);
 		return postRepository.save(p);
 	}
 
