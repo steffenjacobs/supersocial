@@ -7,6 +7,7 @@ import { LoginManager, LoginStatus } from "./LoginManager";
 import { DeploymentManager } from "./DeploymentManager";
 import { ToastManager } from "./ToastManager";
 import { EventBus, EventBusEventType } from "./EventBus";
+import L from "leaflet";
 
 interface MapState {
   zoom: number
@@ -32,6 +33,7 @@ export class MapContainer extends React.Component<MapProps, MapState>{
     let lng = props.loginManager.getLoginStatus().config.find(x => x.descriptor === "user.longitude")?.value;
     this.state = { location: loc, zoom: 5, lat: lat ? Number(lat) : 50, lng: lng ? Number(lng) : 10, changed: false };
     props.eventBus.register(EventBusEventType.USER_CHANGE, (e, u) => this.refreshState(u));
+    L.Icon.Default.imagePath="icons/map/";
   }
 
   /** Called when the user clicks on the map to update the pin. */
