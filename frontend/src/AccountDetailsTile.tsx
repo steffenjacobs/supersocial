@@ -338,7 +338,11 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         return (
             <div className="container double-container container-top-margin" >
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block"> Account Details for {this.state.account.displayName ? this.state.account.displayName : "<unnamed>"}</div>
+                    <div className="inline-block"> Account Details for {this.state.account.displayName ? this.state.account.displayName : "<unnamed>"}
+                        {SnippetManager.isLinked(this.state.account) && <span className="table-icon superscript-icon">
+                            {SnippetManager.isLinked(this.state.account) && <span onClick={() => SnippetManager.goToAccount(this.state.account)} >{ImageProvider.getImage("link")}
+                            </span>}
+                        </span>}</div>
                     <div className="btn-small" onClick={this.close.bind(this)}>✖︎</div>
                 </div>
                 <div className="box-content">

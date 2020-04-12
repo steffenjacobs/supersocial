@@ -49,3 +49,11 @@
 .margin-left-big {    
     margin-left: 10em;
 }
+
+.superscript-icon {
+    display: inline-block;
+    font-size: .5em;
+    margin-left: .5em;
+    vertical-align: top;
+    margin-top: .5em;
+}
