@@ -1,10 +1,12 @@
 import * as React from "react";
 import './UiTile.css';
 import './UiElements.css';
-import { EventBus } from "./EventBus";
+import { EventBus, EventBusEventType } from "./EventBus";
 import { DeploymentManager } from "./DeploymentManager";
 import { ImageProvider } from "./ImageProvider";
 import { ToastManager } from "./ToastManager";
+import { LoginManager } from "./LoginManager";
+import { UserConfigurationDecoder } from "./UserConfigurationDecoder";
 
 export interface TrendingTileState {
     updating?: boolean
@@ -12,6 +14,7 @@ export interface TrendingTileState {
 }
 export interface TrendingTileProps {
     eventBus: EventBus
+    loginManager: LoginManager
 }
 
 export interface TrendingTopic {
@@ -24,13 +27,14 @@ export class TrendingTile extends React.Component<TrendingTileProps, TrendingTil
     constructor(props: TrendingTileProps) {
         super(props);
         this.state = { updating: false, topics: [] };
-        this.refreshTrendingTopics();
+        this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocation(props.loginManager).woeid);
+        props.eventBus.register(EventBusEventType.USER_CHANGE, (e, ld) => this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocationFromLoginStatus(ld).woeid));
     }
 
     /** Fetches the most recent twitter trends from the backend. */
-    private refreshTrendingTopics() {
+    private refreshTrendingTopics(woeid: any) {
         this.setState({ updating: true });
-        fetch(DeploymentManager.getUrl() + 'api/analytics/trending', {
+        fetch(DeploymentManager.getUrl() + 'api/analytics/trending/' + woeid, {
             method: 'get',
             credentials: 'include',
         })
@@ -68,10 +72,10 @@ export class TrendingTile extends React.Component<TrendingTileProps, TrendingTil
         return (
             <div className="container dynamic-container inline-block">
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block">Trending Topics</div>
+                    <div className="inline-block">Trending Topics for {UserConfigurationDecoder.decodeLocation(this.props.loginManager).name}</div>
                     <div
                         className={classUpdating.join(" ")}
-                        onClick={e => this.refreshTrendingTopics()}
+                        onClick={e => this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocation(this.props.loginManager).woeid)}
                     >
                         {ImageProvider.getImage("refresh")}
                     </div>

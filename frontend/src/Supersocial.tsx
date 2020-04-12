@@ -27,7 +27,7 @@ export class Supersocial extends React.Component<SupersocialProps> {
     public render() {
         const components = [{
             title: 'Message Overview',
-            page: <MessageOverview eventBus={this.props.eventBus} />,
+            page: <MessageOverview eventBus={this.props.eventBus} loginManager={this.props.loginManager} />,
             selected: true,
             id: 0,
             icon: ImageProvider.getImage("home-icon"),

@@ -6,7 +6,7 @@ import { EventBus, EventBusEventType } from './EventBus';
 import { LoginManager } from './LoginManager';
 import { Registration } from './Registration';
 
-export interface LoginInfo {
+interface LoginInfo {
   loggedIn?: boolean
   username?: string
 }

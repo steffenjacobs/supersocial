@@ -4,6 +4,12 @@ import { DeploymentManager } from "./DeploymentManager";
 export interface LoginStatus {
     loggedIn: boolean
     username: string
+    config: UserConfiguration[]
+}
+
+export interface UserConfiguration {
+    descriptor: string
+    value: string
 }
 
 /** The LoginManager class contains all the required logic to perform logins and check and update the login status of the current user. */
@@ -11,9 +17,10 @@ export interface LoginStatus {
 //TODO: Logout
 export class LoginManager {
     eventBus: EventBus;
-    loginStatus = {
+    loginStatus: LoginStatus = {
         loggedIn: false,
-        username: "Not logged in"
+        username: "Not logged in",
+        config: []
     };
 
     constructor(eventBus: EventBus) {
@@ -32,7 +39,7 @@ export class LoginManager {
 
     /** Update the login status of the user to log in or log out.*/
     private updateLoginStatus(newLoginStatus: LoginStatus) {
-        this.loginStatus = { loggedIn: newLoginStatus.loggedIn, username: newLoginStatus.username };
+        this.loginStatus = { loggedIn: newLoginStatus.loggedIn, username: newLoginStatus.username, config: newLoginStatus.config };
         this.eventBus.fireEvent(EventBusEventType.USER_CHANGE, this.loginStatus);
     }
 
@@ -55,10 +62,10 @@ export class LoginManager {
             .then(response => {
                 if (response.ok) {
                     response.json().then(data => {
-                        this.updateLoginStatus({ loggedIn: true, username: data.username });
+                        this.updateLoginStatus({ loggedIn: true, username: data.username, config: data.config });
                     });
                 } else {
-                    this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });
+                    this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
                 }
             });
     }
@@ -72,19 +79,19 @@ export class LoginManager {
             .then(response => {
                 if (response.ok) {
                     response.json().then(data => {
-                        this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });
+                        this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
                     });
                 } else {
-                    this.updateLoginStatus({ loggedIn: false, username: "Not logged in" });
+                    this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
                 }
             });
     }
 
     /** @return the loginStatus object containing a username and a loggedIn value */
-    public getLoginStatus() {
+    public getLoginStatus(): LoginStatus {
         if (!this.loginStatus.loggedIn) {
             this.logIn(undefined, undefined);
         }
-        return { username: this.loginStatus.username, loggedIn: this.loginStatus.loggedIn };
+        return { username: this.loginStatus.username, loggedIn: this.loginStatus.loggedIn, config: this.loginStatus.config };
     }
 }
