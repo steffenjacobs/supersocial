@@ -72,8 +72,8 @@ public class CredentialPersistenceManager {
 	/**
 	 * @return all credentials filtered by READ permission for the current user.
 	 */
-	public Stream<Credential> getAll() {
-		return securityService.filterForCurrentUser(StreamSupport.stream(credentialRepository.findAll().spliterator(), false), SecuredAction.READ);
+	public Stream<CredentialDTO> getAll() {
+		return securityService.filterForCurrentUser(StreamSupport.stream(credentialRepository.findAll().spliterator(), false), SecuredAction.READ).map(c-> c.toDTO(isCredentialPublic(c)));
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class CredentialPersistenceManager {
 	 *             or the associated social media account (assuming one is
 	 *             associated).
 	 */
-	public Pair<Credential, Boolean> createOrUpdateCredential(CredentialDTO credential) {
+	public Pair<CredentialDTO, Boolean> createOrUpdateCredential(CredentialDTO credential) {
 		// TODO: check create action
 		Optional<Credential> optCred = Optional.empty();
 		if (credential.getId() != null) {
@@ -114,7 +114,7 @@ public class CredentialPersistenceManager {
 			socialMediaAccountService.appendCredential(credential.getAccountId(), cred.getId());
 		}
 
-		return new Pair<>(cred, created);
+		return new Pair<>(cred.toDTO(isCredentialPublic(cred)), created);
 	}
 
 	/**
@@ -158,5 +158,13 @@ public class CredentialPersistenceManager {
 	public Credential appendToAccount(Credential credential, SocialMediaAccount account) {
 		credential.setAccount(account);
 		return credentialRepository.save(credential);
+	}
+
+	/**
+	 * @return true if the given credential can be given to the public without
+	 *         disclosing secrets.
+	 */
+	public boolean isCredentialPublic(Credential credential) {
+		return "twitter.api.accountname".equals(credential.getDescriptor()) || "facebook.page.id".equals(credential.getDescriptor());
 	}
 }

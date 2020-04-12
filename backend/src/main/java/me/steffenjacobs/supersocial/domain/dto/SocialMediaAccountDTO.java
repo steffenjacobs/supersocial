@@ -53,11 +53,11 @@ public class SocialMediaAccountDTO implements WithErrorDTO {
 	public void setError(String error) {
 		this.error = error;
 	}
-	
+
 	public Set<CredentialDTO> getCredentials() {
 		return credentials;
 	}
-	
+
 	public void setCredentials(Set<CredentialDTO> credentials) {
 		this.credentials = credentials;
 	}

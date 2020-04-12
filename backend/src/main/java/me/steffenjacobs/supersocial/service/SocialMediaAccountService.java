@@ -131,16 +131,16 @@ public class SocialMediaAccountService {
 	}
 
 	/**
-	 * Prunes the {@link Credential credentials} associated to the given
-	 * {@link SocialMediaAccount} and converts it to a
-	 * {@link SocialMediaAccountDTO}.
+	 * Prune the {@link Credential credentials} associated to the given
+	 * {@link SocialMediaAccount} by omitting the non-public values and convert
+	 * it to a {@link SocialMediaAccountDTO}.
 	 */
 	private SocialMediaAccountDTO createPrunedDTO(SocialMediaAccount account) {
 		Set<CredentialDTO> credentials = new HashSet<>();
 
 		account.getCredentials().forEach(c -> {
 			if (securityService.isCurrentUserPermitted(c, SecuredAction.READ)) {
-				credentials.add(c.toDTO());
+				credentials.add(c.toDTO(credentialPersistenceManager.isCredentialPublic(c)));
 			}
 		});
 
