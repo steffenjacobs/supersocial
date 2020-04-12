@@ -309,7 +309,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
 
     public render() {
         //table of credentials for the currently selected social media account
-        const credentialElements = this.state.account.credentials.sort((c1, c2) => c1.descriptor.localeCompare(c2.descriptor)).map(cred => {
+        const credentialElements = this.state.account.credentials.sort((c1, c2) => !c1 ? 1 : c1.descriptor.localeCompare(c2.descriptor)).map(cred => {
             const credentialsField = cred.omitted ?
                 <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder={cred.value} value="" />
                 : <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
@@ -343,7 +343,12 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                             {SnippetManager.isLinked(this.state.account) && <span onClick={() => SnippetManager.goToAccount(this.state.account)} >{ImageProvider.getImage("link")}
                             </span>}
                         </span>}</div>
-                    <div className="btn-small" onClick={this.close.bind(this)}>✖︎</div>
+                    <div>
+                        <div className="btn btn-icon btn-add btn-header" onClick={(_e) => this.addCredential()}>
+                            <div className="align-middle">{ImageProvider.getImage("add-icon")}<span className="btn-header-text">Add Credential</span></div>
+                        </div>
+                        <div className="btn-small inline-block align-middle" onClick={this.close.bind(this)}>✖︎</div>
+                    </div>
                 </div>
                 <div className="box-content">
                     <div className="box-content">
@@ -367,11 +372,8 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                                     this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Twitter+Account"))
                         }
                     </div>
-                    <div className="displayName">Credentials: </div>
+                    <div className="displayName display-name-bold inline-block">Credentials: </div>
                     {credentialElements}
-                    <div className="btn btn-icon btn-add btn-icon-big" onClick={(_e) => this.addCredential()}>
-                        <div className="btn-add-inner">{ImageProvider.getImage("add-icon")}</div>
-                    </div>
                 </div>
             </div >
         );

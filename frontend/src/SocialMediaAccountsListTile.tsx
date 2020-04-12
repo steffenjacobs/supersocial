@@ -170,7 +170,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
             });
 
         //refresh button animation
-        let classUpdating = ["inline-block", "btn-icon", "btn-small"]
+        let classUpdating = ["align-middle", "inline-block", "btn-icon", "btn-small"]
         if (this.state.updating) {
             classUpdating.push("crossRotate");
         }
@@ -182,11 +182,16 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                 <div className="container double-container inline-block">
                     <div className="box-header box-header-with-icon">
                         <div className="inline-block">All Accounts</div>
-                        <div
-                            className={classUpdating.join(" ")}
-                            onClick={e => this.refreshAccounts()}
-                        >
-                            {ImageProvider.getImage("refresh")}
+                        <div>
+                            <div className="btn btn-icon btn-add btn-header font6" onClick={(_e) => this.addAccount()}>
+                                <div className="align-middle">{ImageProvider.getImage("add-icon")}<span className="btn-header-text">Add Account</span></div>
+                            </div>
+                            <div
+                                className={classUpdating.join(" ")}
+                                onClick={e => this.refreshAccounts()}
+                            >
+                                {ImageProvider.getImage("refresh")}
+                            </div>
                         </div>
                     </div>
                     <div className="box-content">
@@ -204,9 +209,6 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                             </tbody>
 
                         </table>
-                        <div onClick={this.addAccount.bind(this)} className="btn btn-icon btn-add btn-icon-big btn-margins">
-                            <div className="btn-add-inner" >{ImageProvider.getImage("add-icon")}</div>
-                        </div>
                     </div>
                 </div >
                 {accountSettings}

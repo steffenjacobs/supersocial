@@ -62,6 +62,21 @@
     fill: #111;
 }
 
+.btn-header {
+    font-size: .5em;
+    display: inline-block;
+    margin-right: 1.5em;
+    width: 12em;
+    vertical-align: middle;
+}
+
+.btn-header-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    vertical-align: top;
+    margin-left: .4em;
+}
+
 .monospace-font {
     font-family: "Courier New", Courier, monospace;
 }

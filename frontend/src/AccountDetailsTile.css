@@ -22,31 +22,21 @@
     fill: #a2c5dd;
 }
 
-.btn-save:hover{
+.btn-save:hover {
     fill: #3498db;
 }
 
 .btn-add {
     fill: #3498db;
     padding: .5em;
-    margin-bottom: 1em;
 }
 
-.btn-add:hover{
+.btn-add:hover {
     fill: #a2c5dd;
-    background-color:white;
+    background-color: white;
 }
 
-.btn-icon-big{
-    width: 2em;
-    height: 2em;
-}
-
-.btn-add-inner{
-    padding-top: .25em;
-}
-
-.margin-left-big {    
+.margin-left-big {
     margin-left: 10em;
 }
 
@@ -56,4 +46,16 @@
     margin-left: .5em;
     vertical-align: top;
     margin-top: .5em;
+}
+
+.align-middle {
+    vertical-align: middle;
+}
+
+.display-name-bold {
+    font-weight: bold;
+}
+
+.font6 {
+    font-size:.6em;
 }
