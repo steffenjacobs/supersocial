@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,7 +17,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 /** @author Steffen Jacobs */
 @Entity
-public class SystemConfiguration implements Secured {
+public class UserConfiguration implements Secured {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -37,6 +38,9 @@ public class SystemConfiguration implements Secured {
 
 	@OneToOne
 	private AccessControlList accessControlList;
+
+	@ManyToOne
+	private SupersocialUser user;
 
 	public String getValue() {
 		return value;
@@ -62,9 +66,17 @@ public class SystemConfiguration implements Secured {
 		return created;
 	}
 
+	public SupersocialUser getUser() {
+		return user;
+	}
+
+	public void setUser(SupersocialUser user) {
+		this.user = user;
+	}
+
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.SystemConfiguration;
+		return SecuredType.UserConfiguration;
 	}
 
 	@Override
@@ -76,4 +88,30 @@ public class SystemConfiguration implements Secured {
 	public void setAccessControlList(AccessControlList accessControlList) {
 		this.accessControlList = accessControlList;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserConfiguration other = (UserConfiguration) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
 }

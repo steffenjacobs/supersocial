@@ -1,12 +1,15 @@
 package me.steffenjacobs.supersocial.domain.entity;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -45,6 +48,9 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 
 	@OneToOne
 	private UserGroup defaultUserGroup;
+
+	@OneToMany(mappedBy = "user")
+	private Set<UserConfiguration> userConfigurations = new HashSet<>();
 
 	public UUID getId() {
 		return id;
@@ -100,6 +106,14 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 
 	public Date getCreated() {
 		return created;
+	}
+
+	public Set<UserConfiguration> getUserConfigurations() {
+		return userConfigurations;
+	}
+
+	public void setUserConfigurations(Set<UserConfiguration> userConfigurations) {
+		this.userConfigurations = userConfigurations;
 	}
 
 }

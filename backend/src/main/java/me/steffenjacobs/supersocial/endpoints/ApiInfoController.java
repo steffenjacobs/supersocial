@@ -16,11 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
 import me.steffenjacobs.supersocial.domain.dto.SystemConfigurationDTO;
 import me.steffenjacobs.supersocial.persistence.SystemConfigurationManager;
 import me.steffenjacobs.supersocial.persistence.exception.SystemConfigurationTypeNotFoundException;
-import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -36,19 +34,10 @@ public class ApiInfoController {
 	private static final Logger LOG = LoggerFactory.getLogger(ApiInfoController.class);
 
 	@Autowired
-	private SecurityService securityService;
-
-	@Autowired
 	private SystemConfigurationManager systemConfigurationManager;
 
 	@Value("${app.version:unknown}")
 	private String version;
-
-	/** @return the login status of the current user. */
-	@GetMapping(path = "/api/loginstatus")
-	public CurrentUserDTO getLoginStatus() throws Exception {
-		return CurrentUserDTO.fromUser(securityService.getCurrentUser());
-	}
 
 	/**
 	 * @return the current version of the software, read from the maven pom.xml.

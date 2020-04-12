@@ -1,6 +1,8 @@
 package me.steffenjacobs.supersocial.domain.dto;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 
@@ -9,6 +11,7 @@ public class CurrentUserDTO {
 	private UUID id;
 	private String username;
 	private int providerId;
+	private Set<UserConfigurationDTO> config;
 
 	public UUID getId() {
 		return id;
@@ -34,11 +37,20 @@ public class CurrentUserDTO {
 		return providerId;
 	}
 
+	public Set<UserConfigurationDTO> getConfig() {
+		return config;
+	}
+
+	public void setConfig(Set<UserConfigurationDTO> config) {
+		this.config = config;
+	}
+
 	public static CurrentUserDTO fromUser(SupersocialUser user) {
 		CurrentUserDTO dto = new CurrentUserDTO();
 		dto.setId(user.getId());
 		dto.setUsername(user.getName());
 		dto.setProviderId(user.getLoginProvider().getId());
+		dto.setConfig(user.getUserConfigurations().stream().map(UserConfigurationDTO::fromConfiguration).collect(Collectors.toSet()));
 		return dto;
 	}
 }
