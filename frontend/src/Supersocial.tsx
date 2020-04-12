@@ -41,7 +41,7 @@ export class Supersocial extends React.Component<SupersocialProps> {
         }, {
             id: 2,
             title: 'Settings',
-            page: <SettingsPage eventBus={this.props.eventBus} />,
+            page: <SettingsPage eventBus={this.props.eventBus} loginManager={this.props.loginManager} />,
             icon: ImageProvider.getImage("settings-icon"),
             path: "/settings"
         }, {

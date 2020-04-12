@@ -7,6 +7,7 @@ import { ImageProvider } from "./ImageProvider";
 import { ToastManager } from "./ToastManager";
 import { LoginManager } from "./LoginManager";
 import { UserConfigurationDecoder } from "./UserConfigurationDecoder";
+import { SnippetManager } from "./SnippetManager";
 
 export interface TrendingTileState {
     updating?: boolean
@@ -64,15 +65,17 @@ export class TrendingTile extends React.Component<TrendingTileProps, TrendingTil
             });
 
         //animation for refresh button
-        let classUpdating = ["inline-block", "btn-icon", "btn-small"]
+        let classUpdating = ["inline-block", "btn-icon", "btn-small", "header-icon-margin-left"]
         if (this.state.updating) {
             classUpdating.push("crossRotate");
         }
 
+        const locationName = UserConfigurationDecoder.decodeLocation(this.props.loginManager).name;
+
         return (
             <div className="container dynamic-container inline-block">
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block">Trending Topics for {UserConfigurationDecoder.decodeLocation(this.props.loginManager).name}</div>
+                    <div className="inline-block">Trending Topics for {locationName} {locationName==="Global"&&SnippetManager.createInfo("https://confluence.supersocial.cloud/display/SP/Select+your+Location", "","","To select a different location, go to the settings.", "fontsize6")}</div>
                     <div
                         className={classUpdating.join(" ")}
                         onClick={e => this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocation(this.props.loginManager).woeid)}

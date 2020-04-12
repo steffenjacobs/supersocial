@@ -14,6 +14,7 @@ interface MapState {
   lng: number
   location: LocationConfiguration
   changed: boolean
+  refreshing?: boolean;
 }
 
 export interface MapProps {
@@ -38,7 +39,8 @@ export class MapContainer extends React.Component<MapProps, MapState>{
     this.setState({
       lat: e.latlng.lat,
       lng: e.latlng.lng,
-      changed: true
+      changed: true,
+      refreshing: false
     });
   }
 
@@ -52,11 +54,12 @@ export class MapContainer extends React.Component<MapProps, MapState>{
     let loc = UserConfigurationDecoder.decodeLocationFromLoginStatus(loginStatus);
     let lat = loginStatus.config.find(x => x.descriptor === "user.latitude")?.value;
     let lng = loginStatus.config.find(x => x.descriptor === "user.longitude")?.value;
-    this.setState({ location: loc, zoom: this.state.zoom, lat: lat ? Number(lat) : 50, lng: lng ? Number(lng) : 10, changed: false });
+    this.setState({ location: loc, zoom: this.state.zoom, lat: lat ? Number(lat) : 50, lng: lng ? Number(lng) : 10, changed: false, refreshing: false });
   }
 
   /** Persist the selected location to the backend. Updates the map and e.g. the trending twitter topics. */
   private saveSelectedLocation(e: any) {
+    this.setState({ refreshing: true });
     fetch(DeploymentManager.getUrl() + 'api/user/location', {
       method: 'PUT',
       headers: new Headers({
@@ -79,22 +82,33 @@ export class MapContainer extends React.Component<MapProps, MapState>{
 
   render() {
     return (
-      <div className="mapContainer">
-        <Map ref={ref => this.map = ref} onzoomlevelschange={e => this.onMapZoom(e)} onzoomend={e => this.onMapZoom(e)} onzoomstart={e => this.onMapZoom(e)} onclick={e => this.onMapClick(e)} className="mapContainer" center={this.state} zoom={this.state.zoom}>
-          <TileLayer
-            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <Marker position={this.state}>
-            <Popup>
-              <b>Your {this.state.changed ? "previously " : ""} selected location:</b><br /><br />
-              {this.state.location.name} ({this.state.location.placeType.name})<br />
-              {this.state.location.country}
-              {this.state.changed ? (<span><br /><br />Click the <b>save</b> button below to store your updated location.</span>) : ""}
-            </Popup>
-          </Marker>
-        </Map>
-        <button className="btn btn-primary send-button" onClick={this.saveSelectedLocation.bind(this)}>Save</button>
+      <div className="container double-container inline-block">
+        <div className="box-header">
+          Select your Location
+                </div>
+        <div className="box-content">
+          {this.state.refreshing ? <div>Refreshing your current location...</div> : <span>
+            <div className="displayName display-name-bold inline-block">Your currently selected location:&nbsp;</div>
+            <span>{this.state.location.name}, {this.state.location.placeType.name} in {this.state.location.country}</span>
+          </span>}
+          <div className="mapContainer">
+            <Map ref={ref => this.map = ref} onzoomlevelschange={e => this.onMapZoom(e)} onzoomend={e => this.onMapZoom(e)} onzoomstart={e => this.onMapZoom(e)} onclick={e => this.onMapClick(e)} className="mapContainer" center={this.state} zoom={this.state.zoom}>
+              <TileLayer
+                attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={this.state}>
+                <Popup>
+                  <b>Your {this.state.changed ? "previously " : ""} selected location:</b><br /><br />
+                  {this.state.location.name} ({this.state.location.placeType.name})<br />
+                  {this.state.location.country}
+                  {this.state.changed ? (<span><br /><br />Click the <b>save</b> button below to store your updated location.</span>) : ""}
+                </Popup>
+              </Marker>
+            </Map>
+            <button className="btn btn-primary send-button" onClick={this.saveSelectedLocation.bind(this)}>Save</button>
+          </div>
+        </div>
       </div>
     );
   }

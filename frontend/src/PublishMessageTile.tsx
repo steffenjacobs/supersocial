@@ -295,7 +295,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
                             {accounts}
                         </div>
                     }
-                    {this.state.accounts.length === 0 && SnippetManager.createInfo("https://confluence.supersocial.cloud/display/SP/How+to+add+a+Social+Media+Account", "Find out how to link your social media accounts ")}
+                    {this.state.accounts.length === 0 && SnippetManager.createInfo("https://confluence.supersocial.cloud/display/SP/How+to+add+a+Social+Media+Account", "Find out how to link your social media accounts ", "info-label")}
                     <button
                         className="btn btn-primary send-button"
                         onClick={this.send.bind(this)} disabled={this.state.accounts.length === 0}

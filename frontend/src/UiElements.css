@@ -235,3 +235,8 @@ table tr:nth-child(odd) {
     display: block;
     padding-left: .25em;
 }
+
+.fontsize6{
+    font-size: .6em;
+    font-weight: 400;
+}

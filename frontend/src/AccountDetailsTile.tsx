@@ -304,7 +304,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         this.state.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
     }
     private createInfo(url: string) {
-        return SnippetManager.createInfo(url, "Find out more about how to get the API keys and secrets ", "margin-left-big");
+        return SnippetManager.createInfo(url, "Find out more about how to get the API keys and secrets ", "margin-left-big info-label");
     }
 
     public render() {

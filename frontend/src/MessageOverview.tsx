@@ -3,7 +3,6 @@ import { PublishMessageTile } from "./PublishMessageTile";
 import { PublishedPostsTile } from "./PublishedPostsTile";
 import { EventBus } from "./EventBus";
 import { TrendingTile } from "./TrendingTile";
-import { MapContainer } from "./MapContainer";
 import { LoginManager } from "./LoginManager";
 
 export interface MessageOverviewProps {
@@ -25,8 +24,6 @@ export class MessageOverview extends React.Component<MessageOverviewProps>{
                 <TrendingTile eventBus={this.props.eventBus} loginManager={this.props.loginManager}/>
                 <div className="vspacer" />
                 <PublishedPostsTile eventBus={this.props.eventBus} />
-                <div className="vspacer" />
-                <MapContainer loginManager = {this.props.loginManager} eventBus={this.props.eventBus}/>
             </div>
         );
     }
