@@ -43,6 +43,9 @@ public class UserConfigurationService {
 
 	@Autowired
 	private SystemConfigurationManager systemConfigurationManager;
+	
+	@Autowired
+	private ScheduledTrendingTopicFetcher scheduledTrendingTopicFetcher;
 
 	/**
 	 * Creates or updates a user configuration for the current user.
@@ -116,14 +119,16 @@ public class UserConfigurationService {
 	public LocationDTO updateUserLocation(LocationDTO userLocation) {
 		SupersocialUser user = securityService.getCurrentUser();
 
-		String locationResult = twitterService.fetchTwitterRegionForLatLon(userLocation.getLatitude(), userLocation.getLongitude(),
+		String locationResult = twitterService.fetchTwitterRegionForLatLng(userLocation.getLatitude(), userLocation.getLongitude(),
 				systemConfigurationManager.getSystemTwitterAccount());
 
 		createOrUpdateSetting("" + userLocation.getLatitude(), user, UserConfigurationType.Latitude.getKey());
 		createOrUpdateSetting("" + userLocation.getLongitude(), user, UserConfigurationType.Longitude.getKey());
 		createOrUpdateSetting(locationResult, user, UserConfigurationType.Location.getKey());
-		systemConfigurationManager.appendToTrackedTrendsWoeids(Long.valueOf("" + JsonPath.read(locationResult, "$[0].woeid")));
-
+		long woeid = Long.valueOf("" + JsonPath.read(locationResult, "$[0].woeid"));
+		systemConfigurationManager.appendToTrackedTrendsWoeids(woeid);
+		scheduledTrendingTopicFetcher.fetchTrendingTopic(woeid);
+		userLocation.setLocationName("" +JsonPath.read(locationResult, "$[0].name"));
 		return userLocation;
 	}
 

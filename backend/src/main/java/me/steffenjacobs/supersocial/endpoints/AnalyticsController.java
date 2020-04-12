@@ -65,7 +65,7 @@ public class AnalyticsController {
 	}
 
 	/** Get trending topics from twitter. */
-	@GetMapping(path = "/api/analytics/trending/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/api/analytics/trending/{woeid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getTrendingTopics(@PathVariable(name="woeid") long woeid) throws Exception {
 		LOG.info("Retrieving trending topics for region {}.", woeid);
 		try {

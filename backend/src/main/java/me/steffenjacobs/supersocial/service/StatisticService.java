@@ -197,9 +197,9 @@ public class StatisticService {
 	 *             if the index was not yet created or there was another error
 	 *             with the elasticsearch.
 	 */
-	public String getTrendingTopics(long id) {
+	public String getTrendingTopics(long woeid) {
 		CompletableFuture<JSONArray> f = new CompletableFuture<>();
-		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", ScheduledTrendingTopicFetcher.TRENDING_INDEX_PATTERN, false,
+		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", String.format(ScheduledTrendingTopicFetcher.TRENDING_INDEX_PATTERN, woeid), false,
 				createFutureCallback(f));
 
 		try {
@@ -207,7 +207,7 @@ public class StatisticService {
 		} catch (InterruptedException | ExecutionException e) {
 			if (e.getCause() instanceof ResponseException) {
 				if (e.getCause().getMessage().contains("index_not_found_exception")) {
-					throw new AnalyticsException(String.format("Error retrieving analytics data: No trending topics yet."), e);
+					throw new AnalyticsException(String.format("Error retrieving analytics data: No trending topics for %s yet.", woeid), e);
 				}
 				if (e.getCause().getMessage().contains("json_parse_exception")) {
 					throw new AnalyticsException(String.format("Error retrieving analytics data: Invalid query."), e);

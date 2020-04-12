@@ -98,6 +98,7 @@ public class TwitterService {
 	 * the given {@link SocialMediaAccount}.
 	 */
 	public String fetchTrendingTopics(long regionId, SocialMediaAccount account) {
+		LOG.info("Fetching trending topics for {}", regionId);
 		try {
 			final String result = attemptAuthorizedRequest(new HttpGet(String.format(TWITTER_TRENDS_ENDPOINT_TEMPLATE, regionId)), account);
 			return JsonPath.read(result, "$..['name','tweet_volume']").toString();
@@ -156,7 +157,7 @@ public class TwitterService {
 	 * Fetch region information based on longitude and latitude from the Twitter
 	 * API to later e.g. localize trends.
 	 */
-	public String fetchTwitterRegionForLatLon(double latitude, double longitude, SocialMediaAccount account) {
+	public String fetchTwitterRegionForLatLng(double latitude, double longitude, SocialMediaAccount account) {
 		try {
 			return attemptAuthorizedRequest(new HttpGet(String.format(TWITTER_REGION_ENDPOINT_TEMPLATE, latitude, longitude)), account);
 		} catch (UnsupportedOperationException | OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
