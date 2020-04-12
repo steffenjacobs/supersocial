@@ -136,6 +136,26 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         })
     }
 
+    private goToAccount(account: SocialMediaAccount) {
+        let url;
+        if (account.platformId === 1) {
+            url = "https://www.facebook.com/" + account.credentials.find(x => x.descriptor === "facebook.page.id")?.value;
+        } else if (account.platformId === 2) {
+            url = "https://twitter.com/" + account.credentials.find(x => x.descriptor === "twitter.api.accountname")?.value;
+        }
+        window.open(url, "_blank");
+    }
+
+    private isLinked(account: SocialMediaAccount) {
+        if(account.platformId === 1){
+            return account.credentials.find(x => x.descriptor === "facebook.page.id")
+        }
+        if (account.platformId === 2){
+            return account.credentials.find(x => x.descriptor === "twitter.api.accountname");
+        }
+        return false;
+    }
+
     public render() {
         //list of accounts
         const accounts = this.state.accounts.sort(
@@ -152,6 +172,10 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                             <span onClick={() => this.deleteAccount(elem)} >{ImageProvider.getImage("none")}
                             </span>
                         </span>
+                        {this.isLinked(elem) && <span className="table-icon">
+                            <span onClick={() => this.goToAccount(elem)} >{ImageProvider.getImage("link")}
+                            </span>
+                        </span>}
                     </div>);
 
                 return (

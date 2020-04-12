@@ -155,7 +155,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
                 } else {
                     if (elem.postUrl) {
-                        status = <td key={elem.id} onClick={o => this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("link")}</td>
+                        status = <td key={elem.id} onClick={o => this.goToPost(elem)} className="checkmark centered pointer">{ImageProvider.getImage("check")}{ImageProvider.getImage("linked")}</td>
                     } else {
                         const statusMsg = elem.scheduled ? "This post is scheduled for " + moment(elem.scheduled).format("YYYY-MM-DD HH:mm") : "This post is neither published nor scheduled yet.";
                         const statusIcons = elem.scheduled ? [ImageProvider.getImage("check"), ImageProvider.getImage("clock-small")] : ImageProvider.getImage("check");
@@ -171,7 +171,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                             </span>
                         </span>
                         <span className="table-icon table-icon-del">
-                            <span className="tooltip" onClick={() => this.deletePostLink(elem)} >{ImageProvider.getImage("none")}{ImageProvider.getImage("link")}
+                            <span className="tooltip" onClick={() => this.deletePostLink(elem)} >{ImageProvider.getImage("none")}{ImageProvider.getImage("linked")}
                                 <span className="tooltiptext">Delete the post from the system without unpublishing it.</span>
                             </span>
                         </span>

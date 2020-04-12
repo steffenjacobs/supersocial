@@ -237,8 +237,8 @@ export class ImageProvider {
                 </g>
             </svg>;
 
-            //Link Icon
-            case "link": return <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+            //Linked Icon
+            case "linked": return <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                 width=".75em" height=".75em" viewBox="0 0 457.03 457.03" fill="#111">
                 <g>
                     <path d="M421.512,207.074l-85.795,85.767c-47.352,47.38-124.169,47.38-171.529,0c-7.46-7.439-13.296-15.821-18.421-24.465
@@ -253,6 +253,10 @@ export class ImageProvider {
               C246.109,360.336,219.437,357.723,194.708,348.104z"/>
                 </g>
             </svg>;
+
+            //Link Icon
+            case "link": return <svg width="1.5em" height="1.5em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"/></svg>;
+
 
             //Clock Icon (small)
             case "clock-small": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width=".75em" height=".75em" fill="#111">
