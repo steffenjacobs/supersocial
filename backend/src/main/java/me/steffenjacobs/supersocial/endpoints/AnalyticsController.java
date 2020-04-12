@@ -22,8 +22,8 @@ import me.steffenjacobs.supersocial.service.StatisticService;
  * @author Steffen Jacobs
  */
 @RestController
-public class AnalyticsEndpoint {
-	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsEndpoint.class);
+public class AnalyticsController {
+	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsController.class);
 
 	@Autowired
 	private StatisticService statisticService;
@@ -65,11 +65,11 @@ public class AnalyticsEndpoint {
 	}
 
 	/** Get trending topics from twitter. */
-	@GetMapping(path = "/api/analytics/trending", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getTrendingTopics() throws Exception {
-		LOG.info("Retrieving trending topics.");
+	@GetMapping(path = "/api/analytics/trending/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getTrendingTopics(@PathVariable(name="woeid") long woeid) throws Exception {
+		LOG.info("Retrieving trending topics for region {}.", woeid);
 		try {
-			return new ResponseEntity<>(statisticService.getTrendingTopics(), HttpStatus.OK);
+			return new ResponseEntity<>(statisticService.getTrendingTopics(woeid), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving trending topics: ", e);
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);

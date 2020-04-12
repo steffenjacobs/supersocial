@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -20,7 +21,7 @@ import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFound
 
 /**
  * Fetches the current twitter trends regulary and stores them into the
- * twitter_trending elasticsearch index.
+ * twitter_trending_{woeid} elasticsearch index.
  * 
  * @author Steffen Jacobs
  */
@@ -30,7 +31,7 @@ public class ScheduledTrendingTopicFetcher {
 	private static final Logger LOG = LoggerFactory.getLogger(ScheduledTrendingTopicFetcher.class);
 	private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("YYYY-MM-dd-HH-mm-ss");
 
-	public static final String TRENDING_INDEX = "twitter_trending";
+	public static final String TRENDING_INDEX_PATTERN = "twitter_trending_%s";
 	public static final String TRENDING_INDEX_DOCUMENT_PATTERN = "{\"trends\": %s, \"created\": \"%s\"}";
 
 	@Autowired
@@ -49,12 +50,26 @@ public class ScheduledTrendingTopicFetcher {
 
 	/** Fetches the trending topics from twitter. */
 	public void fetchTrendingTopics() {
-		createIndexIfNecessary();
+
 		LOG.info("Fetching trending topics from twitter...");
 		try {
-			String result = twitterService.fetchTrendingTopics(1, systemConfigurationManager.getSystemTwitterAccount());
-			elasticSearchConnector.insert(String.format(TRENDING_INDEX_DOCUMENT_PATTERN, result, DATE_TIME_FORMAT.format(new Date())), TRENDING_INDEX, UUID.randomUUID());
-			LOG.info("Fetched trending topics from twitter: '{}'", result);
+			// Collect for deduplication
+			systemConfigurationManager.getTrackedTrendsWoeids().collect(Collectors.toSet()).forEach(woeid -> this.fetchTrendingTopic(woeid));
+		} catch (SystemConfigurationNotFoundException e) {
+			LOG.warn("No tracked topics. Retrieving global Twitter trends only.");
+			fetchTrendingTopic(1);
+		}
+		LOG.info("Fetched all trending topics from twitter.");
+	}
+
+	/** Fetches the trending topics from twitter for a given {@code woeid}. */
+	public void fetchTrendingTopic(long woeid) {
+		final String indexName = String.format(TRENDING_INDEX_PATTERN, woeid);
+		createIndexIfNecessary(indexName);
+		try {
+			String result = twitterService.fetchTrendingTopics(woeid, systemConfigurationManager.getSystemTwitterAccount());
+			elasticSearchConnector.insert(String.format(TRENDING_INDEX_DOCUMENT_PATTERN, result, DATE_TIME_FORMAT.format(new Date())), indexName, UUID.randomUUID());
+			LOG.info("Fetched trending topics from twitter for woeid '{}'.", woeid);
 		} catch (SystemConfigurationNotFoundException e) {
 			LOG.error("Could not fetch trending topics: System Twitter Account not set.");
 		} catch (SocialMediaAccountNotFoundException e) {
@@ -65,13 +80,13 @@ public class ScheduledTrendingTopicFetcher {
 	}
 
 	/** Create an elasticsearch index for the trends if none exists yet. */
-	private void createIndexIfNecessary() {
-		if (elasticSearchConnector.hasIndex(TRENDING_INDEX)) {
+	private void createIndexIfNecessary(String index) {
+		if (elasticSearchConnector.hasIndex(index)) {
 			return;
 		}
 		try {
-			elasticSearchConnector.insertIndex("{\"mappings\": {\"properties\": {\"created\": {\"type\":  \"date\", \"format\": \"yyyy-MM-dd-HH-mm-ss\"} } } }", TRENDING_INDEX);
-			LOG.info("Created index '{}'.", TRENDING_INDEX);
+			elasticSearchConnector.insertIndex("{\"mappings\": {\"properties\": {\"created\": {\"type\":  \"date\", \"format\": \"yyyy-MM-dd-HH-mm-ss\"} } } }", index);
+			LOG.info("Created index '{}'.", index);
 		} catch (Exception e) {
 			LOG.error("Could not create index.", e);
 		}

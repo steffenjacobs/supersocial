@@ -1,5 +1,6 @@
 package me.steffenjacobs.supersocial.persistence;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.AccessControlListRepository;
 import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
@@ -54,8 +56,10 @@ import me.steffenjacobs.supersocial.util.Pair;
 public class SystemConfigurationManager {
 	private static final Logger LOG = LoggerFactory.getLogger(SystemConfigurationManager.class);
 
+	private static final char ENCODING_SPLITTER = ',';
+
 	public enum SystemConfigurationType {
-		TWITTER_ACCOUNT_ID("twitter_account_id"), SYSTEM_ACL("system_acl"), SYSTEM_USER("system_user");
+		TWITTER_ACCOUNT_ID("twitter_account_id"), SYSTEM_ACL("system_acl"), SYSTEM_USER("system_user"), TRACKED_TREND_WOEIDS("tracked_trend_woeids");
 
 		private final String descriptor;
 
@@ -170,7 +174,7 @@ public class SystemConfigurationManager {
 
 	/**
 	 * Retrieve the system twitter account e.g. to load global statistics like
-	 * trends.
+	 * trends. No permission check.
 	 */
 	public SocialMediaAccount getSystemTwitterAccount() {
 		SystemConfiguration twitterAccountId = systemConfigurationRepository.findByDescriptor(SystemConfigurationType.TWITTER_ACCOUNT_ID.getDescriptor())
@@ -209,6 +213,14 @@ public class SystemConfigurationManager {
 		return supersocialUserRepository.findById(UUID.fromString(userConfig.getValue())).orElseThrow(() -> new UsernameNotFoundException(userConfig.getValue()));
 	}
 
+	/** Retrieves the currently tracked woeids for Twitter Trends plus 1 (world id). */
+	public Stream<Long> getTrackedTrendsWoeids() {
+		SystemConfiguration userConfig = systemConfigurationRepository.findByDescriptor(SystemConfigurationType.TRACKED_TREND_WOEIDS.getDescriptor())
+				.orElseThrow(() -> new SystemConfigurationNotFoundException(SystemConfigurationType.TRACKED_TREND_WOEIDS));
+
+		return Stream.concat(Stream.of(1l), Arrays.stream(userConfig.getValue().split("" + ENCODING_SPLITTER)).map(woeid -> Long.parseLong(woeid)));
+	}
+
 	/**
 	 * Set the system twitter account.
 	 * 
@@ -242,6 +254,8 @@ public class SystemConfigurationManager {
 			final UUID parsedId = UUID.fromString(systemConfigurationDTO.getValue());
 			SocialMediaAccount account = socialMediaAccountRepository.findById(parsedId).orElseThrow(() -> new SocialMediaAccountNotFoundException(parsedId));
 			return setSystemTwitterAccount(account);
+		case TRACKED_TREND_WOEIDS:
+			return appendToTrackedTrendsWoeids(Long.parseLong(systemConfigurationDTO.getValue()));
 		case SYSTEM_ACL:
 			throw new AuthorizationException(SystemConfigurationType.SYSTEM_ACL.getDescriptor(), SecuredAction.UPDATE);
 		case SYSTEM_USER:
@@ -253,11 +267,47 @@ public class SystemConfigurationManager {
 	}
 
 	/**
+	 * Append a new woeid to the list of tracked woeids for Twitter Trends. No
+	 * permission check.
+	 */
+	public synchronized Pair<Boolean, SystemConfigurationDTO> appendToTrackedTrendsWoeids(long value) {
+		SystemConfiguration systemConfiguration = systemConfigurationRepository.findByDescriptor(SystemConfigurationType.TRACKED_TREND_WOEIDS.getDescriptor())
+				.orElseGet(() -> this.createSystemConfiguration(false));
+		boolean created = systemConfiguration.getId() == null;
+		systemConfiguration.setDescriptor(SystemConfigurationType.TRACKED_TREND_WOEIDS.getDescriptor());
+
+		final String encodedValues;
+		if (StringUtils.isEmpty(systemConfiguration.getValue())) {
+			// no values stored before
+			encodedValues = "" + value;
+		} else if (!Arrays.stream(systemConfiguration.getValue().split("" + ENCODING_SPLITTER)).filter(x -> ("" + value).equals(x)).findAny().isPresent()) {
+			// values stored before -> add this new value
+			encodedValues = systemConfiguration.getValue() + ENCODING_SPLITTER + value;
+		} else {
+			// value is already stored
+			encodedValues = systemConfiguration.getValue();
+		}
+
+		systemConfiguration.setValue(encodedValues);
+		return new Pair<>(created, SystemConfigurationDTO.fromSystemConfiguration(systemConfigurationRepository.save(systemConfiguration)));
+	}
+
+	/**
+	 * @return a newly created and already persisted system configuration
+	 *         object. Always performs a permission check first.
+	 */
+	private SystemConfiguration createSystemConfiguration() {
+		return this.createSystemConfiguration(true);
+	}
+
+	/**
 	 * @return a newly created and already persisted system configuration
 	 *         object.
 	 */
-	private SystemConfiguration createSystemConfiguration() {
-		securityService.checkIfCurrentUserIsPermitted(getSystemAcl(), SecuredAction.CREATE);
+	private SystemConfiguration createSystemConfiguration(boolean permissionCheck) {
+		if (permissionCheck) {
+			securityService.checkIfCurrentUserIsPermitted(getSystemAcl(), SecuredAction.CREATE);
+		}
 		SystemConfiguration config = new SystemConfiguration();
 		securityService.appendSystemAcl(config);
 		return config;

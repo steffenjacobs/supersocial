@@ -197,9 +197,9 @@ public class StatisticService {
 	 *             if the index was not yet created or there was another error
 	 *             with the elasticsearch.
 	 */
-	public String getTrendingTopics() {
+	public String getTrendingTopics(long id) {
 		CompletableFuture<JSONArray> f = new CompletableFuture<>();
-		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", ScheduledTrendingTopicFetcher.TRENDING_INDEX, false,
+		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", ScheduledTrendingTopicFetcher.TRENDING_INDEX_PATTERN, false,
 				createFutureCallback(f));
 
 		try {

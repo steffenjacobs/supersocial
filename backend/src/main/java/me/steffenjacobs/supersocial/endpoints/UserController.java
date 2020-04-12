@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
+import me.steffenjacobs.supersocial.domain.dto.LocationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserConfigurationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.security.UserService;
 import me.steffenjacobs.supersocial.service.UserConfigurationService;
+import me.steffenjacobs.supersocial.service.exception.TwitterException;
 import me.steffenjacobs.supersocial.service.exception.UserConfigurationNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -77,6 +79,19 @@ public class UserController {
 			return new ResponseEntity<UserConfigurationDTO>(HttpStatus.NO_CONTENT);
 		} catch (UserConfigurationNotFoundException e) {
 			return new ResponseEntity<>(new UserConfigurationDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Update the current location of the user.
+	 */
+	@PutMapping(path = "api/user/location", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<LocationDTO> updateUserLocation(@RequestBody LocationDTO userLocation) {
+		LOG.info("Updating user location to {}/{}", userLocation.getLongitude(), userLocation.getLatitude());
+		try {
+			return new ResponseEntity<LocationDTO>(userConfigurationService.updateUserLocation(userLocation), HttpStatus.OK);
+		} catch (TwitterException e) {
+			return new ResponseEntity<>(new LocationDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 }

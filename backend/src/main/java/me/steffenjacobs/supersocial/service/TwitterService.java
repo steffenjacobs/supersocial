@@ -46,6 +46,7 @@ public class TwitterService {
 	private static final String TWITTER_TRENDS_ENDPOINT_TEMPLATE = "https://api.twitter.com/1.1/trends/place.json?id=%s";
 	private static final String TWITTER_USER_STATS_ENDPOINT_TEMPLATE = "https://api.twitter.com/1.1/users/show.json?screen_name=%s";
 	private static final String TWITTER_TWEET_STATS_ENDPOINT_TEMPLATE = "https://api.twitter.com/1.1/statuses/show/%s.json";
+	private static final String TWITTER_REGION_ENDPOINT_TEMPLATE = "https://api.twitter.com/1.1/trends/closest.json?lat=%s&long=%s";
 
 	@Autowired
 	private CredentialLookupService credentialLookupService;
@@ -148,6 +149,19 @@ public class TwitterService {
 		} catch (UnsupportedOperationException | OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
 			LOG.error("Could not fetch account statistics for user {}: ", account.getId(), e);
 			throw new TwitterException("Could not fetch account statistics.", e);
+		}
+	}
+
+	/**
+	 * Fetch region information based on longitude and latitude from the Twitter
+	 * API to later e.g. localize trends.
+	 */
+	public String fetchTwitterRegionForLatLon(double latitude, double longitude, SocialMediaAccount account) {
+		try {
+			return attemptAuthorizedRequest(new HttpGet(String.format(TWITTER_REGION_ENDPOINT_TEMPLATE, latitude, longitude)), account);
+		} catch (UnsupportedOperationException | OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
+			LOG.error("Could not fetch location from twitter API {}/{}: ", latitude, longitude, e);
+			throw new TwitterException(String.format("Could not fetch location: %s. ", e.getMessage()));
 		}
 	}
 }
