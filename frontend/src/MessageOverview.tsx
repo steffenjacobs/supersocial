@@ -12,9 +12,6 @@ export interface MessageOverviewProps {
 
 /** Message overview page. Contains the message publishing tile (PublishMessageTile.tsx) and the list of published posts (PublishedPostsTile.tsx). */
 export class MessageOverview extends React.Component<MessageOverviewProps>{
-    constructor(props: MessageOverviewProps) {
-        super(props);
-    }
 
     public render() {
         return (

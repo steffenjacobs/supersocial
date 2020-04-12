@@ -11,9 +11,6 @@ export interface SettingsProps {
 
 /** Settings page. Contains the social media account management. */
 export class SettingsPage extends React.Component<SettingsProps>{
-    constructor(props: SettingsProps) {
-        super(props);
-    }
 
     public render() {
         return (

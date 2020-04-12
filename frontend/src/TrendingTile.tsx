@@ -61,7 +61,7 @@ export class TrendingTile extends React.Component<TrendingTileProps, TrendingTil
         const topics = this.state.topics.sort(
             (t1: TrendingTopic, t2: TrendingTopic) => t2.tweet_volume - t1.tweet_volume)
             .slice(0, 10).map(elem => {
-                return <li><a target="_blank" href={this.getTrendUrl(elem)}>{elem.name}</a></li>;
+                return <li key={elem.name}><a target="_blank" rel="noopener noreferrer" href={this.getTrendUrl(elem)}>{elem.name}</a></li>;
             });
 
         //animation for refresh button
