@@ -12,8 +12,11 @@ import { EntityUtil } from "./EntityUtil";
 import { SnippetManager } from "./SnippetManager";
 
 export interface AccountDetailsProps {
-    account: SocialMediaAccount,
     eventBus: EventBus
+    account?: SocialMediaAccount
+}
+export interface AccountDetailsState {
+    account: SocialMediaAccount,
     displayNameLastSaved?: string
     platformIdLastSaved?: number
 }
@@ -27,22 +30,22 @@ export interface Credential {
 }
 
 /** Contains a form to create and update account proerties like name and social media network. Allows to create, update and delete associated credentials. */
-export class AccountDetailsTile extends React.Component<AccountDetailsProps, AccountDetailsProps>{
-    constructor(props: AccountDetailsProps) {
+export class AccountDetailsTile extends React.Component<AccountDetailsProps, AccountDetailsState>{
+    constructor(props: AccountDetailsProps, state: AccountDetailsState) {
         super(props);
-        this.state = { eventBus: props.eventBus, account: props.account, displayNameLastSaved: props.account.displayName, platformIdLastSaved: props.account.platformId };
-        this.fetchCredentials();
-        this.state.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, this.updateSelected.bind(this));
+        this.state = { account: props.account ? props.account : { credentials: [], displayName: "<none>", id: "", platformId: -1 } };
+        this.props.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, (type, acc) => this.updateSelected(acc));
     }
 
     /*Refresh the details view with a new selected account. */
-    private updateSelected(type: EventBusEventType, data: any) {
-        if (data && data.id === this.state.account.id) {
+    private updateSelected(data: any) {
+        console.log(data);
+        if (data) {
             this.setState({
                 account: data,
                 displayNameLastSaved: data.displayName,
                 platformIdLastSaved: data.platformId
-            });
+            }, () => this.fetchCredentials());
         }
     }
 
@@ -63,13 +66,12 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                 } else {
                     response.json().then(data => {
                         this.setState({
-                            eventBus: this.state.eventBus,
                             account: this.mergeCredentials(data),
                             displayNameLastSaved: data.displayName,
                             platformIdLastSaved: data.platformId
                         });
                     });
-                    this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
                 }
             });
     }
@@ -121,7 +123,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                     } else {
                         ToastManager.showSuccessToast("Saved credential '" + c.descriptor + "'.");
                         this.fetchCredentials();
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
                     }
                 });
         });
@@ -150,12 +152,11 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                     response.json().then(data => {
                         ToastManager.showSuccessToast("Updated social media account properties.");
                         this.setState({
-                            eventBus: this.state.eventBus,
                             account: this.mergeCredentials(data),
                             displayNameLastSaved: data.displayName,
                             platformIdLastSaved: data.platformId
                         });
-                        this.state.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, undefined);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, undefined);
                         if (callback) {
                             callback();
                         }
@@ -256,7 +257,6 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         }
         //trigger render
         this.setState({
-            eventBus: this.state.eventBus,
             account: this.state.account
         });
     }
@@ -288,7 +288,6 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         const newCreds = Object.assign([], this.state.account.credentials);
         newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
         this.setState({
-            eventBus: this.state.eventBus,
             account: {
                 credentials: newCreds,
                 displayName: this.state.account.displayName,
@@ -301,7 +300,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
 
     /**Close the details view. */
     public close() {
-        this.state.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
+        this.props.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
     }
     private createInfo(url: string) {
         return SnippetManager.createInfo(url, "Find out more about how to get the API keys and secrets ", "margin-left-big info-label");

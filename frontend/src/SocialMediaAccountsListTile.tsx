@@ -91,6 +91,9 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
 
     /** Select a new social media account to be displayed in the AccountDetailsTile.tsx. */
     private selectAccount(account: SocialMediaAccount) {
+        if (account && (account.id === (this.state.selected ? this.state.selected?.id : false))) {
+            return;
+        }
         if (!account) {
             this.setState({
                 selected: undefined
@@ -104,7 +107,8 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                 platformId: account.platformId,
                 credentials: account.credentials
             }
-        });
+        }, () => this.props.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, account));
+
     }
 
     /** Delete a given social media account in the backend.
@@ -176,7 +180,6 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         }
 
         //details panel
-        const accountSettings = this.state.selected ? <AccountDetailsTile eventBus={this.props.eventBus} account={this.state.selected} /> : <div />;
         return (
             <div>
                 <div className="container double-container inline-block">
@@ -211,7 +214,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                         </table>
                     </div>
                 </div >
-                {accountSettings}
+                {this.state.selected ? <AccountDetailsTile eventBus={this.props.eventBus} account={this.state.selected} /> : <div />}
             </div>
         );
     }
