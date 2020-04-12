@@ -311,7 +311,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         //table of credentials for the currently selected social media account
         const credentialElements = this.state.account.credentials.sort((c1, c2) => c1.descriptor.localeCompare(c2.descriptor)).map(cred => {
             const credentialsField = cred.omitted ?
-                <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder="(omitted)" value="" />
+                <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" placeholder={cred.value} value="" />
                 : <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
 
             //save button: is omitted if no change occured.
@@ -328,7 +328,6 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                         {credentialsField}
                         {saveButton}
                     </div>
-
                 </div>
             );
         });
