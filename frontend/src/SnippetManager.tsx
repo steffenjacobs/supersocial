@@ -5,14 +5,23 @@ import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 /**Contains a bunch of useful snippets to be standardized across the application. */
 export class SnippetManager {
 
-    /**Create an info message with a documentation link. */
-    static createInfo(url: string, text: string, cssClasses?: string, tooltip?: string, cssClassesToolTipText?:string) {
+    /**Create an info message with a documentation link and a tooltip. */
+    static createInfo(url: string, text: string, cssClasses?: string, tooltip?: string, cssClassesToolTipText?: string) {
         const className = "tooltip " + cssClasses;
         const classNameText = "tooltiptext " + cssClassesToolTipText;
         return <span className={className}>{text}
-           {text && <span><a target="blank" href={url}>here</a>.&nbsp;</span>}
-        <a target="blank" href={url}>{ImageProvider.getImage("info-text")}</a>
-        <span className={classNameText}>{tooltip?tooltip:text}</span>
+            {text && <span><a target="blank" href={url}>here</a>.&nbsp;</span>}
+            <a target="blank" href={url}>{ImageProvider.getImage("info-text")}</a>
+            <span className={classNameText}>{tooltip ? tooltip : text}</span>
+        </span>
+    }
+
+    /**Create an info message with a documentation link without a tooltip. */
+    static createInfoWithoutTooltip(url: string, text: string, cssClasses?: string) {
+        const className = "" + cssClasses;
+        return <span className={className}>{text}
+            {text && <span><a target="blank" href={url}>here</a>.&nbsp;</span>}
+            <a target="blank" href={url}>{ImageProvider.getImage("info-text")}</a>
         </span>
     }
 

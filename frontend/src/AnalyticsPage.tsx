@@ -5,6 +5,7 @@ import { DeploymentManager } from "./DeploymentManager";
 import { ToastManager } from "./ToastManager";
 import './AnalyticsPage.css';
 import { Multiselect } from 'multiselect-react-dropdown';
+import { SnippetManager } from "./SnippetManager";
 
 export interface AnalyticsProps {
     eventBus: EventBus
@@ -71,6 +72,7 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
                         closeIcon="cancel"
                         groupBy="type"
                     />
+                    {SnippetManager.createInfoWithoutTooltip("https://confluence.supersocial.cloud/display/SP/Filters+on+the+Analytics+Dashboard", "Hint: If you select all filters, the result is the same as if no filter was selected at all. The filter are combined with a logical or. More information are available ", "hint")}
                 </div>
                 <PostAnalyticsTile analyticsNumber={post} label="# Impressions" eventBus={this.props.eventBus} keyVal="impressions" type={AnalyticsType.POST} background="binoculars" />
                 <PostAnalyticsTile analyticsNumber={post} label="# Comments" eventBus={this.props.eventBus} keyVal="comments" type={AnalyticsType.POST} background="comment" />
