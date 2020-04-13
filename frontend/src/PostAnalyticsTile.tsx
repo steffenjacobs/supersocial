@@ -41,7 +41,7 @@ export interface PostAnalyticsNumberProps {
 export class PostAnalyticsTile extends React.Component<PostAnalyticsNumberProps, PostAnalyticsNumberProps>{
     constructor(props: PostAnalyticsNumberProps) {
         super(props);
-        this.state = { analyticsNumber: props.analyticsNumber, updating: props.updating, eventBus: props.eventBus, label: props.label, keyVal: props.keyVal, type: props.type, background:props.background };
+        this.state = { analyticsNumber: props.analyticsNumber, updating: props.updating, eventBus: props.eventBus, label: props.label, keyVal: props.keyVal, type: props.type, background: props.background };
 
         props.eventBus.register(props.type.refreshEvent, (t, e) => this.refreshData(e));
     }
@@ -73,7 +73,7 @@ export class PostAnalyticsTile extends React.Component<PostAnalyticsNumberProps,
                     </div>
                 </div>
                 <div className="box-content block">
-                    <div className="kpi">{this.state.analyticsNumber.value}</div>
+                    <div className="kpi">{this.state.analyticsNumber.value ? this.state.analyticsNumber.value : 0}</div>
                 </div>
                 <div className="box-content block kpi_background" style={
                     { backgroundImage: "url(icons/" + this.state.background + ".svg)" }

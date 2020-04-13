@@ -42,28 +42,29 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
         super(props);
         this.updateData(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, "");
         this.updateData(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, "");
-        props.eventBus.register(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, (t, e) => this.updateData(t, e.relId));
-        props.eventBus.register(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, (t, e) => this.updateData(t, e.relId));
+        props.eventBus.register(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, (t, e) => this.updateData(t, e.relId, this.state.selectedAccounts, this.state.selectedPosts));
+        props.eventBus.register(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, (t, e) => this.updateData(t, e.relId, this.state.selectedAccounts));
         this.state = { accounts: [], posts: [], selectedAccounts: [], selectedPosts: [] };
     }
 
     public render() {
         let post = { relId: "", value: 0 }
 
-        let accounts = this.state.accounts.map(a => ({ label: a.name, value: a.id, type: "Accounts" }));
-        let posts = this.state.posts.map(p => ({ label: p.summary, value: p.id, type: "Posts" }));
+        let selectableAccounts = this.state.accounts.filter(ac => !this.state.selectedAccounts.includes(ac)).map(a => ({ label: a.name, value: a.id, type: "Accounts" }));
         let selectedAccounts = this.state.selectedAccounts.map(a => ({ label: a.name, value: a.id, type: "Accounts" }));
-        let selectedPosts = this.state.selectedPosts.map(p => ({ label: p.summary, value: p.id, type: "Posts" }));
-        let options = accounts.concat(posts);
-        let selectedOptions = selectedAccounts.concat(selectedPosts);
+
+        //let posts = this.state.posts.map(p => ({ label: p.summary, value: p.id, type: "Posts" }));
+        //let selectedPosts = this.state.selectedPosts.map(p => ({ label: p.summary, value: p.id, type: "Posts" }));
+        //let options = accounts.concat(posts);
+        //let selectedOptions = selectedAccounts.concat(selectedPosts);
 
         return (
             <div>
                 <div className="filter-area">
                     <Multiselect
-                        placeholder="Select data sources..."
-                        options={options}
-                        selectedValues={selectedOptions}
+                        placeholder="Filter data sources..."
+                        options={selectableAccounts}
+                        selectedValues={selectedAccounts}
                         onSelect={this.onSelectionChange.bind(this)}
                         onRemove={this.onSelectionChange.bind(this)}
                         displayValue="label"
@@ -84,14 +85,16 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
     /***Called by the Multiselect UI element. Synchronizes the multiselect state to the component state. */
     private onSelectionChange(value: MultiSelectValue[]) {
         let accounts = value.filter(v => v.type === "Accounts").map(v => this.state.accounts.find(sa => v.value == sa.id));
-        let posts = value.filter(v => v.type === "Posts").map(v => this.state.posts.find(sa => v.value == sa.id));
-        this.setState({ selectedAccounts: accounts as AccountDataSource[], selectedPosts: posts as PostDataSource[] });
+        let posts = [];//value.filter(v => v.type === "Posts").map(v => this.state.posts.find(sa => v.value == sa.id));
+        this.updateData(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, "", accounts as AccountDataSource[], posts as PostDataSource[]);
+        this.updateData(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, "", accounts as AccountDataSource[]);
     }
 
     /** Called by the event handler when new data are to be fetched. */
-    private updateData(eventType: EventBusEventType, relId: string) {
+    private updateData(eventType: EventBusEventType, relId: string, selectedAccounts?: AccountDataSource[], selectedPosts?: PostDataSource[]) {
         let typedPath = eventType === EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ ? "account" : "post";
-        fetch(DeploymentManager.getUrl() + "api/analytics/" + typedPath + "/" + relId + "?query=", {
+        let params = (selectedPosts ? selectedPosts.map(p => p ? "&posts=" + p.id : "").join("") : "") + (selectedAccounts ? selectedAccounts.map(a => a ? "&accounts=" + a.id : "").join("") : "");
+        fetch(DeploymentManager.getUrl() + "api/analytics/" + typedPath + "/" + relId + "?query=" + params, {
             method: 'get',
             credentials: 'include',
         })
@@ -102,11 +105,11 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
                     response.json().then(data => {
                         if (eventType === EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ) {
                             this.props.eventBus.fireEvent(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS, data);
-                            this.setState({ accounts: data[0].entities, selectedAccounts: Object.assign([], data[0].entities) });
+                            this.setState({ accounts: data[0].entities.concat(data[0].filtered), selectedAccounts: data[0].filtered.length ? data[0].entities : [] });
                         }
                         else {
                             this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POST_ANALYTICS, data);
-                            this.setState({ posts: data[0].entities, selectedPosts: Object.assign([], data[0].entities) });
+                            this.setState({ posts: data[0].entities.concat(data[0].filtered), selectedPosts: data[0].filtered.length ? data[0].entities : [] });
                         };
                     });
                 }
