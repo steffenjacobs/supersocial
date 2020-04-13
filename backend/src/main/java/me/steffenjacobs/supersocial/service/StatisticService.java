@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import org.elasticsearch.client.ResponseException;
 import org.slf4j.Logger;
@@ -59,16 +61,27 @@ public class StatisticService {
 	 * 
 	 * @return the aggregated JSON.
 	 */
-	public String getAllAccountStatistics(String query) {
+	public String getAllAccountStatistics(String query, Optional<Set<String>> selectedAccounts) {
+		Stream<SocialMediaAccountDTO> accountStream = socialMediaAccountService.getAllSocialMediaAccounts();
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		JSONArray filteredAccounts = new JSONArray();
+		if (selectedAccounts.isPresent()) {
+			accountStream = accountStream.filter(a -> {
+				if (selectedAccounts.get().contains(a.getId().toString())) {
+					return true;
+				}
+				appendAccountToJson(filteredAccounts, a);
+				return false;
+			});
+		}
 		JSONArray accounts = new JSONArray();
-		socialMediaAccountService.getAllSocialMediaAccounts().forEach(acc -> {
+		accountStream.forEach(acc -> {
 			CompletableFuture<JSONArray> f = new CompletableFuture<>();
 			elasticSearchConnector.find(query, String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()), false, createFutureCallback(f));
 			futures.add(f);
 			appendAccountToJson(accounts, acc);
 		});
-		return aggregateFutures(futures, accounts);
+		return aggregateFutures(futures, accounts, filteredAccounts);
 	}
 
 	/**
@@ -77,16 +90,41 @@ public class StatisticService {
 	 * 
 	 * @return the aggregated JSON.
 	 */
-	public String getAllPostStatistics(String query) {
+	public String getAllPostStatistics(String query, Optional<Set<String>> selectedPosts, Optional<Set<String>> selectedAccounts) {
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		Stream<PostDTO> postStream = postService.getAllPosts().stream().filter(p -> p.getPublished() != null);
+		JSONArray filteredPosts = new JSONArray();
+
+		// filter posts
+		if (selectedPosts.isPresent()) {
+			postStream = postStream.filter(p -> {
+				if (selectedPosts.get().contains(p.getId().toString())) {
+					return true;
+				}
+				appendPostToJson(filteredPosts, p);
+				return false;
+			});
+		}
+
+		// filter by account
+		if (selectedAccounts.isPresent()) {
+			postStream = postStream.filter(p -> {
+				if (selectedAccounts.get().contains(p.getAccountId().toString())) {
+					return true;
+				}
+				appendPostToJson(filteredPosts, p);
+				return false;
+			});
+		}
+
 		JSONArray posts = new JSONArray();
-		postService.getAllPosts().stream().filter(p -> p.getPublished() != null).forEach(post -> {
+		postStream.forEach(post -> {
 			CompletableFuture<JSONArray> f = new CompletableFuture<>();
 			elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, post.getId()), false, createFutureCallback(f));
 			futures.add(f);
 			appendPostToJson(posts, post);
 		});
-		return aggregateFutures(futures, posts);
+		return aggregateFutures(futures, posts, filteredPosts);
 	}
 
 	/**
@@ -118,7 +156,7 @@ public class StatisticService {
 
 	/** Aggregates the JSON properties returned by all the futures. */
 	@SuppressWarnings("unchecked")
-	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures, JSONArray searchedEntities) {
+	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures, JSONArray searchedEntities, JSONArray filteredEntities) {
 		LinkedHashMap<String, Double> map = new LinkedHashMap<String, Double>();
 		futures.stream().map(t -> {
 			try {
@@ -142,6 +180,7 @@ public class StatisticService {
 		JSONObject src = new JSONObject();
 		src.appendField("_source", new JSONObject(map));
 		src.appendField("entities", searchedEntities);
+		src.appendField("filtered", filteredEntities);
 		json.add(src);
 
 		return json.toString();

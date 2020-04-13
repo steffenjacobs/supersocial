@@ -1,5 +1,7 @@
 package me.steffenjacobs.supersocial.endpoints;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -42,10 +44,11 @@ public class AnalyticsController {
 
 	/** Query all statistics for all post. */
 	@GetMapping(path = "/api/analytics/post", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getAllPostStatistics(@RequestParam(name = "query") String query) throws Exception {
-		LOG.info("Retrieving all posts statistics.");
+	public ResponseEntity<String> getPostStatisticsForPosts(@RequestParam(name = "query") String query, @RequestParam(required = false, name = "posts") Set<String> posts,
+			@RequestParam(required = false, name = "accounts") Set<String> accounts) throws Exception {
+		LOG.info("Retrieving posts statistics for {} posts.", posts != null ? posts.size() : "all");
 		try {
-			return new ResponseEntity<>(statisticService.getAllPostStatistics(query), HttpStatus.OK);
+			return new ResponseEntity<>(statisticService.getAllPostStatistics(query, Optional.ofNullable(posts), Optional.ofNullable(accounts)), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving all post analytics ({}): ", query, e);
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
@@ -54,10 +57,11 @@ public class AnalyticsController {
 
 	/** Query all statistics for all social media accounts. */
 	@GetMapping(path = "/api/analytics/account", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getAllAccountStatistics(@RequestParam(name = "query") String query) throws Exception {
-		LOG.info("Retrieving all account statistics.");
+	public ResponseEntity<String> getAllAccountStatistics(@RequestParam(name = "query") String query, @RequestParam(required = false, name = "accounts") Set<String> accounts)
+			throws Exception {
+		LOG.info("Retrieving account statistics for {} accounts.", accounts != null ? accounts.size() : "all");
 		try {
-			return new ResponseEntity<>(statisticService.getAllAccountStatistics(query), HttpStatus.OK);
+			return new ResponseEntity<>(statisticService.getAllAccountStatistics(query, Optional.ofNullable(accounts)), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving all account analytics ({}): ", query, e);
 			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
@@ -66,7 +70,7 @@ public class AnalyticsController {
 
 	/** Get trending topics from twitter. */
 	@GetMapping(path = "/api/analytics/trending/{woeid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getTrendingTopics(@PathVariable(name="woeid") long woeid) throws Exception {
+	public ResponseEntity<String> getTrendingTopics(@PathVariable(name = "woeid") long woeid) throws Exception {
 		LOG.info("Retrieving trending topics for region {}.", woeid);
 		try {
 			return new ResponseEntity<>(statisticService.getTrendingTopics(woeid), HttpStatus.OK);
