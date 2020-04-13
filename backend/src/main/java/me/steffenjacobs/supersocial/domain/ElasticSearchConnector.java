@@ -11,6 +11,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -92,6 +93,8 @@ public class ElasticSearchConnector {
 		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
 			LOG.info("Finding {} in {}.", query, index);
 			performSearchQuery(restClient, query, index, pretty, callback);
+		} catch (ResponseException e) {
+			LOG.error("Could not execute elasticsearch query: {}", e.getMessage());
 		} catch (ParseException | IOException e) {
 			LOG.error("Could not execute elasticsearch search query.", e);
 		}

@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.ElasticSearchConnector;
+import me.steffenjacobs.supersocial.domain.dto.PostDTO;
+import me.steffenjacobs.supersocial.domain.dto.SocialMediaAccountDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import me.steffenjacobs.supersocial.service.exception.AnalyticsException;
@@ -59,12 +61,14 @@ public class StatisticService {
 	 */
 	public String getAllAccountStatistics(String query) {
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		JSONArray accounts = new JSONArray();
 		socialMediaAccountService.getAllSocialMediaAccounts().forEach(acc -> {
 			CompletableFuture<JSONArray> f = new CompletableFuture<>();
 			elasticSearchConnector.find(query, String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()), false, createFutureCallback(f));
 			futures.add(f);
+			appendAccountToJson(accounts, acc);
 		});
-		return aggregateFutures(futures);
+		return aggregateFutures(futures, accounts);
 	}
 
 	/**
@@ -75,17 +79,46 @@ public class StatisticService {
 	 */
 	public String getAllPostStatistics(String query) {
 		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		JSONArray posts = new JSONArray();
 		postService.getAllPosts().stream().filter(p -> p.getPublished() != null).forEach(post -> {
 			CompletableFuture<JSONArray> f = new CompletableFuture<>();
 			elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, post.getId()), false, createFutureCallback(f));
 			futures.add(f);
+			appendPostToJson(posts, post);
 		});
-		return aggregateFutures(futures);
+		return aggregateFutures(futures, posts);
+	}
+
+	/**
+	 * Appends data source information about the given
+	 * {@link SocialMediaAccount} to the given {@link JSONArray}.
+	 */
+	private void appendAccountToJson(JSONArray accounts, SocialMediaAccountDTO acc) {
+		JSONObject json = new JSONObject();
+		json.put("id", acc.getId().toString());
+		json.put("type", "account");
+		json.put("platform", acc.getPlatformId());
+		json.put("name", acc.getDisplayName());
+		accounts.add(json);
+	}
+
+	/**
+	 * Appends data source information about the given {@link Post} to the given
+	 * {@link JSONArray}.
+	 */
+	private void appendPostToJson(JSONArray posts, PostDTO post) {
+		JSONObject json = new JSONObject();
+		json.put("id", post.getId().toString());
+		json.put("type", "post");
+		json.put("platform", post.getPlatformId());
+		json.put("account", post.getAccountId());
+		json.put("summary", post.getText().length() > 20 ? post.getText().substring(0, 17) + "..." : post.getText());
+		posts.add(json);
 	}
 
 	/** Aggregates the JSON properties returned by all the futures. */
 	@SuppressWarnings("unchecked")
-	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures) {
+	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures, JSONArray searchedEntities) {
 		LinkedHashMap<String, Double> map = new LinkedHashMap<String, Double>();
 		futures.stream().map(t -> {
 			try {
@@ -108,6 +141,7 @@ public class StatisticService {
 		JSONArray json = new JSONArray();
 		JSONObject src = new JSONObject();
 		src.appendField("_source", new JSONObject(map));
+		src.appendField("entities", searchedEntities);
 		json.add(src);
 
 		return json.toString();
@@ -199,8 +233,8 @@ public class StatisticService {
 	 */
 	public String getTrendingTopics(long woeid) {
 		CompletableFuture<JSONArray> f = new CompletableFuture<>();
-		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}", String.format(ScheduledTrendingTopicFetcher.TRENDING_INDEX_PATTERN, woeid), false,
-				createFutureCallback(f));
+		elasticSearchConnector.find("{\"query\":{\"match_all\":{}}, \"sort\":{\"created\": \"desc\"}, \"size\": 1}",
+				String.format(ScheduledTrendingTopicFetcher.TRENDING_INDEX_PATTERN, woeid), false, createFutureCallback(f));
 
 		try {
 			return f.get().toString();
