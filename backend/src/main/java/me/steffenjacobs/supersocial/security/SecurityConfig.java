@@ -35,8 +35,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()//
 				.anyRequest().authenticated();//
 		if ("true".equals(env.getProperty("security.standalone"))) {
-			http.httpBasic();
-			http.logout().logoutUrl("/logout");
+			http.formLogin().loginPage("/api/login").loginProcessingUrl("/api/perform_login").defaultSuccessUrl("/api/loginstatus").permitAll();
+			http.logout().logoutUrl("/api/perform_logout").deleteCookies("JSESSIONID");
 			http.csrf().disable();
 		} else {
 			http.formLogin().loginPage("/login").permitAll();
