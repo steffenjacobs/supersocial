@@ -53,8 +53,8 @@ public class ElasticSearchConnector {
 	 */
 	public void insert(String json, String index, UUID id) {
 		try (RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol)).build()) {
-			LOG.info("Inserting {} into {}.", json, index);
-			performInsert(restClient, json, index, id, (SuccessCallback<JSONArray>) e -> LOG.info(e.toString()));
+			LOG.info("Inserting into {}.", index);
+			performInsert(restClient, json, index, id, (SuccessCallback<JSONArray>) e -> {});
 		} catch (ParseException | IOException e) {
 			LOG.error("Could not insert into elasticsearch index.", e);
 		}
