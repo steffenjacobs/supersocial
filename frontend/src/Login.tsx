@@ -58,6 +58,13 @@ export class Login extends React.Component<LoginProps, LoginCredentials> {
         this.props.loginManager.logIn(this.state.username, this.state.password);
     }
 
+    /** Perform sign in action on enter key down. */
+    private onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.keyCode === 13) {
+            this.signIn();
+        }
+    }
+
     public render() {
         if (this.state.loggedIn) {
             return <Redirect to="/" />;
@@ -70,10 +77,10 @@ export class Login extends React.Component<LoginProps, LoginCredentials> {
                 <div className="box-content">
                     <div>
                         <div className="messageLabel">Username</div>
-                        <input className="textarea" placeholder="Enter Username" id="username" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.username} />
+                        <input className="textarea" placeholder="Enter Username" id="username" onKeyDown={this.onKeyDown.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.username} />
 
                         <div className="messageLabel">Password</div>
-                        <input type="password" className="textarea" placeholder="Enter Password" id="password" onKeyDown={this.signIn.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
+                        <input type="password" className="textarea" placeholder="Enter Password" id="password" onKeyDown={this.onKeyDown.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
                     </div>
                     <span>Not registered yet? Click <a href="/register">here</a> to sign up.</span>
                     <button

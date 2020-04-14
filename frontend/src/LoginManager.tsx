@@ -45,24 +45,48 @@ export class LoginManager {
 
     /** Login with username and password. If both are undefined, login just with cookie is attempted. */
     public logIn(username?: string, password?: string) {
-        let dynamicHeaders;
         if (username && password) {
-            dynamicHeaders = new Headers({
-                'Authorization': 'Basic ' + btoa(username + ":" + password)
-            });
+            //login if credentials provided
+            let fd = new FormData();
+            fd.set('username', username);
+            fd.set('password', password);
+
+            fetch(DeploymentManager.getUrl() + 'api/perform_login', {
+                method: 'post',
+                credentials: 'include',
+                body: fd
+            })
+                .then(response => {
+                    if (response.ok) {
+                        response.json().then(data => {
+                            if (data.username) {
+                                this.updateLoginStatus({ loggedIn: true, username: data.username, config: data.config });
+                            } else {
+                                this.fetchLoginStatus();
+                            }
+                        });
+                    } else {
+                        this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
+                    }
+                });
+        } else {
+            //attempt login with cookie only
+            this.fetchLoginStatus();
         }
-        else {
-            dynamicHeaders = new Headers({});
-        }
+    }
+
+    /** fetch the current login status async into this.state.loginStatus using the session cookie. */
+    private fetchLoginStatus() {
         fetch(DeploymentManager.getUrl() + 'api/loginstatus', {
             method: 'get',
-            credentials: 'include',
-            headers: dynamicHeaders
+            credentials: 'include'
         })
             .then(response => {
                 if (response.ok) {
                     response.json().then(data => {
-                        this.updateLoginStatus({ loggedIn: true, username: data.username, config: data.config });
+                        if (data.username) {
+                            this.updateLoginStatus({ loggedIn: true, username: data.username, config: data.config });
+                        }
                     });
                 } else {
                     this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
@@ -72,7 +96,7 @@ export class LoginManager {
 
     /** Log out the current user. */
     public logOut() {
-        fetch(DeploymentManager.getUrl() + 'logout', {
+        fetch(DeploymentManager.getUrl() + 'api/perform_logout', {
             method: 'get',
             credentials: 'include',
         })
@@ -90,7 +114,7 @@ export class LoginManager {
     /** @return the loginStatus object containing a username and a loggedIn value */
     public getLoginStatus(): LoginStatus {
         if (!this.loginStatus.loggedIn) {
-            this.logIn(undefined, undefined);
+            this.logIn();
         }
         return { username: this.loginStatus.username, loggedIn: this.loginStatus.loggedIn, config: this.loginStatus.config };
     }
