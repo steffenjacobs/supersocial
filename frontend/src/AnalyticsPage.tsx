@@ -86,7 +86,7 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
 
     /***Called by the Multiselect UI element. Synchronizes the multiselect state to the component state. */
     private onSelectionChange(value: MultiSelectValue[]) {
-        let accounts = value.filter(v => v.type === "Accounts").map(v => this.state.accounts.find(sa => v.value == sa.id));
+        let accounts = value.filter(v => v.type === "Accounts").map(v => this.state.accounts.find(sa => v.value === sa.id));
         let posts = [];//value.filter(v => v.type === "Posts").map(v => this.state.posts.find(sa => v.value == sa.id));
         this.updateData(EventBusEventType.REFRESH_POST_ANALYTICS_REQ, "", accounts as AccountDataSource[], posts as PostDataSource[]);
         this.updateData(EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ, "", accounts as AccountDataSource[]);
