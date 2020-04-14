@@ -229,13 +229,14 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                 ));
         }
         else if (platformId === "2") {
-            this.addCredentialIfNotPresent("twitter.api.accountname", () =>
-                this.addCredentialIfNotPresent("twitter.api.key", () =>
-                    this.addCredentialIfNotPresent("twitter.api.secret", () =>
-                        this.addCredentialIfNotPresent("twitter.api.accesstoken", () =>
-                            this.addCredentialIfNotPresent("twitter.api.accesstoken.secret", () =>
-                                this.updateProperty("platformId", platformId)
-                            )))));
+            SnippetManager.reduceFn([
+                this.addCredentialIfNotPresent.bind(this, "twitter.api.accountname"),
+                this.addCredentialIfNotPresent.bind(this, "twitter.api.key"),
+                this.addCredentialIfNotPresent.bind(this, "twitter.api.secret"),
+                this.addCredentialIfNotPresent.bind(this, "twitter.api.accesstoken"),
+                this.addCredentialIfNotPresent.bind(this, "twitter.api.accesstoken.secret"),
+                this.updateProperty.bind(this, "platformId", platformId),
+            ]);
         } else {
             this.updateProperty("platformId", platformId);
         }
