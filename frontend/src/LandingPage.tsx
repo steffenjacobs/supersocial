@@ -60,7 +60,7 @@ export class LandingPage extends React.Component<any, any>{
                     <h3 className="landing-h3">Automate your marketing</h3>
                     <h4 className="landing-h4">Schedule content and geofence your efforts to be even more successful.</h4>
                     <div>
-                        <div className="landing-img-container"><img alt="Automate your marketing" src="frontpage/automate-your-marketing.jpg" /></div>
+                        <div className="landing-img-container"><img alt="Automate your marketing" src="frontpage/automate-your-marketing.JPG" /></div>
                         <div className="landing-txt-container">Perfect your market timing and schedule your content to go viral exactly at the right time in the pricely the right market.</div>
                     </div>
                 </div>

@@ -44,6 +44,7 @@
     background: white;
     width: 65em;
     margin-top: 2em;
+    margin-bottom: 2em;
 }
 
 .landing-flex {
@@ -86,9 +87,11 @@
 
 .landing-img-container {
     display: inline-block;
-    width: 40em;
     margin-left: 2em;
     margin-right: 2em;
+}
+.landing-img-container>img{
+    width: 40em;
 }
 
 .landing-txt-container {
