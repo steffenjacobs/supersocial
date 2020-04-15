@@ -10,7 +10,7 @@ export class LandingPage extends React.Component<any, any>{
             <div className="landing-site-inner">
                 <h1 className="landing-h1">Welcome to Supersocial</h1>
                 <h2 className="landing-h2">Social Media Marketing on a new level.</h2>
-                <div className="landing-box flex">
+                <div className="landing-box landing-flex">
                     <img alt="Logo" className="landing-header-elem" src="logo512.png" />
                     <div className="landing-header-elem landing-btn-wrapper">
                         <div className="landing-header-text">Welcome to a new world of data-driven and AI-based social media marketing.</div>
