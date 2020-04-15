@@ -2,15 +2,18 @@ import React from "react";
 import { EventBus, EventBusEventType } from "./EventBus";
 import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
+import { SnippetManager } from "./SnippetManager";
 
 export interface LoginProps {
     eventBus: EventBus
     loginManager: LoginManager
+    params: string
 }
 interface LoginCredentials {
     username: string
     password: string
     loggedIn?: boolean
+    redirect: string
 }
 
 /** Login Page. The user can login here or go to the Registration page to create a new user account. 
@@ -18,7 +21,8 @@ interface LoginCredentials {
 export class Login extends React.Component<LoginProps, LoginCredentials> {
     constructor(props: LoginProps) {
         super(props);
-        this.state = { username: "", password: "", loggedIn: props.loginManager.isLoggedIn() };
+        let redirect = SnippetManager.findUrlParam(props.params, "redirect");
+        this.state = { username: "", password: "", loggedIn: props.loginManager.isLoggedIn(), redirect: redirect ? redirect : "overview" };
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
 
@@ -67,7 +71,7 @@ export class Login extends React.Component<LoginProps, LoginCredentials> {
 
     public render() {
         if (this.state.loggedIn) {
-            return <Redirect to="/" />;
+            return <Redirect to={this.state.redirect} />;
         }
         return (
             <div className="container centered-container">

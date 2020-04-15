@@ -70,7 +70,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
             return (
-                <a key={elem.id} onClick={() => this.setActivePage(elem.id)} /*href={elem.path}*/>
+                <a key={elem.id} href={elem.path}>
                     <div className={clazz}>
                         {elem.icon}
                         <div className="navbar-text">{elem.title}</div>
