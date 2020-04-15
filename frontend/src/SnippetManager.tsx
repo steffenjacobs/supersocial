@@ -46,13 +46,4 @@ export class SnippetManager {
         }
         return false;
     }
-
-    static reduceFn(functions: (() => any)[], initialValue = null) {
-        functions.reduce((initialValue, fn) => fn(), initialValue);
-    }
-
-    static asyncReduceFn(functions: (() => any)[], initialValue = null) {
-        functions.reduce((initialValue, fn) => {
-            return new Promise((resolve, reject) => { fn(resolve, reject); }), initialValue);
-    }
 }
