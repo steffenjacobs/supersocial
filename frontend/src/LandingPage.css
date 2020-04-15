@@ -1,0 +1,98 @@
+.site {
+    color: rgb(50, 56, 59);
+    background: rgb(239, 239, 239);
+    padding-left: 1em;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    display:flex;
+    justify-content: center;
+}
+
+.site-inner {
+    width: 65em;
+}
+
+.h1{
+    margin-bottom: 0;
+}
+
+.h2{
+    font-weight: 100;
+    font-size: 3em;
+    margin: 0;
+}
+
+.h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 2em;
+    font-weight: 100;
+}
+
+.h4 {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 1.5em;
+}
+
+.box {
+    border: 1px solid rgb(199, 215, 216);
+    border-radius: .5em;
+    padding: 1em;
+    background: white;
+    width: 65em;
+    margin-top: 2em;
+}
+
+.flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-elem {
+    height: 300px;
+}
+
+.header-text {
+    font-size: 2em;
+}
+
+.btn-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 2em;
+}
+
+.flex-center{
+    display:flex;
+    justify-content: center;
+}
+
+.btn-header {
+    height: 2em;
+    font-size: 1.5em;
+    width: 13em;
+    margin-top: 1em;
+}
+
+.arrow-right {
+    display: inline;
+    font-size: 2em;
+    padding-left: 1em;
+}
+
+.img-container {
+    display: inline-block;
+    width: 40em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+.txt-container {
+    width: 20em;
+    display: inline-block;
+    vertical-align: top;
+}

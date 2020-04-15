@@ -10,6 +10,7 @@ import { ImageProvider } from './ImageProvider';
 import { AnalyticsPage } from './AnalyticsPage';
 import { SettingsPage } from './SettingsPage';
 import { AboutPage } from './AboutPage';
+import { LandingPage } from './LandingPage';
 
 /** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
 class App extends React.Component<any> {
@@ -77,7 +78,7 @@ class App extends React.Component<any> {
           <Route path="/analytics" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 1) : <Redirect to={"/login?redirect=" + encodeURIComponent("/analytics")} />} />
           <Route path="/settings" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 2) : <Redirect to={"/login?redirect=" + encodeURIComponent("/settings")} />} />
           <Route path="/about" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 3) : <Redirect to={"/login?redirect=" + encodeURIComponent("/about")} />} />
-          <Route path="/" render={(props) => <Redirect to="/overview" />} />
+          <Route path="/" render={(props) => <LandingPage />} />
         </Switch>
       </BrowserRouter>
     );
