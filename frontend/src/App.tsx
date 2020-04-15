@@ -6,24 +6,14 @@ import { EventBus, EventBusEventType } from './EventBus';
 import { LoginManager } from './LoginManager';
 import { Registration } from './Registration';
 
-interface LoginInfo {
-  loggedIn?: boolean
-  username?: string
-}
-
 /** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
-class App extends React.Component<LoginInfo, LoginInfo> {
+class App extends React.Component<any> {
   eventBus = new EventBus();
   loginManager = new LoginManager(this.eventBus);
 
-  constructor(props: LoginInfo) {
+  constructor(props: any) {
     super(props);
-    this.state = {
-      loggedIn: false,
-      username: "Not logged in"
-    };
     this.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
-
   }
 
   private onUserChange(eventData?: any) {
@@ -35,10 +25,10 @@ class App extends React.Component<LoginInfo, LoginInfo> {
     // everything else -> Go to Supersocial application
     return (
       <BrowserRouter>
-        <Switch>  
-          <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />        
+        <Switch>
+          <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />
           <Route path="/login" render={(props) => <Login eventBus={this.eventBus} loginManager={this.loginManager} />} />
-          {this.state.loggedIn ? <Route path="/" render={(props) => <Supersocial eventBus={this.eventBus} loginManager={this.loginManager} />} /> : <Redirect to="/login" />} />}
+          {this.loginManager.isLoggedIn() ? <Route path="/" render={(props) => <Supersocial eventBus={this.eventBus} loginManager={this.loginManager} />} /> : <Redirect to="/login" />} />}
         </Switch>
       </BrowserRouter>
     );

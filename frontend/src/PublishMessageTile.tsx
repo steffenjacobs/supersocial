@@ -74,7 +74,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
 
         //No social media accounts yet -> Show information
         if (this.state.accounts.length === 0) {
-            ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
+            ToastManager.showInfoToast("Please create a social media account to publish to.");
             return;
         }
 
@@ -116,7 +116,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
 
         //No social media accounts yet -> Show information
         if (this.state.accounts.length === 0) {
-            ToastManager.showClickableInfoToast("Please create a social media account to publish to.");
+            ToastManager.showInfoToast("Please create a social media account to publish to.");
             return;
         }
 
