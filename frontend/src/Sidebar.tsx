@@ -88,7 +88,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
                 <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500} />
                 <div className="navbar">
                     <div className="navbar-logo">
-                        <img src="/logo192.png" alt="Logo" />
+                        <a href="/"><img src="/logo192.png" alt="Logo" /></a>
                         <div className="navbar-brandname"> Supersocial</div>
                     </div>
                     {components}

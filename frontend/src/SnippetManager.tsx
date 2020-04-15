@@ -57,7 +57,7 @@ export class SnippetManager {
     }
 
     static parseUrlParams(search: string): Param[] {
-        if (search.length == 0) {
+        if (search.length === 0) {
             return [];
         }
         search = search.substr(1);
