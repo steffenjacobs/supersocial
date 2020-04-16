@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -49,7 +50,7 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 	@OneToOne
 	private UserGroup defaultUserGroup;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
 	private Set<UserConfiguration> userConfigurations = new HashSet<>();
 
 	public UUID getId() {
