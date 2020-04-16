@@ -223,13 +223,14 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     /** Realize a template of credentials necessary to integrate a given social media platform. */
     private prepareCredentials(platformId: string) {
         if (platformId === "1") {
-            this.addCredentialIfNotPresent("facebook.page.id", () =>
-                this.addCredentialIfNotPresent("facebook.page.accesstoken", () =>
-                    this.updateProperty("platformId", platformId)
-                ));
+            SnippetManager.asyncReduceFn([
+                this.addCredentialIfNotPresent.bind(this, "facebook.page.id"),
+                this.addCredentialIfNotPresent.bind(this, "facebook.page.accesstoken"),
+                this.updateProperty.bind(this, "platformId", platformId),
+            ]);
         }
         else if (platformId === "2") {
-            SnippetManager.reduceFn([
+            SnippetManager.asyncReduceFn([
                 this.addCredentialIfNotPresent.bind(this, "twitter.api.accountname"),
                 this.addCredentialIfNotPresent.bind(this, "twitter.api.key"),
                 this.addCredentialIfNotPresent.bind(this, "twitter.api.secret"),
@@ -274,18 +275,16 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     /** Insert a new credential with a given descriptor if none is already present. 
      * Used to insert template credentials for social media platforms without duplication.
      */
-    private addCredentialIfNotPresent(descriptor: string, callback?: any) {
+    private addCredentialIfNotPresent(descriptor: string, resolve: () => void, reject: () => void) {
         if (this.state.account.credentials.filter(c => c.descriptor === descriptor).length === 0) {
-            this.addCredential(descriptor, callback);
+            this.addCredential(descriptor, resolve, reject);
         } else {
-            if (callback) {
-                callback();
-            }
+            resolve();
         }
     }
 
     /**Add a credential to a social media account without persisting it to the backend. */
-    private addCredential(descriptor?: string, callback?: any) {
+    private addCredential(descriptor: string, resolve: () => void, reject: () => void) {
         const newCreds = Object.assign([], this.state.account.credentials);
         newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
         this.setState({
@@ -296,7 +295,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                 error: this.state.account.error,
                 platformId: this.state.account.platformId
             }
-        }, callback);
+        }, resolve);
     }
 
     /**Close the details view. */

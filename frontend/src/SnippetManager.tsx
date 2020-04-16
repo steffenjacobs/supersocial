@@ -51,8 +51,10 @@ export class SnippetManager {
         functions.reduce((initialValue, fn) => fn(), initialValue);
     }
 
-    static asyncReduceFn(functions: (() => any)[], initialValue = null) {
-        functions.reduce((initialValue, fn) => {
-            return new Promise((resolve, reject) => { fn(resolve, reject); }), initialValue);
+    static asyncReduceFn(functions: ((...args) => any)[]) {
+        functions.forEach(async (fn) => {
+            let result = await new Promise((resolve, reject) => { fn(resolve, reject); });
+            return result;
+        })
     }
 }
