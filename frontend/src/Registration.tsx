@@ -4,6 +4,7 @@ import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
 import { DeploymentManager } from "./DeploymentManager";
 import { ToastManager } from "./ToastManager";
+import { ToastContainer, toast } from "react-toastify";
 
 export interface RegistrationProps {
     eventBus: EventBus
@@ -77,10 +78,11 @@ export class Registration extends React.Component<RegistrationProps, Registratio
             body: JSON.stringify({ displayName: this.state.username, email: this.state.email, password: this.state.password })
         })
             .then(response => {
-                if (response.ok) {
-                    this.props.loginManager.logIn(this.state.username, this.state.password);
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                    this.setState({ username: "" });
                 } else {
-                    response.json().then(e => ToastManager.showErrorToast(e.error));
+                    this.props.loginManager.logIn(this.state.username, this.state.password);
                 }
             });
     }
@@ -91,28 +93,31 @@ export class Registration extends React.Component<RegistrationProps, Registratio
             return <Redirect to="/overview" />;
         }
         return (
-            <div className="container centered-container">
-                <div className="box-header">
-                    Sign Up
+            <div>
+                <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500} />
+                <div className="container centered-container">
+                    <div className="box-header">
+                        Sign Up
                 </div>
-                <div className="box-content">
-                    <div>
-                        <div className="messageLabel">Username</div>
-                        <input className="textarea" placeholder="Enter Username" id="username" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.username} />
+                    <div className="box-content">
+                        <div>
+                            <div className="messageLabel">Username</div>
+                            <input className="textarea" placeholder="Enter Username" id="username" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.username} />
 
-                        <div className="messageLabel">Email</div>
-                        <input className="textarea" placeholder="Enter Email" id="email" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.email} />
+                            <div className="messageLabel">Email</div>
+                            <input className="textarea" placeholder="Enter Email" id="email" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.email} />
 
-                        <div className="messageLabel">Password</div>
-                        <input type="password" className="textarea" placeholder="Enter Password" id="password" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
-                    </div>
-                    <span>Already have an account? Click <a href="/login">here</a> to sign in.</span>
-                    <button
-                        className="btn btn-primary send-button"
-                        onClick={this.signUp.bind(this)}
-                    >
-                        Sign Up &gt;
+                            <div className="messageLabel">Password</div>
+                            <input type="password" className="textarea" placeholder="Enter Password" id="password" onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
+                        </div>
+                        <span>Already have an account? Click <a href="/login">here</a> to sign in.</span>
+                        <button
+                            className="btn btn-primary send-button"
+                            onClick={this.signUp.bind(this)}
+                        >
+                            Sign Up &gt;
                     </button>
+                    </div>
                 </div>
             </div>
         );
