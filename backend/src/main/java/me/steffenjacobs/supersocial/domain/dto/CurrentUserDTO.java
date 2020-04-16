@@ -7,14 +7,27 @@ import java.util.stream.Collectors;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 
 /** @author Steffen Jacobs */
-public class CurrentUserDTO {
+public class CurrentUserDTO implements WithErrorDTO {
 	private UUID id;
 	private String username;
 	private int providerId;
 	private Set<UserConfigurationDTO> config;
+	private String error;
+
+	public CurrentUserDTO() {
+	}
+
+	public CurrentUserDTO(String error) {
+		this.error = error;
+	}
 
 	public UUID getId() {
 		return id;
+	}
+
+	@Override
+	public String getError() {
+		return error;
 	}
 
 	public void setId(UUID id) {

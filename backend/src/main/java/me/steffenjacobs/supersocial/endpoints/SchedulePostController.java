@@ -48,7 +48,7 @@ public class SchedulePostController {
 			Pair<ScheduledPostDTO, Boolean> result = scheduledPostService.scheduleOrUpdateScheduledPost(post);
 			return new ResponseEntity<>(result.getA(), result.getB() ? HttpStatus.CREATED : HttpStatus.ACCEPTED);
 		} catch (PostAlreadyScheduledException e) {
-			return new ResponseEntity<>(HttpStatus.FOUND);
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} catch (PostNotFoundException e2) {
 			return new ResponseEntity<>(new ScheduledPostDTO(e2.getMessage()), HttpStatus.BAD_REQUEST);
 		}

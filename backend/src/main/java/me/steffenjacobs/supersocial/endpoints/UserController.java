@@ -20,6 +20,7 @@ import me.steffenjacobs.supersocial.domain.dto.UserConfigurationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.security.UserService;
+import me.steffenjacobs.supersocial.security.exception.UserAlreadyExistsException;
 import me.steffenjacobs.supersocial.service.UserConfigurationService;
 import me.steffenjacobs.supersocial.service.exception.TwitterException;
 import me.steffenjacobs.supersocial.service.exception.UserConfigurationNotFoundException;
@@ -45,9 +46,14 @@ public class UserController {
 
 	/** Creates a new user. */
 	@PostMapping(path = "/api/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void registerUser(@RequestBody UserRegistrationDTO userRegistration) {
+	public ResponseEntity<CurrentUserDTO> registerUser(@RequestBody UserRegistrationDTO userRegistration) {
 		LOG.info("Registering {}", userRegistration);
-		userService.registerNewUser(userRegistration.getDisplayName(), userRegistration.getPassword(), userRegistration.getEmail());
+		try {
+			return new ResponseEntity<CurrentUserDTO>(userService.registerNewUser(userRegistration.getDisplayName(), userRegistration.getPassword(), userRegistration.getEmail()),
+					HttpStatus.ACCEPTED);
+		} catch (UserAlreadyExistsException e) {
+			return new ResponseEntity<CurrentUserDTO>(new CurrentUserDTO(e.getMessage()), HttpStatus.CONFLICT);
+		}
 	}
 
 	/** @return the login status of the current user. */

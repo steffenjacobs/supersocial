@@ -21,7 +21,7 @@ import me.steffenjacobs.supersocial.domain.AccessControlListRepository;
 import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
 import me.steffenjacobs.supersocial.domain.SupersocialUserRepository;
 import me.steffenjacobs.supersocial.domain.SystemConfigurationRepository;
-import me.steffenjacobs.supersocial.domain.dto.SupersocialUserDTO;
+import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
 import me.steffenjacobs.supersocial.domain.dto.SystemConfigurationDTO;
 import me.steffenjacobs.supersocial.domain.entity.AccessControlList;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
@@ -114,10 +114,10 @@ public class SystemConfigurationManager {
 			LOG.info("System user found.");
 		} catch (SystemConfigurationNotFoundException | UsernameNotFoundException e) {
 			String password = (UUID.randomUUID().toString() + UUID.randomUUID().toString()).replace("-", "");
-			SupersocialUserDTO user = userService.registerNewUser("systemuser", password, "systemuser@supersocial.cloud");
+			CurrentUserDTO user = userService.registerNewUser("systemuser", password, "systemuser@supersocial.cloud");
 			SystemConfiguration systemConfiguration = new SystemConfiguration();
 			systemConfiguration.setDescriptor(SystemConfigurationType.SYSTEM_USER.getDescriptor());
-			systemConfiguration.setValue(user.getUuid().toString());
+			systemConfiguration.setValue(user.getId().toString());
 			systemConfiguration = systemConfigurationRepository.save(systemConfiguration);
 			// ACL for configuration object is added on first request because of
 			// a missing context at this point in time.
@@ -213,7 +213,10 @@ public class SystemConfigurationManager {
 		return supersocialUserRepository.findById(UUID.fromString(userConfig.getValue())).orElseThrow(() -> new UsernameNotFoundException(userConfig.getValue()));
 	}
 
-	/** Retrieves the currently tracked woeids for Twitter Trends plus 1 (world id). */
+	/**
+	 * Retrieves the currently tracked woeids for Twitter Trends plus 1 (world
+	 * id).
+	 */
 	public Stream<Long> getTrackedTrendsWoeids() {
 		SystemConfiguration userConfig = systemConfigurationRepository.findByDescriptor(SystemConfigurationType.TRACKED_TREND_WOEIDS.getDescriptor())
 				.orElseThrow(() -> new SystemConfigurationNotFoundException(SystemConfigurationType.TRACKED_TREND_WOEIDS));

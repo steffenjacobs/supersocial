@@ -19,13 +19,14 @@ import me.steffenjacobs.supersocial.domain.AccessControlListRepository;
 import me.steffenjacobs.supersocial.domain.StandaloneUserRepository;
 import me.steffenjacobs.supersocial.domain.SupersocialUserRepository;
 import me.steffenjacobs.supersocial.domain.UserGroupRepository;
-import me.steffenjacobs.supersocial.domain.dto.SupersocialUserDTO;
+import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
 import me.steffenjacobs.supersocial.domain.entity.AccessControlList;
 import me.steffenjacobs.supersocial.domain.entity.LoginProvider;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.StandaloneUser;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
+import me.steffenjacobs.supersocial.security.exception.UserAlreadyExistsException;
 
 /**
  * The UserService handles creation and loading of {@link SupersocialUser}s and
@@ -68,9 +69,16 @@ public class UserService implements UserDetailsService {
 	 * newly created {@link SupersocialUser}</li>
 	 * </ul>
 	 * 
-	 * @return a {@link SupersocialUserDTO} with the newly initialized user.
+	 * @return a {@link CurrentUserDTO} with the newly initialized user.
+	 * 
+	 * @throws UserAlreadyExistsException
+	 *             if the given {@code displayName} is already associated with
+	 *             another user.
 	 */
-	public SupersocialUserDTO registerNewUser(String displayName, String password, String email) {
+	public CurrentUserDTO registerNewUser(String displayName, String password, String email) {
+		if (supersocialUserRepository.findByName(displayName).isPresent()) {
+			throw new UserAlreadyExistsException(displayName);
+		}
 		// create user
 		StandaloneUser user = new StandaloneUser();
 		user.setEmail(email);
@@ -113,7 +121,7 @@ public class UserService implements UserDetailsService {
 		// add Supersocial user ACL to Supersocial user
 		supersocialUser.setAccessControlList(aclSupersocialUser);
 		supersocialUser = supersocialUserRepository.save(supersocialUser);
-		return SupersocialUserDTO.fromSupersocialUser(supersocialUser);
+		return CurrentUserDTO.fromUser(supersocialUser);
 	}
 
 	/**
