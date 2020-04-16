@@ -69,7 +69,7 @@ export class Registration extends React.Component<RegistrationProps, Registratio
 
     /**Create a new user in the backend. */
     private signUp() {
-        fetch(DeploymentManager.getUrl() + 'api/register', {
+        fetch(`${DeploymentManager.getUrl()}api/register`, {
             method: 'post',
             headers: new Headers({
                 'Content-Type': 'application/json'

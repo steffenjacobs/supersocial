@@ -96,7 +96,7 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
     private updateData(eventType: EventBusEventType, relId: string, selectedAccounts?: AccountDataSource[], selectedPosts?: PostDataSource[]) {
         let typedPath = eventType === EventBusEventType.REFRESH_ACCOUNT_ANALYTICS_REQ ? "account" : "post";
         let params = (selectedPosts ? selectedPosts.map(p => p ? "&posts=" + p.id : "").join("") : "") + (selectedAccounts ? selectedAccounts.map(a => a ? "&accounts=" + a.id : "").join("") : "");
-        fetch(DeploymentManager.getUrl() + "api/analytics/" + typedPath + "/" + relId + "?query=" + params, {
+        fetch(`${DeploymentManager.getUrl()}api/analytics/${typedPath}/${relId}?query=${params}`, {
             method: 'get',
             credentials: 'include',
         })

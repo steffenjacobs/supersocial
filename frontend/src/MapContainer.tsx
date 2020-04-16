@@ -62,7 +62,7 @@ export class MapContainer extends React.Component<MapProps, MapState>{
   /** Persist the selected location to the backend. Updates the map and e.g. the trending twitter topics. */
   private saveSelectedLocation(e: any) {
     this.setState({ refreshing: true });
-    fetch(DeploymentManager.getUrl() + 'api/user/location', {
+    fetch(`${DeploymentManager.getUrl()}api/user/location`, {
       method: 'PUT',
       headers: new Headers({
         'Content-Type': 'application/json'

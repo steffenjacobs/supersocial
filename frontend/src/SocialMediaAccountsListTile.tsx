@@ -49,7 +49,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         else {
             this.setState({ accounts: this.state.accounts, updating: true });
         }
-        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
+        fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount`, {
             method: 'get',
             credentials: 'include',
         })
@@ -115,7 +115,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
      * Updates the list of social media accounts afterwards.
       */
     private deleteAccount(account: SocialMediaAccount) {
-        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount/' + account.id, {
+        fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount/${account.id}`, {
             method: 'delete',
             credentials: 'include',
         })

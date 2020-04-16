@@ -51,7 +51,7 @@ export class LoginManager {
             fd.set('username', username);
             fd.set('password', password);
 
-            fetch(DeploymentManager.getUrl() + 'api/perform_login', {
+            fetch(`${DeploymentManager.getUrl()}api/perform_login`, {
                 method: 'post',
                 credentials: 'include',
                 body: fd
@@ -77,7 +77,7 @@ export class LoginManager {
 
     /** fetch the current login status async into this.state.loginStatus using the session cookie. */
     private fetchLoginStatus() {
-        fetch(DeploymentManager.getUrl() + 'api/loginstatus', {
+        fetch(`${DeploymentManager.getUrl()}api/loginstatus`, {
             method: 'get',
             credentials: 'include'
         })
@@ -96,7 +96,7 @@ export class LoginManager {
 
     /** Log out the current user. */
     public logOut() {
-        fetch(DeploymentManager.getUrl() + 'api/perform_logout', {
+        fetch(`${DeploymentManager.getUrl()}api/perform_logout`, {
             method: 'get',
             credentials: 'include',
         })

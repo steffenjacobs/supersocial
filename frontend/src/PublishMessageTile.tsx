@@ -40,7 +40,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
 
     /** Refresh the list of social media accounts */
     private refreshAccounts() {
-        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
+        fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount`, {
             method: 'get',
             credentials: 'include',
         })
@@ -85,7 +85,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
 
         //store post for all selected accounts
         this.state.sendTextForm.accountIds.forEach(accId => {
-            fetch(DeploymentManager.getUrl() + 'api/post', {
+            fetch(`${DeploymentManager.getUrl()}api/post`, {
                 method: 'PUT',
                 headers: new Headers({
                     'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
 
         //store post for all selected accounts
         this.state.sendTextForm.accountIds.forEach(accId => {
-            fetch(DeploymentManager.getUrl() + 'api/publish', {
+            fetch(`${DeploymentManager.getUrl()}api/publish`, {
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/json'
@@ -153,7 +153,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
     /** Schedule a post to be published later. 
      * Does not create a new post.*/
     private createScheduledPost(postId: string) {
-        fetch(DeploymentManager.getUrl() + 'api/schedule/post', {
+        fetch(`${DeploymentManager.getUrl()}api/schedule/post`, {
             method: 'PUT',
             headers: new Headers({
                 'Content-Type': 'application/json'

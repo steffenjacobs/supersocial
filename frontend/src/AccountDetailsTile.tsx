@@ -56,7 +56,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         if (EntityUtil.isGeneratedId(this.state.account.id)) {
             return;
         }
-        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount/' + this.state.account.id, {
+        fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount/${this.state.account.id}`, {
             method: 'GET',
             credentials: 'include',
         })
@@ -104,7 +104,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     */
     private saveCredentialNoCheck(credentialId: string) {
         this.state.account.credentials.filter(cr => cr.id === credentialId).forEach(c => {
-            fetch(DeploymentManager.getUrl() + 'api/credential', {
+            fetch(`${DeploymentManager.getUrl()}api/credential`, {
                 method: 'PUT',
                 headers: new Headers({
                     'Content-Type': 'application/json'
@@ -132,7 +132,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     /** Saves the account details (display name and selected platform).
      * Refreshes all accounts afterwards.*/
     private saveAccountDetails(callback?: any) {
-        fetch(DeploymentManager.getUrl() + 'api/socialmediaaccount', {
+        fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount`, {
             method: 'PUT',
             credentials: 'include',
 
@@ -180,7 +180,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
             if (EntityUtil.isGeneratedId(credentialId)) {
                 return;
             }
-            fetch(DeploymentManager.getUrl() + 'api/credential/' + credentialId, {
+            fetch(`${DeploymentManager.getUrl()}api/credential/${credentialId}`, {
                 method: 'DELETE',
                 credentials: 'include'
             })

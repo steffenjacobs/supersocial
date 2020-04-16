@@ -35,7 +35,7 @@ export class TrendingTile extends React.Component<TrendingTileProps, TrendingTil
     /** Fetches the most recent twitter trends from the backend. */
     private refreshTrendingTopics(woeid: any) {
         this.setState({ updating: true });
-        fetch(DeploymentManager.getUrl() + 'api/analytics/trending/' + woeid, {
+        fetch(`${DeploymentManager.getUrl()}api/analytics/trending/${woeid}`, {
             method: 'get',
             credentials: 'include',
         })

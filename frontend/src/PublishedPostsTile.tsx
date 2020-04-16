@@ -53,7 +53,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         else {
             this.setState({ posts: this.state.posts, updating: true });
         }
-        fetch(DeploymentManager.getUrl() + 'api/post', {
+        fetch(`${DeploymentManager.getUrl()}api/post`, {
             method: 'get',
             credentials: 'include',
         })
@@ -88,7 +88,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
     /** Delete the post from the system without unpublishing it. */
     private deletePostLink(post: PublishedPost) {
-        fetch(DeploymentManager.getUrl() + 'api/post/' + post.id, {
+        fetch(`${DeploymentManager.getUrl()}api/post/${post.id}`, {
             method: 'delete',
             credentials: 'include',
         })
@@ -104,7 +104,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
     /** Remove scheduling information for a scheduled, not yet posted post. */
     private unschedulePost(post: PublishedPost) {
-        fetch(DeploymentManager.getUrl() + 'api/schedule/post/' + post.id, {
+        fetch(`${DeploymentManager.getUrl()}api/schedule/post/${post.id}`, {
             method: 'delete',
             credentials: 'include',
         })
@@ -125,7 +125,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
     /** Publish an unpublished and/or scheduled post right away. */
     private publishPost(post: PublishedPost) {
-        fetch(DeploymentManager.getUrl() + 'api/publishnow/' + post.id, {
+        fetch(`${DeploymentManager.getUrl()}api/publishnow/${post.id}`, {
             method: 'POST',
             credentials: 'include'
         })

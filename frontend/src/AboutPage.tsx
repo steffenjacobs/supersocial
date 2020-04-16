@@ -17,7 +17,7 @@ export class AboutPage extends React.Component<any, AboutState> {
 
 
     private fetchVersionInfo() {
-        fetch(DeploymentManager.getUrl() + 'api/version', {
+        fetch(`${DeploymentManager.getUrl()}api/version`, {
             method: 'get',
             credentials: 'include',
         })
