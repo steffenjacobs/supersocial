@@ -88,7 +88,7 @@ export class Registration extends React.Component<RegistrationProps, Registratio
     public render() {
         //redirect to main page if the user is already logged in.
         if (this.state.loggedIn) {
-            return <Redirect to="/" />;
+            return <Redirect to="/overview" />;
         }
         return (
             <div className="container centered-container">

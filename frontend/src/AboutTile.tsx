@@ -19,7 +19,7 @@ export class AboutTile extends React.Component<ProjectMemberProps>{
         return (
             <div className="about-entry">
                 <h2>{this.props.name} - {this.props.role}</h2>
-                <img className="about-entry-image" src={this.props.imageUrl}></img>
+                <img alt={"Image of " + this.props.name} className="about-entry-image" src={this.props.imageUrl}></img>
                 <div className="about-entry-left">
                     <div className="about-entry-left-inner">
                         <div className="about-entry-description">{this.props.description}</div>

@@ -284,7 +284,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     }
 
     /**Add a credential to a social media account without persisting it to the backend. */
-    private addCredential(descriptor: string, resolve: () => void, reject: () => void) {
+    private addCredential(descriptor?: string, resolve?: () => void, reject?: () => void) {
         const newCreds = Object.assign([], this.state.account.credentials);
         newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
         this.setState({

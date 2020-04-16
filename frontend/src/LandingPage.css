@@ -1,0 +1,101 @@
+.landing-site {
+    color: rgb(50, 56, 59);
+    background: rgb(239, 239, 239);
+    padding-left: 1em;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    display:flex;
+    justify-content: center;
+}
+
+.landing-site-inner {
+    width: 65em;
+}
+
+.landing-h1{
+    margin-bottom: 0;
+}
+
+.landing-h2{
+    font-weight: 100;
+    font-size: 3em;
+    margin: 0;
+}
+
+.landing-h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 2em;
+    font-weight: 100;
+}
+
+.landing-h4 {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 1.5em;
+}
+
+.landing-box {
+    border: 1px solid rgb(199, 215, 216);
+    border-radius: .5em;
+    padding: 1em;
+    background: white;
+    width: 65em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.landing-flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.landing-header-elem {
+    height: 300px;
+}
+
+.landing-header-text {
+    font-size: 2em;
+}
+
+.landing-btn-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 2em;
+}
+
+.landing-flex-center{
+    display:flex;
+    justify-content: center;
+}
+
+.landing-btn-header {
+    height: 2em;
+    font-size: 1.5em;
+    width: 13em;
+    margin-top: 1em;
+}
+
+.landing-arrow-right {
+    display: inline;
+    font-size: 2em;
+    padding-left: 1em;
+}
+
+.landing-img-container {
+    display: inline-block;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+.landing-img-container>img{
+    width: 40em;
+}
+
+.landing-txt-container {
+    width: 20em;
+    display: inline-block;
+    vertical-align: top;
+}

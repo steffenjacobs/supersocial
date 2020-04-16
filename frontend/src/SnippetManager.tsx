@@ -2,6 +2,11 @@ import React from "react";
 import { ImageProvider } from "./ImageProvider";
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 
+export interface Param {
+    name: string
+    value: string
+}
+
 /**Contains a bunch of useful snippets to be standardized across the application. */
 export class SnippetManager {
 
@@ -47,14 +52,29 @@ export class SnippetManager {
         return false;
     }
 
-    static reduceFn(functions: (() => any)[], initialValue = null) {
-        functions.reduce((initialValue, fn) => fn(), initialValue);
+    static findUrlParam(search: string, paramName: string): string | undefined {
+        return SnippetManager.parseUrlParams(search).find(x => x.name === paramName)?.value;
     }
 
     static asyncReduceFn(functions: ((...args) => any)[]) {
         functions.forEach(async (fn) => {
             let result = await new Promise((resolve, reject) => { fn(resolve, reject); });
             return result;
+        })
+    }
+
+    static parseUrlParams(search: string): Param[] {
+        if (search.length === 0) {
+            return [];
+        }
+        search = search.substr(1);
+        let params = search.split("&");
+        return params.map(p => {
+            if (!p.includes("=")) {
+                return { name: decodeURIComponent(p), value: "" };
+            }
+            let split = p.split("=");
+            return { name: decodeURIComponent(split[0]), value: decodeURIComponent(split[1]) }
         })
     }
 }

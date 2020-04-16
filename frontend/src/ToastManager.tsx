@@ -23,7 +23,7 @@ export class ToastManager {
             position: toast.POSITION.TOP_RIGHT
         });
     }
-    static showClickableInfoToast(message: string) {
+    static showInfoToast(message: string) { 
         toast.info(message, {
             position: toast.POSITION.TOP_RIGHT
         });
