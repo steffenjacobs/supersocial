@@ -77,4 +77,9 @@ export class SnippetManager {
             return { name: decodeURIComponent(split[0]), value: decodeURIComponent(split[1]) }
         })
     }
+
+    /** Creates a confluence URL from the given title. */
+    static createConfluenceLink(title: string) {
+        return `https://confluence.supersocial.cloud/display/SP/${title}`;
+    }
 }

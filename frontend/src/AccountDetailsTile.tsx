@@ -366,9 +366,9 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                             {platformSaveButton}
                         </div>
                         {
-                            this.state.account.platformId && this.state.account.platformId === 1 ? this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Facebook+Page") :
+                            this.state.account.platformId && this.state.account.platformId === 1 ? this.createInfo(SnippetManager.createConfluenceLink("Connecting+with+a+Facebook+Page")) :
                                 (this.state.account.platformId === 2 &&
-                                    this.createInfo("https://confluence.supersocial.cloud/display/SP/Connecting+with+a+Twitter+Account"))
+                                    this.createInfo(SnippetManager.createConfluenceLink("Connecting+with+a+Twitter+Account")))
                         }
                     </div>
                     <div className="displayName display-name-bold inline-block">Credentials: </div>
