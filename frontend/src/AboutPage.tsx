@@ -34,10 +34,10 @@ export class AboutPage extends React.Component<any, AboutState> {
         return (
             <div className="about-container">
                 <h1>Supersocial by </h1>
-                <AboutTile name="Steffen Jacobs" role="Project Manager and Lead Developer" twitterHandle="Steffen_Jacobs_" facebookHandle="steffen.jacobs.796" linkedinHandle="steffen-jacobs" xingHandle="Steffen_Jacobs7" githubHandle="steffenjacobs" description="Hi, I'm Steffen. I am a consultant and software engineer and work on all sorts of interesting private and professional projects. I lead this project and also contributed most of the initial source code. I love to work with recent technologies and learn new stuff." imageUrl="team/steffen.JPG" />
+                <AboutTile name="Steffen Jacobs" role="Product Owner and Lead Developer" tiktokHandle="steffen.jacobs" instagramHandle="steffen16378" twitterHandle="Steffen_Jacobs_" facebookHandle="steffen.jacobs.796" linkedinHandle="steffen-jacobs" xingHandle="Steffen_Jacobs7" githubHandle="steffenjacobs" description="Hi, I'm Steffen. I am a consultant and software engineer and work on all sorts of interesting private and professional entrepreneurial projects. I love to work with likeminded individuals who have a faible for recent technologies and learning new stuff. If you'd like to work with us and have the required entrepreneurial sprit, feel free to message me." imageUrl="team/steffen.JPG" />
                 <AboutTile name="Sebastian Hädrich" role="Frontend Developer" description="This is me!" imageUrl="team/placeholder.svg" />
                 <AboutTile name="Thomas Kruse" role="Developer" description="This is me!" imageUrl="team/placeholder.svg" />
-                <div>Product version: {this.state.version}</div>
+                <div>Product version: Supersocial v{this.state.version}</div>
             </div>
         );
     }

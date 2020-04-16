@@ -41,3 +41,13 @@
     justify-content: space-between;
     height: 10em;
 }
+
+.about-icon{
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.about-icon>svg{
+    width: 1.5em;
+    height: 1.5em;
+}
