@@ -39,11 +39,11 @@ export class LandingPage extends React.Component<any, any>{
                 </div>
 
                 <div className="landing-box">
-                    <h3 className="landing-h3">Gain new insides from your customer's perspective</h3>
+                    <h3 className="landing-h3">Gain new insights from your customer's perspective</h3>
                     <h4 className="landing-h4">Use our AI-based sentiment analysis system to visualize the customer's reaction to your efforts in real time.</h4>
                     <div>
                         <div className="landing-img-container"><img alt="Gain new insides" src="frontpage/gain-new-insides.jpg" /></div>
-                        <div className="landing-txt-container">Our advanced interactive data-driven analytics dashboards help you to understand how your customer <b>really</b> thinks about you. Supersocial helps to channel and identify key issues to get you the feedback you need, anticipate customer needs, deepen customer relationships and improve the whole experience for your customers. Because customers tell you everything you need to know <i>all the time.</i></div>
+                        <div className="landing-txt-container">Our advanced interactive data-driven analytics dashboards help you to understand how your customers <b>really</b> thinks about you. Supersocial helps to channel and identify key issues to get you the feedback you need, anticipate customer needs, deepen customer relationships and improve the whole experience for your customers. Because customers tell you everything you need to know <i>all the time.</i></div>
                     </div>
                 </div>
 

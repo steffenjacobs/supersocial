@@ -26,7 +26,7 @@ export class AboutTile extends React.Component<ProjectMemberProps>{
                     <div className="about-entry-left-inner">
                         <div className="about-entry-description">{this.props.description}</div>
                         <div >
-                            {(this.props.twitterHandle || this.props.facebookHandle || this.props.linkedinHandle || this.props.xingHandle || this.props.githubHandle || this.props.instagramHandle ||this.props.tiktokHandle) && <span className="about-entry-socialmediatext">Follow me on social media:</span>}
+                            {(this.props.twitterHandle || this.props.facebookHandle || this.props.linkedinHandle || this.props.xingHandle || this.props.githubHandle || this.props.instagramHandle ||this.props.tiktokHandle) && <span className="about-entry-socialmediatext">Connect with me on social media:</span>}
                             {this.props.twitterHandle && <a target="_blank" rel="noopener noreferrer" className="about-entry-socialmedia-icon" href={"https://twitter.com/" + this.props.twitterHandle}>{ImageProvider.getSocialmediaIcon(2)}</a>}
                             {this.props.facebookHandle && <a target="_blank" rel="noopener noreferrer" className="about-entry-socialmedia-icon" href={"https://facebook.com/" + this.props.facebookHandle}>{ImageProvider.getSocialmediaIcon(1)}</a>}
                             {this.props.linkedinHandle && <a target="_blank" rel="noopener noreferrer" className="about-entry-socialmedia-icon" href={"https://www.linkedin.com/in/" + this.props.linkedinHandle}>{ImageProvider.getSocialmediaIcon(3)}</a>}
