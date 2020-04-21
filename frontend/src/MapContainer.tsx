@@ -33,7 +33,7 @@ export class MapContainer extends React.Component<MapProps, MapState>{
     let lng = props.loginManager.getLoginStatus().config.find(x => x.descriptor === "user.longitude")?.value;
     this.state = { location: loc, zoom: 5, lat: lat ? Number(lat) : 50, lng: lng ? Number(lng) : 10, changed: false };
     props.eventBus.register(EventBusEventType.USER_CHANGE, (e, u) => this.refreshState(u));
-    L.Icon.Default.imagePath="icons/map/";
+    L.Icon.Default.imagePath = "icons/map/";
   }
 
   /** Called when the user clicks on the map to update the pin. */
@@ -87,7 +87,7 @@ export class MapContainer extends React.Component<MapProps, MapState>{
       <div className="container double-container inline-block">
         <div className="box-header">
           Select your Location
-                </div>
+        </div>
         <div className="box-content">
           {this.state.refreshing ? <div>Refreshing your current location...</div> : <span>
             <div className="displayName display-name-bold inline-block">Your currently selected location:&nbsp;</div>

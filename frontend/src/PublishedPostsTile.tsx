@@ -167,8 +167,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                 const allowedActions = (
                     <div className="inline-block">
                         <span className="table-icon">
-                            <span onClick={() => this.selectPost(elem)}>{ImageProvider.getImage("edit")}
-                            </span>
+                            <span onClick={() => this.selectPost(elem)}>{ImageProvider.getImage("edit")}</span>
                         </span>
                         <span className="table-icon table-icon-del">
                             <span className="tooltip" onClick={() => this.deletePostLink(elem)} >{ImageProvider.getImage("none")}{ImageProvider.getImage("linked")}
