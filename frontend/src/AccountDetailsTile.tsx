@@ -314,7 +314,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                 : <input className="credential-field textarea monospace-font" onChange={o => this.updateStateIfNecessary("value", o.currentTarget.id, o.currentTarget.value)} id={"value_" + cred.id} type="text" value={cred.value} />;
 
             //save button: is omitted if no change occured.
-            const saveButton = cred.omitted ? undefined : <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveCredential(cred.id)}>{ImageProvider.getImage("save-icon")}</div>;
+            const saveButton = cred.omitted ? undefined : <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveCredential(cred.id)}>{ImageProvider.getImage("save")}</div>;
             return (
                 <div key={cred.id} className="box-content">
                     <div className="credential">
@@ -332,8 +332,8 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
         });
 
         //save buttons for display name and platform which are only visible if there were changes.
-        const displayNameSaveButton = this.state.displayNameLastSaved !== this.state.account.displayName && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save-icon")}</div>;
-        const platformSaveButton = this.state.platformIdLastSaved !== this.state.account.platformId && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save-icon")}</div>;
+        const displayNameSaveButton = this.state.displayNameLastSaved !== this.state.account.displayName && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save")}</div>;
+        const platformSaveButton = this.state.platformIdLastSaved !== this.state.account.platformId && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveAccountDetails()}>{ImageProvider.getImage("save")}</div>;
         return (
             <div className="container double-container container-top-margin" >
                 <div className="box-header box-header-with-icon">
@@ -344,7 +344,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                         </span>}</div>
                     <div>
                         <div className="btn btn-icon btn-add btn-header" onClick={(_e) => this.addCredential()}>
-                            <div className="align-middle">{ImageProvider.getImage("add-icon")}<span className="btn-header-text">Add Credential</span></div>
+                            <div className="align-middle">{ImageProvider.getImage("add")}<span className="btn-header-text">Add Credential</span></div>
                         </div>
                         <div className="btn-small inline-block align-middle" onClick={this.close.bind(this)}>✖︎</div>
                     </div>

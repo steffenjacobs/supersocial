@@ -5,9 +5,9 @@ export class ImageProvider {
     /** @returns a social media icon for a given platform identifier. */
     static getSocialmediaIcon(platformId: number) {
         if (platformId === 1) {
-            return ImageProvider.getImage("facebook-logo");
+            return ImageProvider.getImage("facebook");
         } else if (platformId === 2) {
-            return ImageProvider.getImage("twitter-logo");
+            return ImageProvider.getImage("twitter");
         } else if (platformId === 3) {
             return ImageProvider.getImage("linkedin");
         } else if (platformId === 4) {
@@ -34,7 +34,7 @@ export class ImageProvider {
         switch (id) {
 
             //Facebook Logo
-            case "facebook-logo":
+            case "facebook":
                 return <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                     viewBox="0 0 266.893 266.895">
                     <path id="Blue_1_" fill="#3C5A99" d="M248.082,262.307c7.854,0,14.223-6.369,14.223-14.225V18.812
@@ -46,7 +46,7 @@ export class ImageProvider {
                 </svg>;
 
             //Twitter Logo
-            case "twitter-logo": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED"
+            case "twitter": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED"
                 data-name="Logo — FIXED" viewBox="90 90 240 240">
                 <path fill="#1da1f2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23" />
             </svg>;
@@ -112,7 +112,7 @@ export class ImageProvider {
             </svg>;
 
             //Home Icon
-            case "home-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "home": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1em" height="1em" viewBox="0 0 1280.000000 1206.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -138,7 +138,7 @@ export class ImageProvider {
             </svg>;
 
             //Info Icon
-            case "info-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "info": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1em" height="1em" viewBox="0 0 1280.000000 1280.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -171,7 +171,7 @@ export class ImageProvider {
             </svg>;
 
             //Settings Icon
-            case "settings-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "settings": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1em" height="1em" viewBox="0 0 1280.000000 1280.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -229,7 +229,7 @@ export class ImageProvider {
             </svg>;
 
             //Save Icon
-            case "save-icon": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 17 17" width="1.5em" height="1.5em">
+            case "save": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 17 17" width="1.5em" height="1.5em">
                 <defs><clipPath><rect width="1.5em" height="1.5em" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><path d="m0 706.47h1490.93v-706.47h-1490.93v706.47" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><path d="m22.2 686.12h1447.73v-667.19h-1447.73v667.19" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath></defs>
                 <g transform="matrix(.0393 0 0 .0393 3 2.998)">
                     <path d="m402.12 84.01l-79.03-79.03c-3.189-3.189-7.514-4.981-12.03-4.981h-294.06c-9.392 0-17 7.614-17 17v373.09c0 9.392 7.613 17 17 17h373.09c9.392 0 17-7.613 17-17v-294.06c0-4.509-1.791-8.835-4.981-12.02m-101.45 79.56h-233.53v-124.7h233.53v124.7" /><path d="m214.05 148.16h43.08c3.131 0 5.668-2.538 5.668-5.669v-82.907c0-3.13-2.537-5.668-5.668-5.668h-43.08c-3.131 0-5.668 2.538-5.668 5.668v82.907c0 3.131 2.537 5.669 5.668 5.669" />
@@ -237,7 +237,7 @@ export class ImageProvider {
             </svg>
 
             //Add Icon
-            case "add-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "add": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1.5em" height="1.5em" viewBox="0 0 1267.000000 1280.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>

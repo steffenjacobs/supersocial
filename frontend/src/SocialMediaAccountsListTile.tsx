@@ -69,10 +69,10 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
     /** @returns a social media icon for a given platform identifier. */
     private getSocialmediaIcon(platformId: number) {
         if (platformId === 1) {
-            return ImageProvider.getImage("facebook-logo");
+            return ImageProvider.getImage("facebook");
         }
         else if (platformId === 2) {
-            return ImageProvider.getImage("twitter-logo");
+            return ImageProvider.getImage("twitter");
         }
         else {
             return ImageProvider.getImage("none-logo");
@@ -187,7 +187,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                         <div className="inline-block">All Accounts</div>
                         <div>
                             <div className="btn btn-icon btn-add btn-header font6" onClick={(_e) => this.addAccount()}>
-                                <div className="align-middle">{ImageProvider.getImage("add-icon")}<span className="btn-header-text">Add Account</span></div>
+                                <div className="align-middle">{ImageProvider.getImage("add")}<span className="btn-header-text">Add Account</span></div>
                             </div>
                             <div
                                 className={classUpdating.join(" ")}

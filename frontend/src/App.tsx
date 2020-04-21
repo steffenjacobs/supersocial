@@ -43,7 +43,7 @@ class App extends React.Component<any> {
       page: <MessageOverview eventBus={this.eventBus} loginManager={this.loginManager} />,
       selected: true,
       id: 0,
-      icon: ImageProvider.getImage("home-icon"),
+      icon: ImageProvider.getImage("home"),
       path: "/overview"
     }, {
       id: 1,
@@ -55,13 +55,13 @@ class App extends React.Component<any> {
       id: 2,
       title: 'Settings',
       page: <SettingsPage eventBus={this.eventBus} loginManager={this.loginManager} />,
-      icon: ImageProvider.getImage("settings-icon"),
+      icon: ImageProvider.getImage("settings"),
       path: "/settings"
     }, {
       id: 3,
       title: 'About',
       page: <AboutPage />,
-      icon: ImageProvider.getImage("info-icon"),
+      icon: ImageProvider.getImage("info"),
       path: "/about"
     }];
 
