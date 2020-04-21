@@ -65,9 +65,6 @@ class App extends React.Component<any> {
       path: "/about"
     }];
 
-    const routes = components.forEach(c => {
-      return <Route path={c.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, c.id) : <Redirect to={"/login?redirect=" + encodeURIComponent(c.path)} />} />;
-    });
     // /login -> go to Login Page
     // everything else -> Go to Supersocial application
     return (
@@ -75,10 +72,7 @@ class App extends React.Component<any> {
         <Switch>
           <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />
           <Route path="/login" render={(props) => <Login eventBus={this.eventBus} loginManager={this.loginManager} params={props.location.search} />} />
-          <Route path="/overview" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 0) : <Redirect to={"/login?redirect=" + encodeURIComponent("/overview")} />} />
-          <Route path="/analytics" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 1) : <Redirect to={"/login?redirect=" + encodeURIComponent("/analytics")} />} />
-          <Route path="/settings" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 2) : <Redirect to={"/login?redirect=" + encodeURIComponent("/settings")} />} />
-          <Route path="/about" render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, 3) : <Redirect to={"/login?redirect=" + encodeURIComponent("/about")} />} />
+          {components.map((component, idx) => <Route path={component.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, idx) : <Redirect to={"/login?redirect=" + encodeURIComponent(component.path)} />} />)}
           <Route path="/privacy" render={(props) => <DataPrivacyPage />} />
           <Route path="/" render={(props) => <LandingPage />} />
         </Switch>
