@@ -75,7 +75,9 @@ export class TrendingTile extends React.Component<TrendingTileProps, TrendingTil
         return (
             <div className="container dynamic-container inline-block">
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block">Trending Topics for {locationName} {locationName==="Global"&&SnippetManager.createInfo(SnippetManager.createConfluenceLink("Select+your+Location"), "","","To select a different location, go to the settings.", "fontsize6")}</div>
+                    <div className="inline-block">
+                        Trending Topics for {locationName} {locationName === "Global" && SnippetManager.createInfo(SnippetManager.createConfluenceLink("Select+your+Location"), "", [], "To select a different location, go to the settings.", ["fontsize6"])}
+                    </div>
                     <div
                         className={classUpdating.join(" ")}
                         onClick={e => this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocation(this.props.loginManager).woeid)}

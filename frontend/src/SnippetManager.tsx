@@ -11,9 +11,9 @@ export interface Param {
 export class SnippetManager {
 
     /**Create an info message with a documentation link and a tooltip. */
-    static createInfo(url: string, text: string, cssClasses?: string, tooltip?: string, cssClassesToolTipText?: string) {
-        const className = "tooltip " + cssClasses;
-        const classNameText = "tooltiptext " + cssClassesToolTipText;
+    static createInfo(url: string, text: string, cssClasses?: string[], tooltip?: string, cssClassesToolTipText?: string[]) {
+        const className = "tooltip " + cssClasses?.join(" ");
+        const classNameText = "tooltiptext " + cssClassesToolTipText?.join(" ");
         return <span className={className}>
             {text}
             {text && <span><a target="blank" href={url}>here</a>.&nbsp;</span>}
@@ -23,8 +23,8 @@ export class SnippetManager {
     }
 
     /**Create an info message with a documentation link without a tooltip. */
-    static createInfoWithoutTooltip(url: string, text: string, cssClasses?: string) {
-        const className = "" + cssClasses;
+    static createInfoWithoutTooltip(url: string, text: string, cssClasses?: string[]) {
+        const className = "" + cssClasses?.join(" ");
         return <span className={className}>
             {text}
             {text && <span><a target="blank" href={url}>here</a>.&nbsp;</span>}
