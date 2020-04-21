@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { ImageProvider } from "./ImageProvider";
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
 import { URLSearchParams } from "url";
@@ -28,7 +28,7 @@ export class SnippetManager {
         const className = "" + cssClasses?.join(" ");
         return <span className={className}>
             {text}
-            {text && <span><a target="blank" href={url}>here</a>.&nbsp;</span>}
+            {text && <Fragment><a target="blank" href={url}>here</a>.&nbsp;</Fragment>}
             <a target="blank" href={url}>{ImageProvider.getImage("info-text")}</a>
         </span>
     }
