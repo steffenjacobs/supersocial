@@ -21,7 +21,7 @@ interface LoginCredentials {
 export class Login extends React.Component<LoginProps, LoginCredentials> {
     constructor(props: LoginProps) {
         super(props);
-        let redirect = SnippetManager.findUrlParam(props.params, "redirect");
+        let redirect = new URLSearchParams(props.params).get("redirect");
         this.state = { username: "", password: "", loggedIn: props.loginManager.isLoggedIn(), redirect: redirect ? redirect : "overview" };
         props.eventBus.register(EventBusEventType.USER_CHANGE, (eventType, eventData?) => this.onUserChange(eventData));
     }
