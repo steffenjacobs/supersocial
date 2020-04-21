@@ -101,10 +101,10 @@ export class MapContainer extends React.Component<MapProps, MapState>{
               />
               <Marker position={this.state}>
                 <Popup>
-                  <b>Your {this.state.changed ? "previously " : ""} selected location:</b><br /><br />
+                  <b>Your {this.state.changed && "previously "} selected location:</b><br /><br />
                   {this.state.location.name} ({this.state.location.placeType.name})<br />
                   {this.state.location.country}
-                  {this.state.changed ? (<span><br /><br />Click the <b>save</b> button below to store your updated location.</span>) : ""}
+                  {this.state.changed && <span><br /><br />Click the <b>save</b> button below to store your updated location.</span>}
                 </Popup>
               </Marker>
             </Map>
