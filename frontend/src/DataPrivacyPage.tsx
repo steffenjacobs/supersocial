@@ -8,7 +8,7 @@ export class DataPrivacyPage extends React.Component<any>{
         <div className="landing-site">
             <div className="landing-site-inner">
             <h2 className="landing-h2">Privacy Policy</h2>
-            <button onClick={e => window.open("/", "_self")} className="btn btn-primary landing-btn-header">&#9664; &nbsp; Go back</button>
+            <button onClick={e => window.location.href="/"} className="btn btn-primary landing-btn-header">&#9664; &nbsp; Go back</button>
         <p>We are very delighted that you have shown interest in our enterprise. Data protection is of a particularly high priority for the management of the a. The use of the Internet pages of the a is possible without any indication of personal data; however, if a data subject wants to use special enterprise services via our website, processing of personal data could become necessary. If the processing of personal data is necessary and there is no statutory basis for such processing, we generally obtain consent from the data subject.</p>
         
         <p>The processing of personal data, such as the name, address, e-mail address, or telephone number of a data subject shall always be in line with the General Data Protection Regulation (GDPR), and in accordance with the country-specific data protection regulations applicable to the a. By means of this data protection declaration, our enterprise would like to inform the general public of the nature, scope, and purpose of the personal data we collect, use and process. Furthermore, data subjects are informed, by means of this data protection declaration, of the rights to which they are entitled.</p>

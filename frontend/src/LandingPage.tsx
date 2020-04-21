@@ -15,7 +15,7 @@ export class LandingPage extends React.Component<any, any>{
                     <div className="landing-header-elem landing-btn-wrapper">
                         <div className="landing-header-text">Welcome to a new world of data-driven and AI-based social media marketing.</div>
                         <div className="landing-flex-center">
-                            <button onClick={e => window.open("/register", "_self")} className="btn btn-primary landing-btn-header">Explore now &nbsp;&#9654;</button>
+                            <button onClick={e => window.location.href="/register"} className="btn btn-primary landing-btn-header">Explore now &nbsp;&#9654;</button>
                         </div>
                     </div>
                 </div>
