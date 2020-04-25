@@ -1,6 +1,6 @@
 package me.steffenjacobs.supersocial.persistence.exception;
 
-import me.steffenjacobs.supersocial.persistence.SystemConfigurationManager;
+import me.steffenjacobs.supersocial.persistence.SystemConfigurationManagerImpl;
 
 /**
  * Should be fired if a system configuration of a specific type does not exist.
@@ -10,7 +10,7 @@ import me.steffenjacobs.supersocial.persistence.SystemConfigurationManager;
 public class SystemConfigurationNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = -5940797324238159301L;
 
-	public SystemConfigurationNotFoundException(SystemConfigurationManager.SystemConfigurationType type) {
+	public SystemConfigurationNotFoundException(SystemConfigurationManagerImpl.SystemConfigurationType type) {
 		super(String.format("No System Configuration with descriptor '%s' could be not found.", type.getDescriptor()));
 	}
 }
