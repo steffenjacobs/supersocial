@@ -93,9 +93,17 @@
 .landing-img-container>img{
     width: 40em;
 }
+.landing-img-container-small>img{
+    width: 10em;
+}
 
 .landing-txt-container {
     width: 20em;
     display: inline-block;
     vertical-align: top;
+    text-align: left;
+}
+
+.landing-content-container{
+    text-align: center;
 }
