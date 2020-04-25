@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.AccessControlListRepository;
 import me.steffenjacobs.supersocial.domain.StandaloneUserRepository;
@@ -26,6 +28,9 @@ import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.StandaloneUser;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
+import me.steffenjacobs.supersocial.security.exception.InvalidEmailException;
+import me.steffenjacobs.supersocial.security.exception.InvalidPasswordException;
+import me.steffenjacobs.supersocial.security.exception.InvalidUsernameException;
 import me.steffenjacobs.supersocial.security.exception.UserAlreadyExistsException;
 
 /**
@@ -37,6 +42,9 @@ import me.steffenjacobs.supersocial.security.exception.UserAlreadyExistsExceptio
  */
 @Component
 public class UserService implements UserDetailsService {
+
+	private static final Pattern EMAIL_PATTERN = Pattern.compile(
+			"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 
 	@Autowired
 	private StandaloneUserRepository standaloneUserRepository;
@@ -76,6 +84,19 @@ public class UserService implements UserDetailsService {
 	 *             another user.
 	 */
 	public CurrentUserDTO registerNewUser(String displayName, String password, String email) {
+
+		if (StringUtils.isEmpty(displayName)) {
+			throw new InvalidUsernameException(displayName);
+		}
+
+		if (StringUtils.isEmpty(password)) {
+			throw new InvalidPasswordException();
+		}
+
+		if (StringUtils.isEmpty(email) || !EMAIL_PATTERN.matcher(email).matches()) {
+			throw new InvalidEmailException(password);
+		}
+
 		if (supersocialUserRepository.findByName(displayName).isPresent()) {
 			throw new UserAlreadyExistsException(displayName);
 		}
@@ -84,6 +105,7 @@ public class UserService implements UserDetailsService {
 		user.setEmail(email);
 		user.setPassword(bCryptPasswordEncoder.encode(password));
 		user.setDisplayName(displayName);
+		user.setActive(1);
 		user = standaloneUserRepository.save(user);
 
 		// create Supersocial user
@@ -199,7 +221,7 @@ public class UserService implements UserDetailsService {
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		SupersocialUser user = supersocialUserRepository.findByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
-		// TODO: user SSO user if user.loginProvider is not set to standalone.
+		// TODO: use SSO user if user.loginProvider is not set to standalone.
 		StandaloneUser sUser = standaloneUserRepository.findById(UUID.fromString(user.getExternalId())).orElseThrow(() -> new UsernameNotFoundException(username));
 		return new User(user.getName(), sUser.getPassword(), new HashSet<>());
 	}
