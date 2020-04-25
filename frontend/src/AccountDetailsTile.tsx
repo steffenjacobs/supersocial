@@ -197,50 +197,45 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
 
     /**Update the current state of a given property without persisting it to the backend. */
     private updateProperty(id: string, value: string) {
-        if (id === "displayName") {
-            this.setState({
-                account: {
-                    credentials: this.state.account.credentials,
-                    id: this.state.account.id,
-                    platformId: this.state.account.platformId,
-                    displayName: value,
-                    error: this.state.account.error
-                }
-            });
-        } else if (id === "platformId") {
-            this.setState({
-                account: {
-                    credentials: this.state.account.credentials,
-                    id: this.state.account.id,
-                    platformId: Number.parseInt(value),
-                    displayName: this.state.account.displayName,
-                    error: this.state.account.error
-                }
-            });
-        }
+        return new Promise((resolve, reject) => {
+            if (id === "displayName") {
+                this.setState({
+                    account: {
+                        credentials: this.state.account.credentials,
+                        id: this.state.account.id,
+                        platformId: this.state.account.platformId,
+                        displayName: value,
+                        error: this.state.account.error
+                    }
+                }, resolve);
+            } else if (id === "platformId") {
+                this.setState({
+                    account: {
+                        credentials: this.state.account.credentials,
+                        id: this.state.account.id,
+                        platformId: Number.parseInt(value),
+                        displayName: this.state.account.displayName,
+                        error: this.state.account.error
+                    }
+                }, resolve);
+            }
+        });
     }
 
     /** Realize a template of credentials necessary to integrate a given social media platform. */
-    private prepareCredentials(platformId: string) {
+    private async prepareCredentials(platformId: string) {
         if (platformId === "1") {
-            SnippetManager.asyncReduceFn([
-                this.addCredentialIfNotPresent.bind(this, "facebook.page.id"),
-                this.addCredentialIfNotPresent.bind(this, "facebook.page.accesstoken"),
-                this.updateProperty.bind(this, "platformId", platformId),
-            ]);
+            await this.addCredentialIfNotPresent("facebook.page.id");
+            await this.addCredentialIfNotPresent("facebook.page.accesstoken");
         }
         else if (platformId === "2") {
-            SnippetManager.asyncReduceFn([
-                this.addCredentialIfNotPresent.bind(this, "twitter.api.accountname"),
-                this.addCredentialIfNotPresent.bind(this, "twitter.api.key"),
-                this.addCredentialIfNotPresent.bind(this, "twitter.api.secret"),
-                this.addCredentialIfNotPresent.bind(this, "twitter.api.accesstoken"),
-                this.addCredentialIfNotPresent.bind(this, "twitter.api.accesstoken.secret"),
-                this.updateProperty.bind(this, "platformId", platformId),
-            ]);
-        } else {
-            this.updateProperty("platformId", platformId);
+            await this.addCredentialIfNotPresent("twitter.api.accountname");
+            await this.addCredentialIfNotPresent("twitter.api.key");
+            await this.addCredentialIfNotPresent("twitter.api.secret");
+            await this.addCredentialIfNotPresent("twitter.api.accesstoken");
+            await this.addCredentialIfNotPresent("twitter.api.accesstoken.secret");
         }
+        this.updateProperty("platformId", platformId);
     }
 
     /** Update the current state of a given credential without persisting it to the backend. */
@@ -275,18 +270,21 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
     /** Insert a new credential with a given descriptor if none is already present. 
      * Used to insert template credentials for social media platforms without duplication.
      */
-    private addCredentialIfNotPresent(descriptor: string, resolve: () => void, reject: () => void) {
-        if (this.state.account.credentials.filter(c => c.descriptor === descriptor).length === 0) {
-            this.addCredential(descriptor, resolve, reject);
-        } else {
-            resolve();
-        }
+    private addCredentialIfNotPresent(descriptor) {
+        return new Promise((resolve, reject) => {
+            if (!this.state.account.credentials.filter(c => c.descriptor === descriptor).length) {
+                this.addCredential(descriptor, resolve, reject);
+            } else {
+                resolve();
+            }
+        });
     }
 
     /**Add a credential to a social media account without persisting it to the backend. */
     private addCredential(descriptor?: string, resolve?: () => void, reject?: () => void) {
         const newCreds = Object.assign([], this.state.account.credentials);
         newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
+        console.log(newCreds);
         this.setState({
             account: {
                 credentials: newCreds,
