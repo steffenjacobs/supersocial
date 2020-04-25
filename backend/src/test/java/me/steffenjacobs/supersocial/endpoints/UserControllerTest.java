@@ -15,14 +15,18 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
+import me.steffenjacobs.supersocial.domain.dto.LocationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
 import me.steffenjacobs.supersocial.domain.entity.LoginProvider;
+import me.steffenjacobs.supersocial.domain.entity.UserConfigurationType;
 
 /** @author Steffen Jacobs */
+@ActiveProfiles({ "systemConfigurationMock", "twitterServiceMock" })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class UserControllerTest {
 
@@ -39,6 +43,55 @@ public class UserControllerTest {
 		String sessionCookie = loginUser(userDto);
 		Assertions.assertTrue(sessionCookie.startsWith("JSESSIONID="));
 		assertUserInfo(userDto, getUserInfo(sessionCookie));
+	}
+
+	@Test
+	void updateLocation() {
+		String sessionCookie = registerAndLogin();
+		LocationDTO location = new LocationDTO();
+		location.setLatitude(1.2);
+		location.setLongitude(2.1);
+		LocationDTO updated = updateUserLocation(sessionCookie, location);
+
+		// check if immediate result is correct
+		Assertions.assertEquals(location.getLatitude(), updated.getLatitude());
+		Assertions.assertEquals(location.getLongitude(), updated.getLongitude());
+		Assertions.assertNotNull(updated.getLocationName());
+		Assertions.assertNull(updated.getError());
+
+		// check if configuration was appended to user settings as expected
+		CurrentUserDTO dto = getUserInfo(sessionCookie);
+		Assertions.assertNotNull(dto.getConfig());
+		Assertions.assertEquals(3, dto.getConfig().size());
+
+		dto.getConfig().forEach(config -> {
+			if (UserConfigurationType.Latitude.getKey().equals(config.getDescriptor())) {
+				Assertions.assertEquals(location.getLatitude(), Double.parseDouble(config.getValue()));
+			} else if (UserConfigurationType.Longitude.getKey().equals(config.getDescriptor())) {
+				Assertions.assertEquals(location.getLongitude(), Double.parseDouble(config.getValue()));
+
+			} else if (UserConfigurationType.Location.getKey().equals(config.getDescriptor())) {
+				Assertions.assertNotNull(config.getValue());
+			} else {
+				Assertions.fail("Unexpected configuration descriptor.");
+			}
+			Assertions.assertNull(config.getError());
+		});
+	}
+
+	private LocationDTO updateUserLocation(String sessionCookie, LocationDTO location) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("Cookie", sessionCookie);
+		HttpEntity<LocationDTO> updateUserLocationRequest = new HttpEntity<>(location, headers);
+		ResponseEntity<LocationDTO> response = restTemplate.exchange(getBaseUrlWithPort() + "/api/user/location", HttpMethod.PUT, updateUserLocationRequest, LocationDTO.class);
+		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+		return response.getBody();
+	}
+
+	private String registerAndLogin() {
+		final UserRegistrationDTO user = createUserRegistrationDto();
+		registerUser(user);
+		return loginUser(user);
 	}
 
 	private String getBaseUrlWithPort() {
