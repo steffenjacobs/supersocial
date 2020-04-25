@@ -1,6 +1,7 @@
 import React from "react";
 import './LandingPage.css';
 import './UiElements.css';
+import { Footer } from "./Footer";
 
 
 export class LandingPage extends React.Component<any, any>{
@@ -83,6 +84,7 @@ export class LandingPage extends React.Component<any, any>{
                     </div>
 
                 </div>
+                <Footer/>
             </div >
         </div>
     }

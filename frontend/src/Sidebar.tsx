@@ -3,6 +3,7 @@ import './Sidebar.css';
 import { LoginManager } from "./LoginManager";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Footer } from "./Footer";
 
 export interface PageComponents {
     components: PageComponent[]
@@ -101,7 +102,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
                         Hello {this.state.loginManager.getLoginStatus().username}!
                     </div>
                 </div>
-                <div className="navbar-page">{selectedComponent?.page}</div>
+                <div className="navbar-page">{selectedComponent?.page}<div className="navbar-footer-container"><Footer/></div></div>
             </div>
         );
     }

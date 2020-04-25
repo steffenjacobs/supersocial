@@ -1,7 +1,6 @@
 import React, { Fragment } from "react";
 import { ImageProvider } from "./ImageProvider";
 import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
-import { URLSearchParams } from "url";
 
 export interface Param {
     name: string

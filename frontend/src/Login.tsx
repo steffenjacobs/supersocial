@@ -2,7 +2,6 @@ import React from "react";
 import { EventBus, EventBusEventType } from "./EventBus";
 import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
-import { SnippetManager } from "./SnippetManager";
 
 export interface LoginProps {
     eventBus: EventBus
