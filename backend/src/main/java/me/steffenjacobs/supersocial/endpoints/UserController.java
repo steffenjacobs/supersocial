@@ -18,6 +18,7 @@ import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
 import me.steffenjacobs.supersocial.domain.dto.LocationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserConfigurationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
+import me.steffenjacobs.supersocial.persistence.exception.SystemConfigurationNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.security.UserService;
 import me.steffenjacobs.supersocial.security.exception.UserAlreadyExistsException;
@@ -98,6 +99,8 @@ public class UserController {
 			return new ResponseEntity<LocationDTO>(userConfigurationService.updateUserLocation(userLocation), HttpStatus.OK);
 		} catch (TwitterException e) {
 			return new ResponseEntity<>(new LocationDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (SystemConfigurationNotFoundException e) {
+			return new ResponseEntity<>(new LocationDTO("System Twitter account is not configured properly."), HttpStatus.INTERNAL_SERVER_ERROR);			
 		}
 	}
 }
