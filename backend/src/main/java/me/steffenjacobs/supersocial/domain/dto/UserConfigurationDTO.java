@@ -12,7 +12,7 @@ public class UserConfigurationDTO implements WithErrorDTO {
 		this.error = error;
 	}
 
-	private UserConfigurationDTO() {
+	public UserConfigurationDTO() {
 	}
 
 	public String getDescriptor() {

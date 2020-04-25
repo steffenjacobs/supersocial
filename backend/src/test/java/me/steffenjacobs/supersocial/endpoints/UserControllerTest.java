@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 
 import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
 import me.steffenjacobs.supersocial.domain.dto.LocationDTO;
+import me.steffenjacobs.supersocial.domain.dto.UserConfigurationDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
 import me.steffenjacobs.supersocial.domain.entity.LoginProvider;
 import me.steffenjacobs.supersocial.domain.entity.UserConfigurationType;
@@ -77,6 +78,54 @@ public class UserControllerTest {
 			}
 			Assertions.assertNull(config.getError());
 		});
+	}
+
+	@Test
+	void crudUserConfiguration() {
+		String sessionCookie = registerAndLogin();
+
+		UserConfigurationDTO config = new UserConfigurationDTO();
+		config.setDescriptor("test-descriptor");
+		config.setValue("test-value");
+
+		// create new config object
+		UserConfigurationDTO createdConfig = sendRequest(sessionCookie, config, HttpMethod.PUT, "api/user/config", UserConfigurationDTO.class, HttpStatus.CREATED);
+		assertConfigValid(config, createdConfig);
+
+		UserConfigurationDTO createdConfigRetrieved = getUserInfo(sessionCookie).getConfig().stream().filter(c -> config.getDescriptor().equals(c.getDescriptor())).findFirst()
+				.get();
+		assertConfigValid(config, createdConfigRetrieved);
+
+		// update existing config object
+		config.setValue("test-value-2");
+		UserConfigurationDTO updatedConfig = sendRequest(sessionCookie, config, HttpMethod.PUT, "api/user/config", UserConfigurationDTO.class, HttpStatus.ACCEPTED);
+		assertConfigValid(config, updatedConfig);
+
+		UserConfigurationDTO updatedConfigRetrieved = getUserInfo(sessionCookie).getConfig().stream().filter(c -> config.getDescriptor().equals(c.getDescriptor())).findFirst()
+				.get();
+		assertConfigValid(config, updatedConfigRetrieved);
+
+		// delete existing config object
+		sendRequest(sessionCookie, null, HttpMethod.DELETE, "api/user/config/" + config.getDescriptor(), UserConfigurationDTO.class, HttpStatus.NO_CONTENT);
+		Assertions.assertFalse(getUserInfo(sessionCookie).getConfig().stream().filter(c -> config.getDescriptor().equals(c.getDescriptor())).findFirst().isPresent());
+
+		// attempt to delete again
+		sendRequest(sessionCookie, null, HttpMethod.DELETE, "api/user/config/" + config.getDescriptor(), UserConfigurationDTO.class, HttpStatus.BAD_REQUEST);
+	}
+
+	private void assertConfigValid(UserConfigurationDTO config, UserConfigurationDTO createdConfig) {
+		Assertions.assertNull(createdConfig.getError());
+		Assertions.assertEquals(config.getDescriptor(), createdConfig.getDescriptor());
+		Assertions.assertEquals(config.getValue(), createdConfig.getValue());
+	}
+
+	private <T> T sendRequest(String sessionCookie, T body, HttpMethod method, String uri, Class<T> type, HttpStatus expectedHttpStatusResponse) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("Cookie", sessionCookie);
+		HttpEntity<T> updateUserLocationRequest = new HttpEntity<>(body, headers);
+		ResponseEntity<T> response = restTemplate.exchange(getBaseUrlWithPort() + uri, method, updateUserLocationRequest, type);
+		Assertions.assertEquals(expectedHttpStatusResponse, response.getStatusCode());
+		return response.getBody();
 	}
 
 	private LocationDTO updateUserLocation(String sessionCookie, LocationDTO location) {
