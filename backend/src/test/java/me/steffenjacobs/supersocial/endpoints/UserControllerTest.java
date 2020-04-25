@@ -52,7 +52,7 @@ public class UserControllerTest {
 		LocationDTO location = new LocationDTO();
 		location.setLatitude(1.2);
 		location.setLongitude(2.1);
-		LocationDTO updated = updateUserLocation(sessionCookie, location);
+		LocationDTO updated = sendRequest(sessionCookie, location, HttpMethod.PUT, "/api/user/location", LocationDTO.class, HttpStatus.OK);
 
 		// check if immediate result is correct
 		Assertions.assertEquals(location.getLatitude(), updated.getLatitude());
@@ -128,15 +128,6 @@ public class UserControllerTest {
 		return response.getBody();
 	}
 
-	private LocationDTO updateUserLocation(String sessionCookie, LocationDTO location) {
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Cookie", sessionCookie);
-		HttpEntity<LocationDTO> updateUserLocationRequest = new HttpEntity<>(location, headers);
-		ResponseEntity<LocationDTO> response = restTemplate.exchange(getBaseUrlWithPort() + "/api/user/location", HttpMethod.PUT, updateUserLocationRequest, LocationDTO.class);
-		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-		return response.getBody();
-	}
-
 	private String registerAndLogin() {
 		final UserRegistrationDTO user = createUserRegistrationDto();
 		registerUser(user);
@@ -154,12 +145,7 @@ public class UserControllerTest {
 	}
 
 	private CurrentUserDTO getUserInfo(String sessionCookie) {
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Cookie", sessionCookie);
-		HttpEntity<?> registrationRequest = new HttpEntity<>(headers);
-		ResponseEntity<CurrentUserDTO> response = restTemplate.exchange(getBaseUrlWithPort() + "/api/loginstatus", HttpMethod.GET, registrationRequest, CurrentUserDTO.class);
-		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-		return response.getBody();
+		return sendRequest(sessionCookie, null, HttpMethod.GET, "/api/loginstatus", CurrentUserDTO.class, HttpStatus.OK);
 	}
 
 	private CurrentUserDTO registerUser(UserRegistrationDTO userRegistrationDto) {
