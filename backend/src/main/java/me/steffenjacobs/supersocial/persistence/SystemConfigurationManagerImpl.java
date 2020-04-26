@@ -154,7 +154,7 @@ public class SystemConfigurationManagerImpl implements SystemConfigurationManage
 			// it
 			boolean invalidAcl = true;
 			for (Entry<UserGroup, SecuredAction> e : getSystemAcl().getPermittedActions().entrySet()) {
-				if (securityService.implies(e.getValue(), SecuredAction.UPDATE) && e.getKey().getUsers().size() > 0) {
+				if (securityService.implies(e.getValue(), SecuredAction.UPDATE) && !e.getKey().getUsers().isEmpty()) {
 					invalidAcl = false;
 					break;
 				}
@@ -240,7 +240,7 @@ public class SystemConfigurationManagerImpl implements SystemConfigurationManage
 		SystemConfiguration userConfig = systemConfigurationRepository.findByDescriptor(SystemConfigurationType.TRACKED_TREND_WOEIDS.getDescriptor())
 				.orElseThrow(() -> new SystemConfigurationNotFoundException(SystemConfigurationType.TRACKED_TREND_WOEIDS));
 
-		return Stream.concat(Stream.of(1l), Arrays.stream(userConfig.getValue().split("" + ENCODING_SPLITTER)).map(woeid -> Long.parseLong(woeid)));
+		return Stream.concat(Stream.of(1l), Arrays.stream(userConfig.getValue().split("" + ENCODING_SPLITTER)).map(Long::parseLong));
 	}
 
 	/**
@@ -304,7 +304,7 @@ public class SystemConfigurationManagerImpl implements SystemConfigurationManage
 		if (StringUtils.isEmpty(systemConfiguration.getValue())) {
 			// no values stored before
 			encodedValues = "" + value;
-		} else if (!Arrays.stream(systemConfiguration.getValue().split("" + ENCODING_SPLITTER)).filter(x -> ("" + value).equals(x)).findAny().isPresent()) {
+		} else if (Arrays.stream(systemConfiguration.getValue().split("" + ENCODING_SPLITTER)).noneMatch(x -> ("" + value).equals(x))) {
 			// values stored before -> add this new value
 			encodedValues = systemConfiguration.getValue() + ENCODING_SPLITTER + value;
 		} else {

@@ -36,7 +36,7 @@ public class SocialMediaAccount implements Secured {
 	private Date created;
 
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
-	private Set<Credential> credentials = new HashSet<Credential>();
+	private Set<Credential> credentials = new HashSet<>();
 
 	@OneToOne
 	private AccessControlList accessControlList;

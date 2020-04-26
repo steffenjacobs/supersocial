@@ -283,7 +283,7 @@ public class StatisticService {
 					throw new AnalyticsException(String.format("Error retrieving analytics data: No trending topics for %s yet.", woeid), e);
 				}
 				if (e.getCause().getMessage().contains("json_parse_exception")) {
-					throw new AnalyticsException(String.format("Error retrieving analytics data: Invalid query."), e);
+					throw new AnalyticsException("Error retrieving analytics data: Invalid query.", e);
 				}
 			}
 			throw new AnalyticsException(String.format("Error retrieving analytics data: %s.", e.getMessage()), e);

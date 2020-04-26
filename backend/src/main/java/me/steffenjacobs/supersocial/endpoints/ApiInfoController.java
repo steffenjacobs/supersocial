@@ -43,7 +43,7 @@ public class ApiInfoController {
 	 * @return the current version of the software, read from the maven pom.xml.
 	 */
 	@GetMapping(path = "/api/version", produces = MediaType.APPLICATION_JSON_VALUE)
-	public String getVersion() throws Exception {
+	public String getVersion() {
 		return "{\"version\": \"" + version + "\"}";
 	}
 

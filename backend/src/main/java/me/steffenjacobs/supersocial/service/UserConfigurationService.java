@@ -125,7 +125,7 @@ public class UserConfigurationService {
 		createOrUpdateSetting("" + userLocation.getLatitude(), user, UserConfigurationType.LATITUDE.getKey());
 		createOrUpdateSetting("" + userLocation.getLongitude(), user, UserConfigurationType.LONGITUDE.getKey());
 		createOrUpdateSetting(locationResult, user, UserConfigurationType.LOCATION.getKey());
-		long woeid = Long.valueOf("" + JsonPath.read(locationResult, "$[0].woeid"));
+		long woeid = Long.parseLong("" + JsonPath.read(locationResult, "$[0].woeid"));
 		systemConfigurationManager.appendToTrackedTrendsWoeids(woeid);
 		scheduledTrendingTopicFetcher.fetchTrendingTopic(woeid);
 		userLocation.setLocationName("" +JsonPath.read(locationResult, "$[0].name"));

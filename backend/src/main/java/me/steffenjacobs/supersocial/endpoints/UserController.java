@@ -59,7 +59,7 @@ public class UserController {
 
 	/** @return the login status of the current user. */
 	@GetMapping(path = "/api/loginstatus")
-	public CurrentUserDTO getLoginStatus() throws Exception {
+	public CurrentUserDTO getLoginStatus() {
 		return CurrentUserDTO.fromUser(securityService.getCurrentUser());
 	}
 

@@ -2,7 +2,6 @@ package me.steffenjacobs.supersocial.service;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -74,7 +73,7 @@ public class FacebookService {
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			final HttpResponse httpResponse = httpClient.execute(httpPost);
-			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
+			return IOUtils.toString(httpResponse.getEntity().getContent(), StandardCharsets.UTF_8);
 		}
 	}
 
@@ -90,7 +89,7 @@ public class FacebookService {
 
 		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
 			HttpResponse httpResponse = httpClient.execute(httpGet);
-			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
+			return IOUtils.toString(httpResponse.getEntity().getContent(), StandardCharsets.UTF_8);
 		} catch (IOException e1) {
 			throw new FacebookException("Could not exchange user token for page token", e1);
 		}
