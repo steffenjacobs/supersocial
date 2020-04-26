@@ -114,16 +114,29 @@ public class SystemConfigurationManagerImpl implements SystemConfigurationManage
 			getSystemUser();
 			LOG.info("System user found.");
 		} catch (SystemConfigurationNotFoundException | UsernameNotFoundException e) {
-			String password = (UUID.randomUUID().toString() + UUID.randomUUID().toString()).replace("-", "");
-			CurrentUserDTO user = userService.registerNewUser("systemuser", password, "systemuser@supersocial.cloud");
-			SystemConfiguration systemConfiguration = new SystemConfiguration();
-			systemConfiguration.setDescriptor(SystemConfigurationType.SYSTEM_USER.getDescriptor());
-			systemConfiguration.setValue(user.getId().toString());
-			systemConfiguration = systemConfigurationRepository.save(systemConfiguration);
-			// ACL for configuration object is added on first request because of
-			// a missing context at this point in time.
-			LOG.info("Created a new system user with password '{}'. Write this password down because it will not be displayed again.", password);
+
+			supersocialUserRepository.findByName("systemuser").ifPresentOrElse(user -> {
+				updateSystemUser(user.getId().toString());
+				LOG.info("System user existed but was not properly stored in the configurationS.");
+
+			}, () -> {
+				String password = (UUID.randomUUID().toString() + UUID.randomUUID().toString()).replace("-", "");
+				CurrentUserDTO user = userService.registerNewUser("systemuser", password, "systemuser@supersocial.cloud");
+				updateSystemUser(user.getId().toString());
+				// ACL for configuration object is added on first request
+				// because of
+				// a missing context at this point in time.
+				LOG.info("Created a new system user with password '{}'. Write this password down because it will not be displayed again.", password);
+			});
+
 		}
+	}
+
+	private void updateSystemUser(String userId) {
+		SystemConfiguration systemConfiguration = new SystemConfiguration();
+		systemConfiguration.setDescriptor(SystemConfigurationType.SYSTEM_USER.getDescriptor());
+		systemConfiguration.setValue(userId);
+		systemConfiguration = systemConfigurationRepository.save(systemConfiguration);
 	}
 
 	/**
