@@ -8,7 +8,7 @@ import { Footer } from "./Footer";
 export interface PageComponents {
     components: PageComponent[]
     loginManager: LoginManager
-    selected: number
+    selected: PageComponent
 }
 
 export interface PageComponent {
@@ -29,14 +29,14 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
     }
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
-    private setActivePage(pageId: number, notMounted?: boolean) {
+    private setActivePage(elem: PageComponent, notMounted?: boolean) {
         var newComponents: PageComponent[] = [];
         for (let c = 0; c < this.state.components.length; c++) {
             let comp = this.state.components[c];
-            if (comp.selected && comp.id !== pageId) {
+            if (comp.selected && comp.id !== elem.id) {
                 newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, path: comp.path })
             }
-            else if (comp.id === pageId) {
+            else if (comp.id === elem.id) {
                 newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, selected: true, path: comp.path })
             } else {
                 newComponents.push(comp);
@@ -44,11 +44,11 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         }
 
         if (notMounted) {
-            this.state = { components: newComponents, loginManager: this.state.loginManager, selected: pageId };
+            this.state = { components: newComponents, loginManager: this.state.loginManager, selected: elem };
         } else {
-            this.setState({ components: newComponents, selected: pageId });
+            this.setState({ components: newComponents, selected: elem });
         }
-        //TODO: set title and url in browser window
+        window.history.pushState('', 'Supersocial - ', elem.path);
     }
 
     /** @return the header component with the titleo f the page. */
@@ -71,7 +71,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
             return (
-                <a key={elem.id} href={elem.path}>
+                <a key={elem.id} onClick={c=>this.setActivePage(elem)}>
                     <div className={clazz}>
                         {elem.icon}
                         <div className="navbar-text">{elem.title}</div>

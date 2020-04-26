@@ -4,7 +4,7 @@ import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
 import { EventBus, EventBusEventType } from './EventBus';
 import { LoginManager } from './LoginManager';
 import { Registration } from './Registration';
-import { Sidebar } from './Sidebar';
+import { Sidebar, PageComponent } from './Sidebar';
 import { MessageOverview } from './MessageOverview';
 import { ImageProvider } from './ImageProvider';
 import { AnalyticsPage } from './AnalyticsPage';
@@ -30,7 +30,7 @@ class App extends React.Component<any> {
 
 
   /**Change the selected page. */
-  private selectComponent(components, selected: number) {
+  private selectComponent(components, selected: PageComponent) {
     return (<div className="App">
       <Sidebar components={components} loginManager={this.loginManager} selected={selected} />
     </div>);
@@ -72,7 +72,7 @@ class App extends React.Component<any> {
         <Switch>
           <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />
           <Route path="/login" render={(props) => <Login eventBus={this.eventBus} loginManager={this.loginManager} params={props.location.search} />} />
-          {components.map((component, idx) => <Route path={component.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, idx) : <Redirect to={"/login?redirect=" + encodeURIComponent(component.path)} />} />)}
+          {components.map((component, idx) => <Route path={component.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, component) : <Redirect to={"/login?redirect=" + encodeURIComponent(component.path)} />} />)}
           <Route path="/privacy" render={(props) => <DataPrivacyPage />} />
           <Route path="/" render={(props) => <LandingPage />} />
         </Switch>
