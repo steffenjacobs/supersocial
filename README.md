@@ -1,14 +1,24 @@
 # Supersocial
 
 ## Supersocial — Social Media Marketing on a new Level
-Supersocial helps you to manage your social media pages and kick off marketing campaigns. 
+[Supersocial](https://supersocial.cloud) helps you to manage your social media pages and kick off marketing campaigns. 
+
+## Prerequisites
+[Docker](https://www.docker.com/), [Docker-Compose](https://docs.docker.com/compose/) and [Git](https://git-scm.com/) need to be installed.
+
+## Deployment
+1. Clone the project: `git clone https://github.com/steffenjacobs/supersocial.git`.
+2. Build and start Supersocial with `docker-compose up --build`.
+3. Open `localhost:9001` in your web browser.
+4. Set up a system twitter account to fetch the twitter trends and convert user locations.
+5. Enjoy!
 
 ## Local Development
 To setup supersocial locally for development purposes, this can be done with Docker and Docker-Compose.
 
     $ docker-compose up --build
-    # stoppen
-    $ docker-compose stop
+    # stop
+    $ docker-compose down
 ----
 
 For development purposes, frontend and backend can be started separately.
@@ -33,3 +43,6 @@ Warning: All persistent data are stored in volumes. For a clean reboot, these ha
 Supersocial is available under the following URLs:
 * http://localhost:9001/ - React Frontend
 * http://localhost:9002 - Spring Boot Backend
+
+## Further Documentation
+Further documentation can be found [here](https://confluence.supersocial.cloud/display/SP/User+Guide).
