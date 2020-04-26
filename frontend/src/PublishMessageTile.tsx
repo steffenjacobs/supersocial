@@ -57,8 +57,6 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
 
     /** Event handler for when a post had been selected, e.g. via PublishedPostsTile.tsx */
     private selectPost(eventData?: any) {
-        var platforms = new Set<string>();
-        platforms.add("" + eventData.platformId);
         this.setState({
             sendTextForm: {
                 message: eventData.text,

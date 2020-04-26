@@ -112,7 +112,7 @@ export class AnalyticsPage extends React.Component<AnalyticsProps, AnalyticsStat
                         else {
                             this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POST_ANALYTICS, data);
                             this.setState({ posts: data[0].entities.concat(data[0].filtered), selectedPosts: data[0].filtered.length ? data[0].entities : [] });
-                        };
+                        }
                     });
                 }
             });

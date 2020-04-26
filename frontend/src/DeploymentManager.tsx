@@ -4,7 +4,7 @@ export class DeploymentManager {
     static local = true;
     //set this to 'true' if the user connects iva port 8080 on a localhost connection (Start backend from IDE)
     static local8080 = true;
-    static getUrl(): String {
+    static getUrl(): string {
         return this.local ? (this.local8080?"http://localhost:8080/":"http://localhost:9001/") : "https://api.supersocial.cloud/";
     }
 }

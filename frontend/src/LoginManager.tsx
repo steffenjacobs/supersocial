@@ -31,7 +31,7 @@ export class LoginManager {
     public isLoggedIn() {
         if (!this.loginStatus.loggedIn) {
             //attempt login with cookie
-            this.logIn(undefined, undefined);
+            this.logIn();
             return false;
         }
         return this.loginStatus.loggedIn;

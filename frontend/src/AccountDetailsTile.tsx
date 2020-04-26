@@ -156,7 +156,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
                             displayNameLastSaved: data.displayName,
                             platformIdLastSaved: data.platformId
                         });
-                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, undefined);
+                        this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
                         if (callback) {
                             callback();
                         }
@@ -298,7 +298,7 @@ export class AccountDetailsTile extends React.Component<AccountDetailsProps, Acc
 
     /**Close the details view. */
     public close() {
-        this.props.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, undefined);
+        this.props.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED);
     }
     private createInfo(url: string) {
         return SnippetManager.createInfo(url, "Find out more about how to get the API keys and secrets ", ["margin-left-big", "info-label"]);

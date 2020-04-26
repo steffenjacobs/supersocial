@@ -6,10 +6,6 @@
 	top: 0;
 }
 
-.leaflet-container {
-	overflow: hidden;
-}
-
 .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow {
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -69,6 +65,7 @@
 
 .leaflet-container {
 	-webkit-tap-highlight-color: transparent;
+	overflow: hidden;
 }
 
 .leaflet-container a {
