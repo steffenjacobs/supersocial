@@ -50,10 +50,10 @@ public class UserController {
 	public ResponseEntity<CurrentUserDTO> registerUser(@RequestBody UserRegistrationDTO userRegistration) {
 		LOG.info("Registering {}", userRegistration);
 		try {
-			return new ResponseEntity<CurrentUserDTO>(userService.registerNewUser(userRegistration.getDisplayName(), userRegistration.getPassword(), userRegistration.getEmail()),
+			return new ResponseEntity<>(userService.registerNewUser(userRegistration.getDisplayName(), userRegistration.getPassword(), userRegistration.getEmail()),
 					HttpStatus.ACCEPTED);
 		} catch (UserAlreadyExistsException e) {
-			return new ResponseEntity<CurrentUserDTO>(new CurrentUserDTO(e.getMessage()), HttpStatus.CONFLICT);
+			return new ResponseEntity<>(new CurrentUserDTO(e.getMessage()), HttpStatus.CONFLICT);
 		}
 	}
 
@@ -83,7 +83,7 @@ public class UserController {
 		LOG.info("Deleting user config {}", descriptor);
 		try {
 			userConfigurationService.deleteUserConfigByDescriptor(descriptor);
-			return new ResponseEntity<UserConfigurationDTO>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (UserConfigurationNotFoundException e) {
 			return new ResponseEntity<>(new UserConfigurationDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
@@ -96,7 +96,7 @@ public class UserController {
 	public ResponseEntity<LocationDTO> updateUserLocation(@RequestBody LocationDTO userLocation) {
 		LOG.info("Updating user location to {}/{}", userLocation.getLongitude(), userLocation.getLatitude());
 		try {
-			return new ResponseEntity<LocationDTO>(userConfigurationService.updateUserLocation(userLocation), HttpStatus.OK);
+			return new ResponseEntity<>(userConfigurationService.updateUserLocation(userLocation), HttpStatus.OK);
 		} catch (TwitterException e) {
 			return new ResponseEntity<>(new LocationDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		} catch (SystemConfigurationNotFoundException e) {

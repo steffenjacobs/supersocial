@@ -44,9 +44,6 @@ public class Credential implements Secured {
 	@ManyToOne
 	private SocialMediaAccount account;
 
-	public Credential() {
-	}
-
 	private void setId(UUID id) {
 		this.id = id;
 	}
@@ -100,7 +97,7 @@ public class Credential implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.Credential;
+		return SecuredType.CREDENTIAL;
 	}
 
 	@Override

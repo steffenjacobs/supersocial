@@ -42,9 +42,6 @@ public class ScheduledPost implements Secured {
 	@ManyToOne
 	private SupersocialUser creator;
 
-	public ScheduledPost() {
-	}
-
 	public Post getPost() {
 		return post;
 	}
@@ -79,7 +76,7 @@ public class ScheduledPost implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.ScheduledPost;
+		return SecuredType.SCHEDULED_POST;
 	}
 
 	@Override

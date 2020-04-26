@@ -122,9 +122,9 @@ public class UserConfigurationService {
 		String locationResult = twitterService.fetchTwitterRegionForLatLng(userLocation.getLatitude(), userLocation.getLongitude(),
 				systemConfigurationManager.getSystemTwitterAccount());
 
-		createOrUpdateSetting("" + userLocation.getLatitude(), user, UserConfigurationType.Latitude.getKey());
-		createOrUpdateSetting("" + userLocation.getLongitude(), user, UserConfigurationType.Longitude.getKey());
-		createOrUpdateSetting(locationResult, user, UserConfigurationType.Location.getKey());
+		createOrUpdateSetting("" + userLocation.getLatitude(), user, UserConfigurationType.LATITUDE.getKey());
+		createOrUpdateSetting("" + userLocation.getLongitude(), user, UserConfigurationType.LONGITUDE.getKey());
+		createOrUpdateSetting(locationResult, user, UserConfigurationType.LOCATION.getKey());
 		long woeid = Long.valueOf("" + JsonPath.read(locationResult, "$[0].woeid"));
 		systemConfigurationManager.appendToTrackedTrendsWoeids(woeid);
 		scheduledTrendingTopicFetcher.fetchTrendingTopic(woeid);

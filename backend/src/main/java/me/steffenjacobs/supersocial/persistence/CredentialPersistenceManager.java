@@ -101,7 +101,7 @@ public class CredentialPersistenceManager {
 		}
 
 		Credential cred = optCred.orElseGet(Credential::new);
-		boolean created = credential.getId() == null;
+		final boolean created = credential.getId() == null;
 
 		cred.setDescriptor(credential.getDescriptor());
 		cred.setValue(credential.getValue());

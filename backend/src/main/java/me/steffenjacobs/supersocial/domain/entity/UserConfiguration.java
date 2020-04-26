@@ -76,7 +76,7 @@ public class UserConfiguration implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.UserConfiguration;
+		return SecuredType.USER_CONFIGURATION;
 	}
 
 	@Override
@@ -109,8 +109,9 @@ public class UserConfiguration implements Secured {
 		if (id == null) {
 			if (other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

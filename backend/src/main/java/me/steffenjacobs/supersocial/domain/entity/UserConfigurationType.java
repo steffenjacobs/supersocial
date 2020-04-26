@@ -2,7 +2,7 @@ package me.steffenjacobs.supersocial.domain.entity;
 
 /** @author Steffen Jacobs */
 public enum UserConfigurationType {
-	Longitude("user.longitude"), Latitude("user.latitude"), Location("user.location");
+	LONGITUDE("user.longitude"), LATITUDE("user.latitude"), LOCATION("user.location");
 
 	private final String key;
 

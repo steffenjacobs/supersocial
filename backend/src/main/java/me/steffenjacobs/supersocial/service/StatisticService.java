@@ -63,7 +63,7 @@ public class StatisticService {
 	 */
 	public String getAllAccountStatistics(String query, Optional<Set<String>> selectedAccounts) {
 		Stream<SocialMediaAccountDTO> accountStream = socialMediaAccountService.getAllSocialMediaAccounts();
-		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<>();
 		JSONArray filteredAccounts = new JSONArray();
 		if (selectedAccounts.isPresent()) {
 			accountStream = accountStream.filter(a -> {
@@ -91,7 +91,7 @@ public class StatisticService {
 	 * @return the aggregated JSON.
 	 */
 	public String getAllPostStatistics(String query, Optional<Set<String>> selectedPosts, Optional<Set<String>> selectedAccounts) {
-		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<CompletableFuture<JSONArray>>();
+		Collection<CompletableFuture<JSONArray>> futures = new LinkedList<>();
 		Stream<PostDTO> postStream = postService.getAllPosts().stream().filter(p -> p.getPublished() != null);
 		JSONArray filteredPosts = new JSONArray();
 
@@ -157,7 +157,7 @@ public class StatisticService {
 	/** Aggregates the JSON properties returned by all the futures. */
 	@SuppressWarnings("unchecked")
 	private String aggregateFutures(Collection<CompletableFuture<JSONArray>> futures, JSONArray searchedEntities, JSONArray filteredEntities) {
-		LinkedHashMap<String, Double> map = new LinkedHashMap<String, Double>();
+		LinkedHashMap<String, Double> map = new LinkedHashMap<>();
 		futures.stream().map(t -> {
 			try {
 				return Optional.of(t.get());

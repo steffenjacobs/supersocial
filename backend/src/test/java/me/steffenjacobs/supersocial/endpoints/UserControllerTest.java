@@ -66,12 +66,12 @@ public class UserControllerTest {
 		Assertions.assertEquals(3, dto.getConfig().size());
 
 		dto.getConfig().forEach(config -> {
-			if (UserConfigurationType.Latitude.getKey().equals(config.getDescriptor())) {
+			if (UserConfigurationType.LATITUDE.getKey().equals(config.getDescriptor())) {
 				Assertions.assertEquals(location.getLatitude(), Double.parseDouble(config.getValue()));
-			} else if (UserConfigurationType.Longitude.getKey().equals(config.getDescriptor())) {
+			} else if (UserConfigurationType.LONGITUDE.getKey().equals(config.getDescriptor())) {
 				Assertions.assertEquals(location.getLongitude(), Double.parseDouble(config.getValue()));
 
-			} else if (UserConfigurationType.Location.getKey().equals(config.getDescriptor())) {
+			} else if (UserConfigurationType.LOCATION.getKey().equals(config.getDescriptor())) {
 				Assertions.assertNotNull(config.getValue());
 			} else {
 				Assertions.fail("Unexpected configuration descriptor.");

@@ -84,7 +84,7 @@ public class SupersocialUser implements AuthenticatedPrincipal, Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.SupersocialUser;
+		return SecuredType.SUPERSOCIAL_USER;
 	}
 
 	@Override

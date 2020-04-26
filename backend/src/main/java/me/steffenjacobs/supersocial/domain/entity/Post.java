@@ -53,9 +53,6 @@ public class Post implements Secured {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private SocialMediaAccount socialMediaAccountToPostWith;
 
-	public Post() {
-	}
-
 	public String getText() {
 		return text;
 	}
@@ -106,7 +103,7 @@ public class Post implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.Post;
+		return SecuredType.POST;
 	}
 
 	@Override

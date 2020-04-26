@@ -25,6 +25,8 @@ import me.steffenjacobs.supersocial.service.StatisticService;
  */
 @RestController
 public class AnalyticsController {
+	private static final String ERROR_JSON_PATTERN = "{\"error\": \"%s\"}";
+
 	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsController.class);
 
 	@Autowired
@@ -38,7 +40,7 @@ public class AnalyticsController {
 			return new ResponseEntity<>(statisticService.getPostStatistics(id, query), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving analytics for {} ({}): ", id, query);
-			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(String.format(ERROR_JSON_PATTERN, e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -51,7 +53,7 @@ public class AnalyticsController {
 			return new ResponseEntity<>(statisticService.getAllPostStatistics(query, Optional.ofNullable(posts), Optional.ofNullable(accounts)), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving all post analytics ({}): ", query, e);
-			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(String.format(ERROR_JSON_PATTERN, e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -64,7 +66,7 @@ public class AnalyticsController {
 			return new ResponseEntity<>(statisticService.getAllAccountStatistics(query, Optional.ofNullable(accounts)), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving all account analytics ({}): ", query, e);
-			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(String.format(ERROR_JSON_PATTERN, e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -76,7 +78,7 @@ public class AnalyticsController {
 			return new ResponseEntity<>(statisticService.getTrendingTopics(woeid), HttpStatus.OK);
 		} catch (Exception e) {
 			LOG.error("Error retrieving trending topics: ", e);
-			return new ResponseEntity<>(String.format("{\"error\": \"%s\"}", e.getMessage()), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(String.format(ERROR_JSON_PATTERN, e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 

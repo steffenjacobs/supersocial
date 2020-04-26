@@ -2,8 +2,6 @@ package me.steffenjacobs.supersocial.persistence;
 
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
 import me.steffenjacobs.supersocial.domain.dto.SystemConfigurationDTO;
 import me.steffenjacobs.supersocial.domain.entity.AccessControlList;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;

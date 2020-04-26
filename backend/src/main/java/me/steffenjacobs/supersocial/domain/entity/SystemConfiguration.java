@@ -64,7 +64,7 @@ public class SystemConfiguration implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.SystemConfiguration;
+		return SecuredType.SYSTEM_CONFIGURATION;
 	}
 
 	@Override

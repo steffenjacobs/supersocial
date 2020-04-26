@@ -56,7 +56,7 @@ public class UserGroup implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.UserGroup;
+		return SecuredType.USER_GROUP;
 	}
 
 	@Override
@@ -101,8 +101,9 @@ public class UserGroup implements Secured {
 		if (id == null) {
 			if (other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

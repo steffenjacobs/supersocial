@@ -92,7 +92,7 @@ public class StandaloneUser implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.User;
+		return SecuredType.USER;
 	}
 
 	@Override

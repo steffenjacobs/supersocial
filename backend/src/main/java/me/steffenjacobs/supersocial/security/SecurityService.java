@@ -142,10 +142,8 @@ public class SecurityService {
 			return false;
 		}
 		for (Map.Entry<UserGroup, SecuredAction> entry : acl.getPermittedActions().entrySet()) {
-			if (entry.getKey().getUsers().contains(user)) {
-				if (implies(entry.getValue(), actionToPerform)) {
-					return true;
-				}
+			if (entry.getKey().getUsers().contains(user) && implies(entry.getValue(), actionToPerform)) {
+				return true;
 			}
 		}
 		return false;
@@ -200,7 +198,7 @@ public class SecurityService {
 		// retrieve or create permitted actions
 		Map<UserGroup, SecuredAction> permittedActions = acl.getPermittedActions();
 		if (permittedActions == null) {
-			permittedActions = new HashMap<UserGroup, SecuredAction>();
+			permittedActions = new HashMap<>();
 		}
 		permittedActions.put(userGroup, SecuredAction.ALL);
 		acl.setPermittedActions(permittedActions);
@@ -292,10 +290,8 @@ public class SecurityService {
 
 		SupersocialUser user = getCurrentUser();
 		for (Map.Entry<UserGroup, SecuredAction> entry : securedObject.getAccessControlList().getPermittedActions().entrySet()) {
-			if (entry.getKey().getUsers().contains(user)) {
-				if (implies(entry.getValue(), actionToPerform)) {
-					return entry.getKey();
-				}
+			if (entry.getKey().getUsers().contains(user) && implies(entry.getValue(), actionToPerform)) {
+				return entry.getKey();
 			}
 		}
 		return null;

@@ -59,7 +59,7 @@ public class UserServiceTest {
 		SupersocialUser supUser = supersocialUserRepository.findByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
 		Assertions.assertEquals(LoginProvider.SUPERSOCIAL, supUser.getLoginProvider(), "Expected different login provider.");
 		Assertions.assertEquals(username, supUser.getName(), "Expected different username.");
-		Assertions.assertEquals(SecuredType.SupersocialUser, supUser.getSecuredType(), "Expected different secured type.");
+		Assertions.assertEquals(SecuredType.SUPERSOCIAL_USER, supUser.getSecuredType(), "Expected different secured type.");
 		assertCreationDate(supUser.getCreated());
 
 		AccessControlList acl = supUser.getAccessControlList();
@@ -80,7 +80,7 @@ public class UserServiceTest {
 		Assertions.assertEquals(username, sUser.getDisplayName(), "Expected different username.");
 		Assertions.assertEquals(email, sUser.getEmail(), "Expected different email address.");
 		Assertions.assertNotEquals(password, sUser.getPassword(), "Expected password to be not stored in plain text.");
-		Assertions.assertEquals(SecuredType.User, sUser.getSecuredType(), "Expected different secured type.");
+		Assertions.assertEquals(SecuredType.USER, sUser.getSecuredType(), "Expected different secured type.");
 
 	}
 
@@ -133,7 +133,7 @@ public class UserServiceTest {
 		assertCreationDate(acl.getCreated());
 		Assertions.assertNotNull(userGroup, "Expected user group to exist.");
 		assertCreationDate(userGroup.getCreated());
-		Assertions.assertEquals(SecuredType.UserGroup, userGroup.getSecuredType());
+		Assertions.assertEquals(SecuredType.USER_GROUP, userGroup.getSecuredType());
 		Assertions.assertNotNull(acl.getPermittedActions(), "Expected ACL to contain permitted actions.");
 		Assertions.assertTrue(acl.getPermittedActions().containsKey(userGroup), "Expected permitted actions on ACL to contain given user group.");
 		Assertions.assertTrue(securityService.implies(acl.getPermittedActions().get(userGroup), SecuredAction.ALL),

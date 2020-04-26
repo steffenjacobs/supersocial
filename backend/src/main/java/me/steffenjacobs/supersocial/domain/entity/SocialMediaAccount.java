@@ -75,7 +75,7 @@ public class SocialMediaAccount implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.SocialMediaAccount;
+		return SecuredType.SOCIAL_MEDIA_ACCOUNT;
 	}
 
 	public Platform getPlatform() {
