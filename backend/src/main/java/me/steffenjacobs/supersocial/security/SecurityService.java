@@ -3,6 +3,7 @@ package me.steffenjacobs.supersocial.security;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.domain.AccessControlListRepository;
 import me.steffenjacobs.supersocial.domain.SupersocialUserRepository;
+import me.steffenjacobs.supersocial.domain.dto.AccessControlListDTO;
 import me.steffenjacobs.supersocial.domain.entity.AccessControlList;
 import me.steffenjacobs.supersocial.domain.entity.LoginProvider;
 import me.steffenjacobs.supersocial.domain.entity.Secured;
@@ -25,6 +27,7 @@ import me.steffenjacobs.supersocial.domain.entity.StandaloneUser;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 import me.steffenjacobs.supersocial.persistence.SystemConfigurationManager;
+import me.steffenjacobs.supersocial.persistence.exception.AccessControlListNotFoundException;
 import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
 
 /**
@@ -47,7 +50,7 @@ public class SecurityService {
 	private EntityManager entityManager;
 
 	@Autowired
-	private UserService userService;
+	private UserGroupService userGroupService;
 
 	@Autowired
 	private SystemConfigurationManager systemConfigurationManager;
@@ -82,7 +85,7 @@ public class SecurityService {
 			SupersocialUser newUser = new SupersocialUser();
 			newUser.setExternalId(principal.getExternalId());
 			newUser.setLoginProvider(LoginProvider.DISCOURSE);
-			userService.createAclWithDefaultUserGroup(newUser);
+			userGroupService.createAclWithDefaultUserGroup(newUser);
 			return supersocialUserRepository.save(newUser);
 		}
 
@@ -319,5 +322,41 @@ public class SecurityService {
 	 */
 	public <S extends Secured> Optional<S> filterForCurrentUser(Optional<S> optional, SecuredAction actionToPerform) {
 		return optional.map(c -> isCurrentUserPermitted(c, actionToPerform) ? c : null);
+	}
+
+	/**
+	 * Adds the {@code UserGroup} associated to the given {@code userGroupId} to
+	 * the {@code AccessControlList} associated to the given {@code aclId} and
+	 * granting the given {@link SecuredAction}.
+	 */
+	public AccessControlListDTO addToAcl(UUID aclId, UUID userGroupId, SecuredAction action) {
+		AccessControlList acl = accessControlListRepository.findById(aclId).orElseThrow(() -> new AccessControlListNotFoundException(aclId));
+		checkIfCurrentUserIsPermitted(acl, SecuredAction.UPDATE_ACL);
+		UserGroup userGroup = userGroupService.getUserGroup(userGroupId);
+		acl.getPermittedActions().put(userGroup, action);
+		return AccessControlListDTO.fromAccessControlList(accessControlListRepository.save(acl));
+	}
+
+	/**
+	 * Remove the {@code UserGroup} associated to the given {@code userGroupId}
+	 * from the {@code AccessControlList} associated to the given {@code aclId}.
+	 */
+	public AccessControlListDTO removeFromAcl(UUID aclId, UUID userGroupId) {
+		AccessControlList acl = accessControlListRepository.findById(aclId).orElseThrow(() -> new AccessControlListNotFoundException(aclId));
+		checkIfCurrentUserIsPermitted(acl, SecuredAction.UPDATE_ACL);
+		UserGroup userGroup = userGroupService.getUserGroup(userGroupId);
+		acl.getPermittedActions().remove(userGroup);
+
+		return AccessControlListDTO.fromAccessControlList(accessControlListRepository.save(acl));
+	}
+
+	/**
+	 * Retrieve the {@link AccessControlList} associated to the given
+	 * {@code aclId}.
+	 */
+	public AccessControlListDTO getAcl(UUID aclId) {
+		AccessControlList acl = accessControlListRepository.findById(aclId).orElseThrow(() -> new AccessControlListNotFoundException(aclId));
+		checkIfCurrentUserIsPermitted(acl, SecuredAction.READ);
+		return AccessControlListDTO.fromAccessControlList(acl);
 	}
 }

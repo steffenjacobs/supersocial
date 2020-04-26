@@ -3,7 +3,6 @@ package me.steffenjacobs.supersocial.security;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -61,6 +60,9 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+	@Autowired
+	private UserGroupService userGroupService;
+
 	/**
 	 * Create a new user. This will
 	 * <ul>
@@ -116,11 +118,11 @@ public class UserService implements UserDetailsService {
 		supersocialUser = supersocialUserRepository.save(supersocialUser);
 
 		// create default user group for user
-		UserGroup defaultUserGroup = createDefaultUserGroup(supersocialUser);
+		UserGroup defaultUserGroup = userGroupService.createDefaultUserGroup(supersocialUser);
 		supersocialUser.setDefaultUserGroup(defaultUserGroup);
 
 		// create ACL for default user group
-		AccessControlList aclGroup = createUserGroupAcl(defaultUserGroup);
+		AccessControlList aclGroup = userGroupService.createUserGroupAcl(defaultUserGroup);
 
 		// add user group ACL to user group
 		defaultUserGroup.setAccessControlList(aclGroup);
@@ -138,72 +140,12 @@ public class UserService implements UserDetailsService {
 		user = standaloneUserRepository.save(user);
 
 		// create ACL for Supersocial user
-		AccessControlList aclSupersocialUser = createAclWithUserGroup(defaultUserGroup);
+		AccessControlList aclSupersocialUser = userGroupService.createAclWithUserGroup(defaultUserGroup);
 
 		// add Supersocial user ACL to Supersocial user
 		supersocialUser.setAccessControlList(aclSupersocialUser);
 		supersocialUser = supersocialUserRepository.save(supersocialUser);
 		return CurrentUserDTO.fromUser(supersocialUser);
-	}
-
-	/**
-	 * Create an {@link AccessControlList} for the given {@link UserGroup} where
-	 * the group itself has all permission on the newly created ACL.
-	 * 
-	 * @return the newly created {@link AccessControlList}
-	 */
-	private AccessControlList createUserGroupAcl(UserGroup defaultUserGroup) {
-		Map<UserGroup, SecuredAction> permittedActionsGroup = new HashMap<>();
-		permittedActionsGroup.put(defaultUserGroup, SecuredAction.ALL);
-		AccessControlList aclGroup = new AccessControlList();
-		aclGroup.setPermittedActions(permittedActionsGroup);
-		aclGroup = accessControlListRepository.save(aclGroup);
-		return aclGroup;
-	}
-
-	/**
-	 * Create an {@link AccessControlList} for the given
-	 * {@link SupersocialUser}. Therefore, creates a default {@link UserGroup}
-	 * and the associated {@link AccessControlList} first to be put on this ACL
-	 * for the {@link SupersocialUser}
-	 * 
-	 */
-	public void createAclWithDefaultUserGroup(SupersocialUser supersocialUser) {
-		UserGroup defaultUserGroup = createDefaultUserGroup(supersocialUser);
-		defaultUserGroup.setAccessControlList(createUserGroupAcl(defaultUserGroup));
-		defaultUserGroup = userGroupRepository.save(defaultUserGroup);
-
-		supersocialUser.setAccessControlList(createAclWithUserGroup(defaultUserGroup));
-		supersocialUser.setDefaultUserGroup(defaultUserGroup);
-	}
-
-	/**
-	 * Create an {@link AccessControlList} for the given default
-	 * {@link UserGroup} granting all permissions to the given default
-	 * {@link UserGroup}
-	 * 
-	 * @return the newly created {@link AccessControlList} for the
-	 *         {@link SupersocialUser} with the newly created default
-	 *         {@link UserGroup}.
-	 */
-	private AccessControlList createAclWithUserGroup(UserGroup defaultUserGroup) {
-		Map<UserGroup, SecuredAction> permittedActionsSupersocialUser = new HashMap<>();
-		permittedActionsSupersocialUser.put(defaultUserGroup, SecuredAction.ALL);
-		AccessControlList aclSupersocialUser = new AccessControlList();
-		aclSupersocialUser.setPermittedActions(permittedActionsSupersocialUser);
-		aclSupersocialUser = accessControlListRepository.save(aclSupersocialUser);
-		return aclSupersocialUser;
-	}
-
-	/** Create and save the default user group for a given user. */
-	private UserGroup createDefaultUserGroup(SupersocialUser supersocialUser) {
-		UserGroup defaultUserGroup = new UserGroup();
-		Set<SupersocialUser> users = new HashSet<>();
-		users.add(supersocialUser);
-		defaultUserGroup.setUsers(users);
-		defaultUserGroup.setName("default-" + supersocialUser.getName());
-		defaultUserGroup = userGroupRepository.save(defaultUserGroup);
-		return defaultUserGroup;
 	}
 
 	/**
