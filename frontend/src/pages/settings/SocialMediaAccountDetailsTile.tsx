@@ -32,7 +32,7 @@ export interface Credential {
 export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAccountDetailsProps, SocialMediaAccountDetailsState>{
     constructor(props: SocialMediaAccountDetailsProps, state: SocialMediaAccountDetailsState) {
         super(props);
-        this.state = { account: props.account ? props.account : { credentials: [], displayName: "<none>", id: "", platformId: -1 } };
+        this.state = { account: props.account ? props.account : { aclId:"", acl:[], credentials: [], displayName: "<none>", id: "", platformId: -1 } };
         this.props.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, (type, acc) => this.updateSelected(acc));
     }
 
@@ -172,7 +172,9 @@ export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAc
                 id: this.state.account.id,
                 displayName: this.state.account.displayName,
                 platformId: this.state.account.platformId,
-                credentials: this.state.account.credentials.filter(x => x.id !== credentialId)
+                credentials: this.state.account.credentials.filter(x => x.id !== credentialId),
+                acl: this.state.account.acl,
+                aclId: this.state.account.aclId
             }
         }, () => {
             if (EntityUtil.isGeneratedId(credentialId)) {
@@ -203,7 +205,9 @@ export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAc
                         id: this.state.account.id,
                         platformId: this.state.account.platformId,
                         displayName: value,
-                        error: this.state.account.error
+                        error: this.state.account.error,
+                        acl: this.state.account.acl,
+                        aclId: this.state.account.aclId
                     }
                 }, resolve);
             } else if (id === "platformId") {
@@ -213,7 +217,9 @@ export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAc
                         id: this.state.account.id,
                         platformId: Number.parseInt(value),
                         displayName: this.state.account.displayName,
-                        error: this.state.account.error
+                        error: this.state.account.error,
+                        acl: this.state.account.acl,
+                        aclId: this.state.account.aclId
                     }
                 }, resolve);
             }
@@ -288,7 +294,9 @@ export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAc
                 displayName: this.state.account.displayName,
                 id: this.state.account.id,
                 error: this.state.account.error,
-                platformId: this.state.account.platformId
+                platformId: this.state.account.platformId,
+                acl: this.state.account.acl,
+                aclId: this.state.account.aclId
             }
         }, resolve);
     }

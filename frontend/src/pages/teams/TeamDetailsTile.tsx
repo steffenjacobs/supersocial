@@ -9,15 +9,25 @@ import { ToastManager } from "../../misc/ToastManager";
 import { EntityUtil } from "../../misc/EntityUtil";
 import { SnippetManager } from "../../misc/SnippetManager";
 import { Team } from "./TeamsListTile";
+import { SocialMediaAccount } from "../settings/SocialMediaAccountsListTile";
+import { Multiselect } from 'multiselect-react-dropdown';
 
 export interface TeamDetailsProps {
     eventBus: EventBus
     team?: Team
+    accounts: SocialMediaAccount[]
 }
 export interface TeamDetailsState {
     team: Team,
     displayNameLastSaved?: string
     usernameToAdd?: string
+}
+
+//TODO extract from here + AnalyticsPage to permanent location
+interface MultiSelectValue {
+    label: string
+    value: string
+    type: string
 }
 
 /** Contains a form to create and update team properties like team name and associated users.*/
@@ -160,6 +170,55 @@ export class TeamDetailsTile extends React.Component<TeamDetailsProps, TeamDetai
             });
     }
 
+    private removeAccountFromTeam(aclId: string) {
+        console.log("removing " + aclId);
+        fetch(`${DeploymentManager.getUrl()}api/security/acl/${aclId}/${this.state.team.id}/${0}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_TEAMS);
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
+                    ToastManager.showSuccessToast("Removed social media account from team.");
+                    //response.json().then(json => this.updateSelected(json));
+                }
+            });
+    }
+
+    private addAccountToTeam(aclId: string) {
+        fetch(`${DeploymentManager.getUrl()}api/security/acl/${aclId}/${this.state.team.id}/${31}`, {
+            method: 'PUT',
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    ToastManager.showSuccessToast("Added social media account to team.");
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_TEAMS);
+                    this.props.eventBus.fireEvent(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS);
+                    //response.json().then(json => this.updateSelected(json));
+                }
+            });
+    }
+
+    private onSelectionChange(value: MultiSelectValue[]) {
+        let selectedAccounts = this.calculateSelectedAccounts();//.map(x => x.id);
+
+        //added
+        value.filter(v => !selectedAccounts.find(x=> x.id === v.value)).forEach(addedAccount => this.addAccountToTeam((this.props.accounts.find(x=>x.id === addedAccount.value) as SocialMediaAccount).aclId));
+
+        //removed
+        selectedAccounts.filter(sa => !value.find(v => sa.id === v.value)).forEach(removedAccount => this.removeAccountFromTeam(removedAccount.aclId));
+    }
+
+    private calculateSelectedAccounts() {
+        return this.props.accounts.sort((c1, c2) => !c1 ? 1 : c1.id.localeCompare(c2.id)).filter(acc => acc.acl.find(p => p.id === this.state.team.id))
+    }
+
     public render() {
         const userElements = this.state.team.users.sort((c1, c2) => !c1 ? 1 : c1.id.localeCompare(c2.id)).map(usr => {
             return (
@@ -170,6 +229,9 @@ export class TeamDetailsTile extends React.Component<TeamDetailsProps, TeamDetai
                     </span>
                 </div>);
         });
+
+        let selectableAccounts = this.props.accounts.sort((c1, c2) => !c1 ? 1 : c1.id.localeCompare(c2.id)).map(a => ({ label: a.displayName, value: a.id, type: "Accounts" }));
+        let selectedAccounts = this.props.accounts.sort((c1, c2) => !c1 ? 1 : c1.id.localeCompare(c2.id)).filter(acc => acc.acl.find(p => p.id === this.state.team.id)).map(a => ({ label: a.displayName, value: a.id, type: "Accounts" }));
 
         const displayNameSaveButton = this.state.displayNameLastSaved !== this.state.team.name && <div className="btn-icon btn-credentials btn-save" onClick={o => this.saveTeam()}>{ImageProvider.getImage("save")}</div>;
         return (
@@ -195,6 +257,17 @@ export class TeamDetailsTile extends React.Component<TeamDetailsProps, TeamDetai
                     </div>
                     <div className="displayName display-name-bold">Users: </div>
                     {userElements}
+                    <div className="displayName display-name-bold">Social Media Accounts: </div>
+                    <Multiselect
+                        placeholder="Select accounts to share"
+                        options={selectableAccounts}
+                        selectedValues={selectedAccounts}
+                        onSelect={this.onSelectionChange.bind(this)}
+                        onRemove={this.onSelectionChange.bind(this)}
+                        displayValue="label"
+                        closeIcon="cancel"
+                        groupBy="type"
+                    />
                 </div>
             </div >
         );

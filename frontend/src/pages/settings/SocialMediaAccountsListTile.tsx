@@ -19,6 +19,13 @@ export interface SocialMediaAccount {
     credentials: Credential[]
     platformId: number
     error?: string
+    acl: AclEntry[]
+    aclId: string
+}
+
+interface AclEntry{
+    id: string
+    value: string
 }
 
 interface SocialMediaAccounts {
@@ -101,7 +108,9 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                 id: account.id,
                 displayName: account.displayName,
                 platformId: account.platformId,
-                credentials: account.credentials
+                credentials: account.credentials,
+                acl: account.acl,
+                aclId: account.aclId
             }
         }, () => this.props.eventBus.fireEvent(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, account));
 
@@ -132,7 +141,9 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                 id: EntityUtil.makeId(),
                 displayName: "",
                 platformId: 0,
-                credentials: []
+                credentials: [],
+                acl: [],
+                aclId: ""
             }
         })
     }

@@ -7,12 +7,14 @@ import { DeploymentManager } from "../../misc/DeploymentManager";
 import { ToastManager } from "../../misc/ToastManager";
 import { EntityUtil } from "../../misc/EntityUtil";
 import { TeamDetailsTile } from "./TeamDetailsTile";
+import { SocialMediaAccount } from "../settings/SocialMediaAccountsListTile";
+import { access } from "fs";
 
 export interface TeamsListTileProps {
     eventBus: EventBus
 }
 
-interface TeamMember{
+interface TeamMember {
     id: string
     name: string
 }
@@ -28,6 +30,7 @@ interface Teams {
     teams: Team[]
     updating?: boolean
     selected?: Team
+    accounts: SocialMediaAccount[]
 }
 
 /** Lists the teams the current user has access to. */
@@ -36,9 +39,11 @@ interface Teams {
 export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
     constructor(props: TeamsListTileProps, state: Teams) {
         super(props);
-        this.state = { teams: [], updating: true };
+        this.state = { teams: [], accounts: [], updating: true };
         this.refreshTeams(true);
+        this.refreshAccounts();
         this.props.eventBus.register(EventBusEventType.REFRESH_TEAMS, (eventType, eventData) => this.refreshTeams());
+        this.props.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, (eventType, eventData) => this.refreshAccounts());
         this.props.eventBus.register(EventBusEventType.SELECTED_TEAM_CHANGED, (eventType, eventData) => this.selectTeam(eventData));
     }
 
@@ -59,6 +64,23 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                         teams: data,
                         updating: false,
                         selected: data.filter(a => a.id === (this.state.selected ? this.state.selected.id : undefined)) ? this.state.selected : undefined
+                    }));
+                }
+            });
+    }
+
+    /** fetch social media accounts */
+    private refreshAccounts() {
+        fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount`, {
+            method: 'get',
+            credentials: 'include',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    ToastManager.showErrorToast(response);
+                } else {
+                    response.json().then(data => this.setState({
+                        accounts: data
                     }));
                 }
             });
@@ -97,7 +119,7 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                     ToastManager.showErrorToast(response);
                 } else {
                     ToastManager.showSuccessToast("Deleted team '" + team.name + "'");
-                    if(this.state.selected && team.id === this.state.selected.id){
+                    if (this.state.selected && team.id === this.state.selected.id) {
                         this.selectTeam(undefined as any);
                     }
                     this.refreshTeams();
@@ -134,6 +156,7 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                     <tr key={elem.id}>
                         <td>{elem.name}</td>
                         <td>{elem.users.length}</td>
+                        <td>{this.state.accounts.filter(acc => acc.acl.find(a => a.id === elem.id)).length}</td>
                         <td>{allowedActions}</td>
                     </tr>
                 );
@@ -152,7 +175,7 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                     <div className="box-header box-header-with-icon">
                         <div className="inline-block">All Teams</div>
                         <div>
-                             <div className="btn btn-icon btn-add btn-header font6" onClick={(_e) => this.addTeam()}>
+                            <div className="btn btn-icon btn-add btn-header font6" onClick={(_e) => this.addTeam()}>
                                 <div className="align-middle">{ImageProvider.getImage("add")}<span className="btn-header-text">Add Team</span></div>
                             </div>
                             <div
@@ -169,6 +192,7 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                                 <tr>
                                     <th className="table-text-column">Display Name</th>
                                     <th># Users</th>
+                                    <th># Accounts</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -179,7 +203,7 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                         </table>
                     </div>
                 </div >
-                {this.state.selected ? <TeamDetailsTile eventBus={this.props.eventBus} team={this.state.selected} /> : <div />}
+                {this.state.selected ? <TeamDetailsTile eventBus={this.props.eventBus} team={this.state.selected} accounts={this.state.accounts} /> : <div />}
             </div>
         );
     }
