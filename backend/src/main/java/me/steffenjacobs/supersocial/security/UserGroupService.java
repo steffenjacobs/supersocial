@@ -23,6 +23,7 @@ import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUser
 import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserGroup;
 import me.steffenjacobs.supersocial.security.exception.UserNotFoundException;
 import me.steffenjacobs.supersocial.security.exception.UserNotInUserGroupException;
+import me.steffenjacobs.supersocial.security.exception.UsergroupEmptyException;
 import me.steffenjacobs.supersocial.security.exception.UsergroupNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -53,17 +54,21 @@ public class UserGroupService {
 	public void deleteUserGroup(UUID userGroupId) {
 		UserGroup userGroup = userGroupRepository.findById(userGroupId).orElseThrow(() -> new UsergroupNotFoundException(userGroupId));
 		securityService.checkIfCurrentUserIsPermitted(userGroup, SecuredAction.DELETE);
-		
-		if(securityService.getCurrentUser().getDefaultUserGroup().getId().equals(userGroupId)) {
+
+		if (securityService.getCurrentUser().getDefaultUserGroup().getId().equals(userGroupId)) {
 			throw new CouldNotDeleteDefaultUserGroup(userGroupId);
 		}
+		deleteUserGroupNoCheck(userGroup);
+	}
 
+	private void deleteUserGroupNoCheck(UserGroup userGroup) {
 		// delete ACL
 		final AccessControlList acl = userGroup.getAccessControlList();
 		userGroup.setAccessControlList(null);
 		userGroup = userGroupRepository.save(userGroup);
 		accessControlListRepository.delete(acl);
 
+		// delete UserGroup
 		userGroupRepository.delete(userGroup);
 	}
 
@@ -114,12 +119,17 @@ public class UserGroupService {
 		if (!userGroup.getUsers().contains(user)) {
 			throw new UserNotInUserGroupException(userId, userGroupId);
 		}
-		
-		if(user.getDefaultUserGroup().equals(userGroup)) {
+
+		if (user.getDefaultUserGroup().equals(userGroup)) {
 			throw new CouldNotDeleteDefaultUserFromDefaultUserGroup(userGroupId);
 		}
-		
+
 		userGroup.getUsers().remove(user);
+
+		if (userGroup.getUsers().isEmpty()) {
+			deleteUserGroupNoCheck(userGroup);
+			throw new UsergroupEmptyException(userGroupId);
+		}
 
 		return UserGroupDTO.fromUserGroup(userGroupRepository.save(userGroup));
 	}

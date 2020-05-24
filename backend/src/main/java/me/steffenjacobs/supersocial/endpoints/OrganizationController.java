@@ -21,6 +21,7 @@ import me.steffenjacobs.supersocial.security.UserGroupService;
 import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserFromDefaultUserGroup;
 import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserGroup;
 import me.steffenjacobs.supersocial.security.exception.InvalidUsernameException;
+import me.steffenjacobs.supersocial.security.exception.UsergroupEmptyException;
 import me.steffenjacobs.supersocial.security.exception.UsergroupNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
 
@@ -63,6 +64,8 @@ public class OrganizationController {
 			return new ResponseEntity<>(userGroupService.deleteUserFromUserGroup(userId, userGroupId), HttpStatus.ACCEPTED);
 		} catch (UsergroupNotFoundException | InvalidUsernameException | CouldNotDeleteDefaultUserFromDefaultUserGroup e) {
 			return new ResponseEntity<>(new UserGroupDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (UsergroupEmptyException e) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 	}
 
