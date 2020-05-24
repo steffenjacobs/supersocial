@@ -1,6 +1,6 @@
 package me.steffenjacobs.supersocial.domain.dto;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -15,7 +15,7 @@ public class SocialMediaAccountDTO implements WithErrorDTO, WithAclDTO {
 	private int platformId;
 	private String error;
 	private Set<CredentialDTO> credentials;
-	private Map<UUID, Integer> acl;
+	private List<AclEntryDTO> acl;
 	private UUID aclId;
 
 	public SocialMediaAccountDTO() {
@@ -79,7 +79,8 @@ public class SocialMediaAccountDTO implements WithErrorDTO, WithAclDTO {
 		accountDto.setDisplayName(account.getDisplayName());
 		accountDto.setPlatformId(account.getPlatform().getId());
 		accountDto.setCredentials(credentials);
-		accountDto.setAcl(account.getAccessControlList().getPermittedActions().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getId(), e -> e.getValue().getMask())));
+		accountDto.setAcl(account.getAccessControlList().getPermittedActions().entrySet().stream().map(e -> new AclEntryDTO(e.getKey().getId(), e.getValue().getMask()))
+				.collect(Collectors.toList()));
 		accountDto.setAclId(account.getAccessControlList().getId());
 		return accountDto;
 	}
@@ -124,12 +125,12 @@ public class SocialMediaAccountDTO implements WithErrorDTO, WithAclDTO {
 		return true;
 	}
 
-	public void setAcl(Map<UUID, Integer> acl) {
+	public void setAcl(List<AclEntryDTO> acl) {
 		this.acl = acl;
 	}
 
 	@Override
-	public Map<UUID, Integer> getAcl() {
+	public List<AclEntryDTO> getAcl() {
 		return this.acl;
 	}
 

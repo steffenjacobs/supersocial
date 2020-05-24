@@ -1,7 +1,10 @@
 package me.steffenjacobs.supersocial.endpoints;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +13,7 @@ import org.springframework.http.HttpStatus;
 
 import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.dto.AccessControlListDTO;
+import me.steffenjacobs.supersocial.domain.dto.AclEntryDTO;
 import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
 import me.steffenjacobs.supersocial.domain.dto.SocialMediaAccountDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserGroupDTO;
@@ -71,13 +75,13 @@ class AclControllerTest extends UserAwareTest {
 		SocialMediaAccountDTO accountQueriedUpdated = sendRequest(sessionCookie, null, HttpMethod.GET, "api/socialmediaaccount/" + accountCreated.getId(),
 				SocialMediaAccountDTO.class, HttpStatus.OK);
 		Assertions.assertEquals(aclQueried.getId(), accountQueriedUpdated.getAclId());
-		Assertions.assertEquals(aclQueried.getPermittedActions(), accountQueriedUpdated.getAcl());
+		Assertions.assertEquals(aclQueried.getPermittedActions(), unwrapAclEntryDtos(accountQueriedUpdated.getAcl()));
 
 		// check if user 2 now has access
 		SocialMediaAccountDTO accountQueriedUpdated2 = sendRequest(sessionCookie2, null, HttpMethod.GET, "api/socialmediaaccount/" + accountCreated.getId(),
 				SocialMediaAccountDTO.class, HttpStatus.OK);
 		Assertions.assertEquals(aclQueried.getId(), accountQueriedUpdated2.getAclId());
-		Assertions.assertEquals(aclQueried.getPermittedActions(), accountQueriedUpdated2.getAcl());
+		Assertions.assertEquals(aclQueried.getPermittedActions(), unwrapAclEntryDtos(accountQueriedUpdated2.getAcl()));
 
 		// remove the user group from the ACL
 		sendRequest(sessionCookie, null, HttpMethod.DELETE,
@@ -96,10 +100,14 @@ class AclControllerTest extends UserAwareTest {
 		SocialMediaAccountDTO accountQueriedUpdatedRemoved = sendRequest(sessionCookie, null, HttpMethod.GET, "api/socialmediaaccount/" + accountCreated.getId(),
 				SocialMediaAccountDTO.class, HttpStatus.OK);
 		Assertions.assertEquals(aclQueried.getId(), accountQueriedUpdatedRemoved.getAclId());
-		Assertions.assertEquals(aclQueriedRemoved.getPermittedActions(), accountQueriedUpdatedRemoved.getAcl());
+		Assertions.assertEquals(aclQueriedRemoved.getPermittedActions(), unwrapAclEntryDtos(accountQueriedUpdatedRemoved.getAcl()));
 
 		// check if user 2 no longer has access
 		sendRequest(sessionCookie2, null, HttpMethod.GET, "api/socialmediaaccount/" + accountCreated.getId(), SocialMediaAccountDTO.class, HttpStatus.NOT_FOUND);
+	}
+
+	private Map<UUID, Integer> unwrapAclEntryDtos(List<AclEntryDTO> dtos) {
+		return dtos.stream().collect(Collectors.toMap(d -> d.getId(), d -> d.getValue()));
 	}
 
 }
