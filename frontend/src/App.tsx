@@ -12,6 +12,7 @@ import { SettingsPage } from './SettingsPage';
 import { AboutPage } from './AboutPage';
 import { LandingPage } from './LandingPage';
 import { DataPrivacyPage } from './DataPrivacyPage';
+import { TeamsPage } from './TeamsPage';
 
 /** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
 class App extends React.Component<any> {
@@ -59,6 +60,12 @@ class App extends React.Component<any> {
       path: "/settings"
     }, {
       id: 3,
+      title: 'Teams',
+      page: <TeamsPage eventBus={this.eventBus} loginManager={this.loginManager} />,
+      icon: ImageProvider.getImage("teams"),
+      path: "/teams"
+    }, {
+      id: 4,
       title: 'About',
       page: <AboutPage />,
       icon: ImageProvider.getImage("info"),
