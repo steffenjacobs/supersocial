@@ -59,7 +59,7 @@ public class UserGroupService {
 		securityService.checkIfCurrentUserIsPermitted(userGroup, SecuredAction.DELETE);
 
 		if (securityService.getCurrentUser().getDefaultUserGroup().getId().equals(userGroupId)) {
-			throw new CouldNotDeleteDefaultUserGroup(userGroupId);
+			throw new CouldNotDeleteDefaultUserGroup(userGroup.getName());
 		}
 		deleteUserGroupNoCheck(userGroup);
 	}
@@ -132,7 +132,7 @@ public class UserGroupService {
 		}
 
 		if (user.getDefaultUserGroup().equals(userGroup)) {
-			throw new CouldNotDeleteDefaultUserFromDefaultUserGroup(userGroupId);
+			throw new CouldNotDeleteDefaultUserFromDefaultUserGroup(userGroup.getName());
 		}
 
 		userGroup.getUsers().remove(user);
