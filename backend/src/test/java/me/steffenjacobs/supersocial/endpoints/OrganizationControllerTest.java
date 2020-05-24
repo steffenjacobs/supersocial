@@ -119,4 +119,26 @@ class OrganizationControllerTest extends UserAwareTest {
 		// group after being removed from it.
 		Assertions.assertTrue(Arrays.stream(userGroupsQueried).noneMatch(userGroupCreated::equals));
 	}
+	
+	@Test
+	void addUserToUserGroupByUsername() {
+		String sessionCookie = registerAndLogin();
+		String sessionCookie2 = registerAndLogin();
+		CurrentUserDTO user2 = getUserInfo(sessionCookie2);
+
+		UserGroupDTO userGroup = new UserGroupDTO();
+		userGroup.setName("test-" + UUID.randomUUID());
+
+		// create a user group
+		UserGroupDTO userGroupCreated = sendRequest(sessionCookie, userGroup, HttpMethod.PUT, "/api/organization", UserGroupDTO.class, HttpStatus.CREATED);
+
+		// add the user to the newly created user group
+		UserGroupDTO userGroupUpdated = sendRequest(sessionCookie, userGroup, HttpMethod.PUT,
+				String.format("/api/organization/%s/%s", userGroupCreated.getId().toString(), user2.getUsername()), UserGroupDTO.class, HttpStatus.ACCEPTED);
+		Assertions.assertTrue(userGroupUpdated.getUsers().stream().map(UserDTO::getId).anyMatch(i -> user2.getId().equals(i)));
+
+		// check if the user is still in the updated group
+		UserGroupDTO[] userGroupsQueried = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);
+		Assertions.assertTrue(Arrays.stream(userGroupsQueried).anyMatch(userGroupUpdated::equals));
+	}
 }
