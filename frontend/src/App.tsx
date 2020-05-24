@@ -1,18 +1,18 @@
 import React from 'react';
-import { Login } from './Login';
+import { Login } from './login/Login';
 import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
-import { EventBus, EventBusEventType } from './EventBus';
-import { LoginManager } from './LoginManager';
-import { Registration } from './Registration';
+import { EventBus, EventBusEventType } from './misc/EventBus';
+import { LoginManager } from './login/LoginManager';
+import { Registration } from './login/Registration';
 import { Sidebar, PageComponent } from './Sidebar';
-import { MessageOverview } from './MessageOverview';
+import { MessageOverview } from './pages/overview/MessageOverview';
 import { ImageProvider } from './ImageProvider';
-import { AnalyticsPage } from './AnalyticsPage';
-import { SettingsPage } from './SettingsPage';
-import { AboutPage } from './AboutPage';
+import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
+import { SettingsPage } from './pages/settings/SettingsPage';
+import { AboutPage } from './pages/about/AboutPage';
 import { LandingPage } from './LandingPage';
 import { DataPrivacyPage } from './DataPrivacyPage';
-import { TeamsPage } from './TeamsPage';
+import { TeamsPage } from './pages/teams/TeamsPage';
 
 /** Main entry point for the application. The EventBus and the LoginManager live on this layer and are passed downwards from here. */
 class App extends React.Component<any> {

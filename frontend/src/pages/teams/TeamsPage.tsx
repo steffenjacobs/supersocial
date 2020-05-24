@@ -1,6 +1,6 @@
 import * as React from "react";
-import { EventBus } from "./EventBus";
-import { LoginManager } from "./LoginManager";
+import { EventBus } from "../../misc/EventBus";
+import { LoginManager } from "../../login/LoginManager";
 import { TeamsListTile } from "./TeamsListTile";
 
 export interface TeamsPageProps {

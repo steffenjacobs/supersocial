@@ -1,5 +1,5 @@
-import { EventBus, EventBusEventType } from "./EventBus";
-import { DeploymentManager } from "./DeploymentManager";
+import { EventBus, EventBusEventType } from "../misc/EventBus";
+import { DeploymentManager } from "../misc/DeploymentManager";
 
 export interface LoginStatus {
     loggedIn: boolean

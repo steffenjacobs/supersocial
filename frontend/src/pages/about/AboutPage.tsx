@@ -1,8 +1,8 @@
 import React from "react";
 import { AboutTile } from "./AboutTile";
 import './AboutTile.css';
-import { DeploymentManager } from "./DeploymentManager";
-import { ToastManager } from "./ToastManager";
+import { DeploymentManager } from "../../misc/DeploymentManager";
+import { ToastManager } from "../../misc/ToastManager";
 
 interface AboutState {
     version: string

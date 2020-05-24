@@ -1,5 +1,5 @@
 import React from "react";
-import { ImageProvider } from "./ImageProvider";
+import { ImageProvider } from "../../ImageProvider";
 
 export interface ProjectMemberProps {
     name: string

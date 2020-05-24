@@ -1,10 +1,9 @@
 import * as React from "react";
-import './PublishedPostsTile.css';
-import './UiTile.css';
-import './UiElements.css';
+import '../../UiTile.css';
+import '../../UiElements.css';
 import './PostAnalyticsTile.css';
-import { EventBus, EventBusEventType } from "./EventBus";
-import { ImageProvider } from "./ImageProvider";
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
+import { ImageProvider } from "../../ImageProvider";
 
 export class AnalyticsType {
     public static POST = new AnalyticsType("postId", EventBusEventType.REFRESH_POST_ANALYTICS, EventBusEventType.REFRESH_POST_ANALYTICS_REQ);

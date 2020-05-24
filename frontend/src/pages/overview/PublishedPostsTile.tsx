@@ -1,13 +1,13 @@
 import * as React from "react";
 import Moment from 'react-moment';
 import './PublishedPostsTile.css';
-import './UiTile.css';
-import './UiElements.css';
-import { EventBus, EventBusEventType } from "./EventBus";
-import { ImageProvider } from "./ImageProvider";
-import { DeploymentManager } from "./DeploymentManager";
+import '../../UiTile.css';
+import '../../UiElements.css';
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
+import { ImageProvider } from "../../ImageProvider";
+import { DeploymentManager } from "../../misc/DeploymentManager";
 import moment from "moment";
-import { ToastManager } from "./ToastManager";
+import { ToastManager } from "../../misc/ToastManager";
 
 export interface PublishedPostsProps {
     eventBus: EventBus

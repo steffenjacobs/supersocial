@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
-import { ImageProvider } from "./ImageProvider";
-import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
+import { ImageProvider } from "../ImageProvider";
+import { SocialMediaAccount } from "../pages/settings/SocialMediaAccountsListTile";
 
 export interface Param {
     name: string

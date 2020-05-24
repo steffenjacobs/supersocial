@@ -1,13 +1,13 @@
 import * as React from "react";
-import './UiTile.css';
-import './UiElements.css';
+import '../../UiTile.css';
+import '../../UiElements.css';
 import './TeamDetailsTile.css';
-import { EventBus, EventBusEventType } from "./EventBus";
-import { DeploymentManager } from "./DeploymentManager";
-import { ImageProvider } from "./ImageProvider";
-import { ToastManager } from "./ToastManager";
-import { EntityUtil } from "./EntityUtil";
-import { SnippetManager } from "./SnippetManager";
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
+import { DeploymentManager } from "../../misc/DeploymentManager";
+import { ImageProvider } from "../../ImageProvider";
+import { ToastManager } from "../../misc/ToastManager";
+import { EntityUtil } from "../../misc/EntityUtil";
+import { SnippetManager } from "../../misc/SnippetManager";
 import { Team } from "./TeamsListTile";
 
 export interface TeamDetailsProps {

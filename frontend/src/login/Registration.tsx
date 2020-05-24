@@ -1,9 +1,9 @@
 import React from "react";
-import { EventBus, EventBusEventType } from "./EventBus";
+import { EventBus, EventBusEventType } from "../misc/EventBus";
 import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
-import { DeploymentManager } from "./DeploymentManager";
-import { ToastManager } from "./ToastManager";
+import { DeploymentManager } from "../misc/DeploymentManager";
+import { ToastManager } from "../misc/ToastManager";
 import { ToastContainer, toast } from "react-toastify";
 
 export interface RegistrationProps {

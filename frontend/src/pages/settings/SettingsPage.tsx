@@ -1,7 +1,7 @@
 import * as React from "react";
-import { EventBus } from "./EventBus";
+import { EventBus } from "../../misc/EventBus";
 import { SocialMediaAccountsListTile } from "./SocialMediaAccountsListTile";
-import { LoginManager } from "./LoginManager";
+import { LoginManager } from "../../login/LoginManager";
 import { MapContainer } from "./MapContainer";
 
 export interface SettingsProps {

@@ -1,13 +1,13 @@
 import * as React from "react";
-import './UiTile.css';
-import './UiElements.css';
-import { EventBus, EventBusEventType } from "./EventBus";
-import { DeploymentManager } from "./DeploymentManager";
-import { ImageProvider } from "./ImageProvider";
-import { ToastManager } from "./ToastManager";
-import { LoginManager } from "./LoginManager";
-import { UserConfigurationDecoder } from "./UserConfigurationDecoder";
-import { SnippetManager } from "./SnippetManager";
+import '../../UiTile.css';
+import '../../UiElements.css';
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
+import { DeploymentManager } from "../../misc/DeploymentManager";
+import { ImageProvider } from "../../ImageProvider";
+import { ToastManager } from "../../misc/ToastManager";
+import { LoginManager } from "../../login/LoginManager";
+import { UserConfigurationDecoder } from "../../login/UserConfigurationDecoder";
+import { SnippetManager } from "../../misc/SnippetManager";
 
 export interface TrendingTileState {
     updating?: boolean

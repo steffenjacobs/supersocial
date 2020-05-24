@@ -1,6 +1,6 @@
 import React from "react";
 import './Sidebar.css';
-import { LoginManager } from "./LoginManager";
+import { LoginManager } from "./login/LoginManager";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Footer } from "./Footer";

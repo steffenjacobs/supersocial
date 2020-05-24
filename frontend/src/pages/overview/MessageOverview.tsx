@@ -1,9 +1,9 @@
 import * as React from "react";
 import { PublishMessageTile } from "./PublishMessageTile";
 import { PublishedPostsTile } from "./PublishedPostsTile";
-import { EventBus } from "./EventBus";
+import { EventBus } from "../../misc/EventBus";
 import { TrendingTile } from "./TrendingTile";
-import { LoginManager } from "./LoginManager";
+import { LoginManager } from "../../login/LoginManager";
 
 export interface MessageOverviewProps {
     eventBus: EventBus

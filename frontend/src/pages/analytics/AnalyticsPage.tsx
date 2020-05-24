@@ -1,11 +1,11 @@
 import * as React from "react";
-import { EventBus, EventBusEventType } from "./EventBus";
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
 import { PostAnalyticsTile, AnalyticsType } from "./PostAnalyticsTile";
-import { DeploymentManager } from "./DeploymentManager";
-import { ToastManager } from "./ToastManager";
+import { DeploymentManager } from "../../misc/DeploymentManager";
+import { ToastManager } from "../../misc/ToastManager";
 import './AnalyticsPage.css';
 import { Multiselect } from 'multiselect-react-dropdown';
-import { SnippetManager } from "./SnippetManager";
+import { SnippetManager } from "../../misc/SnippetManager";
 
 export interface AnalyticsProps {
     eventBus: EventBus

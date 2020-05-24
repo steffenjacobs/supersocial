@@ -1,15 +1,15 @@
 import * as React from "react";
 import './PublishMessageTile.css';
-import './UiTile.css';
-import './UiElements.css';
+import '../../UiTile.css';
+import '../../UiElements.css';
 import './react-datetime.css';
-import { EventBus, EventBusEventType } from "./EventBus";
-import { DeploymentManager } from "./DeploymentManager";
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
+import { DeploymentManager } from "../../misc/DeploymentManager";
 import Datetime from 'react-datetime';
-import { SocialMediaAccount } from "./SocialMediaAccountsListTile";
-import { ImageProvider } from "./ImageProvider";
-import { ToastManager } from "./ToastManager";
-import { SnippetManager } from "./SnippetManager";
+import { SocialMediaAccount } from "../settings/SocialMediaAccountsListTile";
+import { ImageProvider } from "../../ImageProvider";
+import { ToastManager } from "../../misc/ToastManager";
+import { SnippetManager } from "../../misc/SnippetManager";
 
 export interface PublishMessageTileProps {
     eventBus: EventBus

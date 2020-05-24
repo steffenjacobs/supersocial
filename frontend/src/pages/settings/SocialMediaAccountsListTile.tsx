@@ -1,14 +1,13 @@
 import * as React from "react";
-import './PublishedPostsTile.css';
-import './UiTile.css';
-import './UiElements.css';
-import { EventBus, EventBusEventType } from "./EventBus";
-import { ImageProvider } from "./ImageProvider";
-import { DeploymentManager } from "./DeploymentManager";
+import '../../UiTile.css';
+import '../../UiElements.css';
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
+import { ImageProvider } from "../../ImageProvider";
+import { DeploymentManager } from "../../misc/DeploymentManager";
 import { Credential, SocialMediaAccountDetailsTile } from "./SocialMediaAccountDetailsTile";
-import { ToastManager } from "./ToastManager";
-import { EntityUtil } from "./EntityUtil";
-import { SnippetManager } from "./SnippetManager";
+import { ToastManager } from "../../misc/ToastManager";
+import { EntityUtil } from "../../misc/EntityUtil";
+import { SnippetManager } from "../../misc/SnippetManager";
 
 export interface SocialMediaAccountsListTileProps {
     eventBus: EventBus

@@ -1,5 +1,5 @@
 import React from "react";
-import { EventBus, EventBusEventType } from "./EventBus";
+import { EventBus, EventBusEventType } from "../misc/EventBus";
 import { LoginManager } from "./LoginManager";
 import { Redirect } from "react-router-dom";
 

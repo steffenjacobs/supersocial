@@ -2,11 +2,11 @@ import React from "react";
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 import './MapContainer.css';
 import './leaflet.css';
-import { LocationConfiguration, UserConfigurationDecoder } from "./UserConfigurationDecoder";
-import { LoginManager, LoginStatus } from "./LoginManager";
-import { DeploymentManager } from "./DeploymentManager";
-import { ToastManager } from "./ToastManager";
-import { EventBus, EventBusEventType } from "./EventBus";
+import { LocationConfiguration, UserConfigurationDecoder } from "../../login/UserConfigurationDecoder";
+import { LoginManager, LoginStatus } from "../../login/LoginManager";
+import { DeploymentManager } from "../../misc/DeploymentManager";
+import { ToastManager } from "../../misc/ToastManager";
+import { EventBus, EventBusEventType } from "../../misc/EventBus";
 import L from "leaflet";
 
 interface MapState {
