@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 import me.steffenjacobs.supersocial.domain.dto.CurrentUserDTO;
+import me.steffenjacobs.supersocial.domain.dto.UserDTO;
 import me.steffenjacobs.supersocial.domain.dto.UserGroupDTO;
 
 /** @author Steffen Jacobs */
@@ -65,7 +66,7 @@ class OrganizationControllerTest extends UserAwareTest {
 		// add the user to the newly created user group
 		UserGroupDTO userGroupUpdated = sendRequest(sessionCookie, userGroup, HttpMethod.PUT,
 				String.format("/api/organization/%s/%s", userGroupCreated.getId().toString(), user2.getId().toString()), UserGroupDTO.class, HttpStatus.ACCEPTED);
-		Assertions.assertTrue(userGroupUpdated.getUsers().contains(user2.getId()));
+		Assertions.assertTrue(userGroupUpdated.getUsers().stream().map(UserDTO::getId).anyMatch(i->user2.getId().equals(i)));
 
 		// check if the user is still in the updated group
 		UserGroupDTO[] userGroupsQueried = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);

@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 
 /** @author Steffen Jacobs */
@@ -12,7 +11,7 @@ public class UserGroupDTO implements WithErrorDTO {
 	private UUID id;
 	private String name;
 	private String error;
-	private Set<UUID> users;
+	private Set<UserDTO> users;
 
 	public UserGroupDTO(String error) {
 		this.error = error;
@@ -38,20 +37,22 @@ public class UserGroupDTO implements WithErrorDTO {
 		this.name = name;
 	}
 
-	public Set<UUID> getUsers() {
+	public Set<UserDTO> getUsers() {
 		return users;
 	}
 
-	public void setUsers(Set<UUID> users) {
+	public void setUsers(Set<UserDTO> users) {
 		this.users = users;
 	}
+	
+	
 
 	public static UserGroupDTO fromUserGroup(UserGroup userGroup) {
 		UserGroupDTO dto = new UserGroupDTO();
 		dto.setId(userGroup.getId());
 		dto.setName(userGroup.getName());
 		// TODO: decide if this should be pruned
-		dto.setUsers(userGroup.getUsers().stream().map(SupersocialUser::getId).collect(Collectors.toSet()));
+		dto.setUsers(userGroup.getUsers().stream().map(UserDTO::fromUser).collect(Collectors.toSet()));
 		return dto;
 	}
 
