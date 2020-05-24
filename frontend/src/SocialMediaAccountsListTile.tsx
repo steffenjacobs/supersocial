@@ -5,7 +5,7 @@ import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
 import { ImageProvider } from "./ImageProvider";
 import { DeploymentManager } from "./DeploymentManager";
-import { Credential, AccountDetailsTile } from "./AccountDetailsTile";
+import { Credential, SocialMediaAccountDetailsTile } from "./SocialMediaAccountDetailsTile";
 import { ToastManager } from "./ToastManager";
 import { EntityUtil } from "./EntityUtil";
 import { SnippetManager } from "./SnippetManager";
@@ -89,7 +89,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
         }
     }
 
-    /** Select a new social media account to be displayed in the AccountDetailsTile.tsx. */
+    /** Select a new social media account to be displayed in the SocialMediaAccountDetailsTile.tsx. */
     private selectAccount(account: SocialMediaAccount) {
         if (account && (account.id === (this.state.selected ? this.state.selected?.id : false))) {
             return;
@@ -214,7 +214,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
                         </table>
                     </div>
                 </div >
-                {this.state.selected ? <AccountDetailsTile eventBus={this.props.eventBus} account={this.state.selected} /> : <div />}
+                {this.state.selected ? <SocialMediaAccountDetailsTile eventBus={this.props.eventBus} account={this.state.selected} /> : <div />}
             </div>
         );
     }

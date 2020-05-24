@@ -1,6 +1,6 @@
 import * as React from "react";
 import './PublishMessageTile.css';
-import './AccountDetailsTile.css';
+import './SocialMediaAccountDetailsTile.css';
 import './UiTile.css';
 import './UiElements.css';
 import { EventBus, EventBusEventType } from "./EventBus";
@@ -11,11 +11,11 @@ import { ToastManager } from "./ToastManager";
 import { EntityUtil } from "./EntityUtil";
 import { SnippetManager } from "./SnippetManager";
 
-export interface AccountDetailsProps {
+export interface SocialMediaAccountDetailsProps {
     eventBus: EventBus
     account?: SocialMediaAccount
 }
-export interface AccountDetailsState {
+export interface SocialMediaAccountDetailsState {
     account: SocialMediaAccount,
     displayNameLastSaved?: string
     platformIdLastSaved?: number
@@ -30,8 +30,8 @@ export interface Credential {
 }
 
 /** Contains a form to create and update account proerties like name and social media network. Allows to create, update and delete associated credentials. */
-export class AccountDetailsTile extends React.Component<AccountDetailsProps, AccountDetailsState>{
-    constructor(props: AccountDetailsProps, state: AccountDetailsState) {
+export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAccountDetailsProps, SocialMediaAccountDetailsState>{
+    constructor(props: SocialMediaAccountDetailsProps, state: SocialMediaAccountDetailsState) {
         super(props);
         this.state = { account: props.account ? props.account : { credentials: [], displayName: "<none>", id: "", platformId: -1 } };
         this.props.eventBus.register(EventBusEventType.SELECTED_SOCIAL_MEDIA_ACCOUNT_CHANGED, (type, acc) => this.updateSelected(acc));
