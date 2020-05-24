@@ -19,6 +19,8 @@ import me.steffenjacobs.supersocial.domain.entity.AccessControlList;
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 import me.steffenjacobs.supersocial.domain.entity.SupersocialUser;
 import me.steffenjacobs.supersocial.domain.entity.UserGroup;
+import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserFromDefaultUserGroup;
+import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserGroup;
 import me.steffenjacobs.supersocial.security.exception.UserNotFoundException;
 import me.steffenjacobs.supersocial.security.exception.UserNotInUserGroupException;
 import me.steffenjacobs.supersocial.security.exception.UsergroupNotFoundException;
@@ -51,6 +53,10 @@ public class UserGroupService {
 	public void deleteUserGroup(UUID userGroupId) {
 		UserGroup userGroup = userGroupRepository.findById(userGroupId).orElseThrow(() -> new UsergroupNotFoundException(userGroupId));
 		securityService.checkIfCurrentUserIsPermitted(userGroup, SecuredAction.DELETE);
+		
+		if(securityService.getCurrentUser().getDefaultUserGroup().getId().equals(userGroupId)) {
+			throw new CouldNotDeleteDefaultUserGroup(userGroupId);
+		}
 
 		// delete ACL
 		final AccessControlList acl = userGroup.getAccessControlList();
@@ -108,6 +114,11 @@ public class UserGroupService {
 		if (!userGroup.getUsers().contains(user)) {
 			throw new UserNotInUserGroupException(userId, userGroupId);
 		}
+		
+		if(user.getDefaultUserGroup().equals(userGroup)) {
+			throw new CouldNotDeleteDefaultUserFromDefaultUserGroup(userGroupId);
+		}
+		
 		userGroup.getUsers().remove(user);
 
 		return UserGroupDTO.fromUserGroup(userGroupRepository.save(userGroup));

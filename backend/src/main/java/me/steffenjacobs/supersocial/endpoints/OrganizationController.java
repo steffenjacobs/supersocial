@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.steffenjacobs.supersocial.domain.dto.UserGroupDTO;
 import me.steffenjacobs.supersocial.security.UserGroupService;
+import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserFromDefaultUserGroup;
+import me.steffenjacobs.supersocial.security.exception.CouldNotDeleteDefaultUserGroup;
 import me.steffenjacobs.supersocial.security.exception.InvalidUsernameException;
 import me.steffenjacobs.supersocial.security.exception.UsergroupNotFoundException;
 import me.steffenjacobs.supersocial.util.Pair;
@@ -54,12 +56,12 @@ public class OrganizationController {
 	}
 
 	/** Delete a given user to a user group. */
-	@DeleteMapping(path = "/api/organization/{userGroupId}/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(path = "/api/organization/{userGroupId}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserGroupDTO> deleteUserToUserGroup(@PathVariable(name = "userGroupId") UUID userGroupId, @PathVariable(name = "userId") UUID userId) throws Exception {
 		LOG.info("Removing {} from organization {}.", userId, userGroupId);
 		try {
 			return new ResponseEntity<>(userGroupService.deleteUserFromUserGroup(userId, userGroupId), HttpStatus.ACCEPTED);
-		} catch (UsergroupNotFoundException | InvalidUsernameException e) {
+		} catch (UsergroupNotFoundException | InvalidUsernameException | CouldNotDeleteDefaultUserFromDefaultUserGroup e) {
 			return new ResponseEntity<>(new UserGroupDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -80,6 +82,8 @@ public class OrganizationController {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (UsergroupNotFoundException e) {
 			return new ResponseEntity<>(new UserGroupDTO(e.getMessage()), HttpStatus.NOT_FOUND);
+		} catch (CouldNotDeleteDefaultUserGroup e) {
+			return new ResponseEntity<>(new UserGroupDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 }
