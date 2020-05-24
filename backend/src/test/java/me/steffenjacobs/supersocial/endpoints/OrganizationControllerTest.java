@@ -66,7 +66,7 @@ class OrganizationControllerTest extends UserAwareTest {
 		// add the user to the newly created user group
 		UserGroupDTO userGroupUpdated = sendRequest(sessionCookie, userGroup, HttpMethod.PUT,
 				String.format("/api/organization/%s/%s", userGroupCreated.getId().toString(), user2.getId().toString()), UserGroupDTO.class, HttpStatus.ACCEPTED);
-		Assertions.assertTrue(userGroupUpdated.getUsers().stream().map(UserDTO::getId).anyMatch(i->user2.getId().equals(i)));
+		Assertions.assertTrue(userGroupUpdated.getUsers().stream().map(UserDTO::getId).anyMatch(i -> user2.getId().equals(i)));
 
 		// check if the user is still in the updated group
 		UserGroupDTO[] userGroupsQueried = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);
@@ -80,7 +80,7 @@ class OrganizationControllerTest extends UserAwareTest {
 		userGroupsQueried = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);
 		Assertions.assertTrue(Arrays.stream(userGroupsQueried).noneMatch(userGroupUpdated::equals));
 	}
-	
+
 	@Test
 	void attemptDeletionOfDefaultUserGroupOrDefaultFromDefaultUserGroup() {
 		String sessionCookie = registerAndLogin();
@@ -89,12 +89,34 @@ class OrganizationControllerTest extends UserAwareTest {
 
 		// attempt to delete the default user group
 		sendRequest(sessionCookie, null, HttpMethod.DELETE, String.format("/api/organization/%s", userGroups[0].getId()), UserGroupDTO.class, HttpStatus.BAD_REQUEST);
-		
+
 		// attempt to delete the default user from the default user group
 		CurrentUserDTO user = getUserInfo(sessionCookie);
-		sendRequest(sessionCookie, null, HttpMethod.DELETE, String.format("/api/organization/%s/%s", userGroups[0].getId().toString(), user.getId().toString()),
-				UserGroupDTO.class, HttpStatus.BAD_REQUEST);
-		
-		
+		sendRequest(sessionCookie, null, HttpMethod.DELETE, String.format("/api/organization/%s/%s", userGroups[0].getId().toString(), user.getId().toString()), UserGroupDTO.class,
+				HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	void removeLastUserFromUserGroup() {
+		String sessionCookie = registerAndLogin();
+
+		UserGroupDTO userGroup = new UserGroupDTO();
+		userGroup.setName("test-" + UUID.randomUUID());
+
+		// create a user group
+		UserGroupDTO userGroupCreated = sendRequest(sessionCookie, userGroup, HttpMethod.PUT, "/api/organization", UserGroupDTO.class, HttpStatus.CREATED);
+
+		// delete user from the group
+		CurrentUserDTO user = getUserInfo(sessionCookie);
+		sendRequest(sessionCookie, userGroup, HttpMethod.DELETE, String.format("/api/organization/%s/%s", userGroupCreated.getId().toString(), user.getId().toString()),
+				UserGroupDTO.class, HttpStatus.NO_CONTENT);
+
+		// check if it is still there
+		UserGroupDTO[] userGroupsQueried = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);
+
+		// this is suboptimal, since this user would not be able to see the
+		// group after being removed from it.
+		Assertions.assertTrue(Arrays.stream(userGroupsQueried).noneMatch(userGroupCreated::equals));
 	}
 }
