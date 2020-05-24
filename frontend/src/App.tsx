@@ -79,7 +79,7 @@ class App extends React.Component<any> {
         <Switch>
           <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />
           <Route path="/login" render={(props) => <Login eventBus={this.eventBus} loginManager={this.loginManager} params={props.location.search} />} />
-          {components.map((component, idx) => <Route path={component.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, component) : <Redirect to={"/login?redirect=" + encodeURIComponent(component.path)} />} />)}
+          {components.map((component, idx) => <Route key={component.id} path={component.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, component) : <Redirect to={"/login?redirect=" + encodeURIComponent(component.path)} />} />)}
           <Route path="/privacy" render={(props) => <DataPrivacyPage />} />
           <Route path="/" render={(props) => <LandingPage />} />
         </Switch>

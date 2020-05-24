@@ -39,7 +39,7 @@ interface PublishedPostsState {
 export class PublishedPostsTile extends React.Component<PublishedPostsProps, PublishedPostsState>{
     constructor(props: PublishedPostsProps) {
         super(props);
-        this.state = { posts: [] };
+        this.state = { posts: [], updating: true };
 
         this.refreshPosts(true);
         this.props.eventBus.register(EventBusEventType.REFRESH_POSTS, (eventType, eventData) => this.refreshPosts());
@@ -47,10 +47,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
     private refreshPosts(notMounted?: boolean) {
-        if (notMounted) {
-            this.state = { posts: this.state.posts, requireLogin: this.state.requireLogin, updating: true };
-        }
-        else {
+        if (!notMounted) {
             this.setState({ posts: this.state.posts, updating: true });
         }
         fetch(`${DeploymentManager.getUrl()}api/post`, {

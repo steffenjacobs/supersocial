@@ -27,14 +27,16 @@ export interface TrendingTopic {
 export class TrendingTile extends React.Component<TrendingTileProps, TrendingTileState>{
     constructor(props: TrendingTileProps) {
         super(props);
-        this.state = { updating: false, topics: [] };
-        this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocation(props.loginManager).woeid);
+        this.state = { updating: true, topics: [] };
+        this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocation(props.loginManager).woeid, true);
         props.eventBus.register(EventBusEventType.USER_CHANGE, (e, ld) => this.refreshTrendingTopics(UserConfigurationDecoder.decodeLocationFromLoginStatus(ld).woeid));
     }
 
     /** Fetches the most recent twitter trends from the backend. */
-    private refreshTrendingTopics(woeid: any) {
-        this.setState({ updating: true });
+    private refreshTrendingTopics(woeid: any, notMounted?:boolean) {
+        if(!notMounted){
+            this.setState({ updating: true });
+        }
         fetch(`${DeploymentManager.getUrl()}api/analytics/trending/${woeid}`, {
             method: 'get',
             credentials: 'include',

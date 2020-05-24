@@ -25,7 +25,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
         this.state = { components: props.components, loginManager: props.loginManager, selected: props.selected };
-        this.setActivePage(this.state.selected, true);
+        this.setActivePage(props.selected, true);
     }
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
@@ -43,9 +43,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
             }
         }
 
-        if (notMounted) {
-            this.state = { components: newComponents, loginManager: this.state.loginManager, selected: elem };
-        } else {
+        if (!notMounted) {
             this.setState({ components: newComponents, selected: elem });
         }
         window.history.pushState('', 'Supersocial - ', elem.path);

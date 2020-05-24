@@ -33,7 +33,7 @@ interface SocialMediaAccounts {
 export class SocialMediaAccountsListTile extends React.Component<SocialMediaAccountsListTileProps, SocialMediaAccounts>{
     constructor(props: SocialMediaAccountsListTileProps, state: SocialMediaAccounts) {
         super(props);
-        this.state = { accounts: [] };
+        this.state = { accounts: [], updating: true };
 
         this.refreshAccounts(true);
         this.props.eventBus.register(EventBusEventType.REFRESH_SOCIAL_MEDIA_ACCOUNTS, (eventType, eventData) => this.refreshAccounts());
@@ -42,10 +42,7 @@ export class SocialMediaAccountsListTile extends React.Component<SocialMediaAcco
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_POSTS event is received via the EventBus. */
     private refreshAccounts(notMounted?: boolean) {
-        if (notMounted) {
-            this.state = { accounts: this.state.accounts, updating: true, selected: this.state.selected };
-        }
-        else {
+        if (!notMounted) {
             this.setState({ accounts: this.state.accounts, updating: true });
         }
         fetch(`${DeploymentManager.getUrl()}api/socialmediaaccount`, {

@@ -38,7 +38,6 @@ export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAc
 
     /*Refresh the details view with a new selected account. */
     private updateSelected(data: any) {
-        console.log(data);
         if (data) {
             this.setState({
                 account: data,
@@ -283,7 +282,6 @@ export class SocialMediaAccountDetailsTile extends React.Component<SocialMediaAc
     private addCredential(descriptor?: string, resolve?: () => void, reject?: () => void) {
         const newCreds = Object.assign([], this.state.account.credentials);
         newCreds.push({ id: EntityUtil.makeId(), value: "", descriptor: descriptor ? descriptor : "", omitted: false, created: new Date() });
-        console.log(newCreds);
         this.setState({
             account: {
                 credentials: newCreds,
