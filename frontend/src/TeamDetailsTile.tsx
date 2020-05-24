@@ -135,7 +135,7 @@ export class TeamDetailsTile extends React.Component<TeamDetailsProps, TeamDetai
                 team: {
                     id: this.state.team.id,
                     name: this.state.team.name,
-                    users: this.state.team.users.filter(u => u.id != userId)
+                    users: this.state.team.users.filter(u => u.id !== userId)
                 }
             });
             return;

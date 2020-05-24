@@ -36,8 +36,7 @@ interface Teams {
 export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
     constructor(props: TeamsListTileProps, state: Teams) {
         super(props);
-        this.state = { teams: [] };
-
+        this.state = { teams: [], updating: true };
         this.refreshTeams(true);
         this.props.eventBus.register(EventBusEventType.REFRESH_TEAMS, (eventType, eventData) => this.refreshTeams());
         this.props.eventBus.register(EventBusEventType.SELECTED_TEAM_CHANGED, (eventType, eventData) => this.selectTeam(eventData));
@@ -45,10 +44,7 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
 
     /** Triggers a refresh of this list. This is also triggered when a REFRESH_TEAMS event is received via the EventBus. */
     private refreshTeams(notMounted?: boolean) {
-        if (notMounted) {
-            this.state = { teams: this.state.teams, updating: true, selected: this.state.selected };
-        }
-        else {
+        if (!notMounted) {
             this.setState({ teams: this.state.teams, updating: true });
         }
         fetch(`${DeploymentManager.getUrl()}api/organization`, {
@@ -101,6 +97,9 @@ export class TeamsListTile extends React.Component<TeamsListTileProps, Teams>{
                     ToastManager.showErrorToast(response);
                 } else {
                     ToastManager.showSuccessToast("Deleted team '" + team.name + "'");
+                    if(this.state.selected && team.id === this.state.selected.id){
+                        this.selectTeam(undefined as any);
+                    }
                     this.refreshTeams();
                 }
             });
