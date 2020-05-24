@@ -80,4 +80,21 @@ class OrganizationControllerTest extends UserAwareTest {
 		userGroupsQueried = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);
 		Assertions.assertTrue(Arrays.stream(userGroupsQueried).noneMatch(userGroupUpdated::equals));
 	}
+	
+	@Test
+	void attemptDeletionOfDefaultUserGroupOrDefaultFromDefaultUserGroup() {
+		String sessionCookie = registerAndLogin();
+		UserGroupDTO[] userGroups = sendRequest(sessionCookie, null, HttpMethod.GET, "/api/organization", UserGroupDTO[].class, HttpStatus.OK);
+		Assertions.assertEquals(1, userGroups.length);
+
+		// attempt to delete the default user group
+		sendRequest(sessionCookie, null, HttpMethod.DELETE, String.format("/api/organization/%s", userGroups[0].getId()), UserGroupDTO.class, HttpStatus.BAD_REQUEST);
+		
+		// attempt to delete the default user from the default user group
+		CurrentUserDTO user = getUserInfo(sessionCookie);
+		sendRequest(sessionCookie, null, HttpMethod.DELETE, String.format("/api/organization/%s/%s", userGroups[0].getId().toString(), user.getId().toString()),
+				UserGroupDTO.class, HttpStatus.BAD_REQUEST);
+		
+		
+	}
 }
