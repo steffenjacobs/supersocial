@@ -47,9 +47,10 @@ public class OrganizationController {
 
 	/** Add a given user to a user group. */
 	@PutMapping(path = "/api/organization/{userGroupId}/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserGroupDTO> addUserToUserGroup(@PathVariable(name = "userGroupId") UUID userGroupId, @PathVariable(name = "userId") UUID userId) throws Exception {
-		LOG.info("Adding {} to organization {}.", userId, userGroupId);
+	public ResponseEntity<UserGroupDTO> addUserToUserGroup(@PathVariable(name = "userGroupId") UUID userGroupId, @PathVariable(name = "userId") String userId) throws Exception {
+		LOG.info("Adding {} to organization {}.", userId, userGroupId);		
 		try {
+			
 			return new ResponseEntity<>(userGroupService.addUserToUserGroup(userId, userGroupId), HttpStatus.ACCEPTED);
 		} catch (IllegalArgumentException | UsergroupNotFoundException | InvalidUsernameException e) {
 			return new ResponseEntity<>(new UserGroupDTO(e.getMessage()), HttpStatus.BAD_REQUEST);

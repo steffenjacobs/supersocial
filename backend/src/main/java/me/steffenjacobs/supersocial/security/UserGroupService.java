@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -42,6 +43,8 @@ public class UserGroupService {
 
 	@Autowired
 	private SupersocialUserRepository supersocialUserRepository;
+
+	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
 
 	public UserGroup getUserGroup(UUID userGroupId) {
 		return securityService.filterForCurrentUser(userGroupRepository.findById(userGroupId), SecuredAction.READ).orElseThrow(() -> new UsergroupNotFoundException(userGroupId));
@@ -97,11 +100,19 @@ public class UserGroupService {
 		return userGroup;
 	}
 
-	public UserGroupDTO addUserToUserGroup(UUID userId, UUID userGroupId) {
+	public UserGroupDTO addUserToUserGroup(String userIdOrUsername, UUID userGroupId) {
+
+		// find user by identifier or name
+		SupersocialUser user = null;
+		if (UUID_PATTERN.matcher(userIdOrUsername).matches()) {
+			user = supersocialUserRepository.findById(UUID.fromString(userIdOrUsername))
+					.orElseGet(() -> supersocialUserRepository.findByName(userIdOrUsername).orElseThrow(() -> new UserNotFoundException(userIdOrUsername)));
+		} else {
+			user = supersocialUserRepository.findByName(userIdOrUsername).orElseThrow(() -> new UserNotFoundException(userIdOrUsername));
+		}
 
 		// no permission check for finding the user. TODO: send invitation to
 		// user
-		SupersocialUser user = supersocialUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 		UserGroup userGroup = userGroupRepository.findById(userGroupId).orElseThrow(() -> new UsergroupNotFoundException(userGroupId));
 		securityService.checkIfCurrentUserIsPermitted(userGroup, SecuredAction.UPDATE);
 

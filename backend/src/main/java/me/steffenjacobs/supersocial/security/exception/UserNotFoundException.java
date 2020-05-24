@@ -14,4 +14,8 @@ public class UserNotFoundException extends RuntimeException {
 		super(String.format("User with id '%s' does not exist.", id.toString()));
 	}
 
+	public UserNotFoundException(String name) {
+		super(String.format("User with name '%s' does not exist.", name));
+	}
+
 }
