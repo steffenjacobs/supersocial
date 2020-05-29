@@ -1,14 +1,15 @@
 import React from "react";
-import { EventBus, EventBusEventType } from "../misc/EventBus";
-import { LoginManager } from "./LoginManager";
+import { EventBusEventType, EventBus } from "../misc/EventBus";
 import { Redirect } from "react-router-dom";
+import './InlineLogin.css';
+import { LoginManager } from "./LoginManager";
 
-export interface LoginProps {
+interface LoginProps {
     eventBus: EventBus
     loginManager: LoginManager
     params: string
 }
-interface LoginCredentials {
+export interface LoginCredentials {
     username: string
     password: string
     loggedIn?: boolean
@@ -17,7 +18,7 @@ interface LoginCredentials {
 
 /** Login Page. The user can login here or go to the Registration page to create a new user account. 
  * Consult the LoginManger.tsx for further login logic. */
-export class Login extends React.Component<LoginProps, LoginCredentials> {
+export class InlineLogin extends React.Component<LoginProps, LoginCredentials> {
     constructor(props: LoginProps) {
         super(props);
         let redirect = new URLSearchParams(props.params).get("redirect");
@@ -73,27 +74,17 @@ export class Login extends React.Component<LoginProps, LoginCredentials> {
             return <Redirect to={this.state.redirect} />;
         }
         return (
-            <div className="container centered-container">
-                <div className="box-header">
-                    Sign In
-                </div>
-                <div className="box-content">
-                    <div>
-                        <div className="messageLabel">Username</div>
+            <div className="inline-login">
                         <input className="textarea" placeholder="Enter Username" id="username" onKeyDown={this.onKeyDown.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.username} />
-
-                        <div className="messageLabel">Password</div>
                         <input type="password" className="textarea" placeholder="Enter Password" id="password" onKeyDown={this.onKeyDown.bind(this)} onChange={this.formInputFieldUpdated.bind(this)} value={this.state.password} />
-                    </div>
-                    <span>Not registered yet? Click <a href="/register">here</a> to sign up.</span>
                     <button
-                        className="btn btn-primary send-button"
+                        className="btn btn-primary sign-in-button"
                         onClick={this.signIn.bind(this)}
                     >
-                        Sign In &gt;
+                        Sign In
                     </button>
+                    <span className="register-text">Not registered yet? Click <a href="/register">here</a> to sign up.</span>
                 </div>
-            </div>
         );
     }
 }

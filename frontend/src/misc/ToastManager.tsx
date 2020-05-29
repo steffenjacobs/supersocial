@@ -18,6 +18,11 @@ export class ToastManager {
             position: toast.POSITION.TOP_RIGHT
         });
     }
+    static showErrorToastMsg(message: string) {
+        toast.error(message, {
+            position: toast.POSITION.TOP_RIGHT
+        });
+    }
     static showWarnToast(message: string) {
         toast.warn(message, {
             position: toast.POSITION.TOP_RIGHT

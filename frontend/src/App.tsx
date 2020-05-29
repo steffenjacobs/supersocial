@@ -1,5 +1,4 @@
 import React from 'react';
-import { Login } from './login/Login';
 import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
 import { EventBus, EventBusEventType } from './misc/EventBus';
 import { LoginManager } from './login/LoginManager';
@@ -78,10 +77,10 @@ class App extends React.Component<any> {
       <BrowserRouter>
         <Switch>
           <Route path="/register" render={(props) => <Registration eventBus={this.eventBus} loginManager={this.loginManager} />} />
-          <Route path="/login" render={(props) => <Login eventBus={this.eventBus} loginManager={this.loginManager} params={props.location.search} />} />
+          <Route path="/login" render={(props) => <LandingPage eventBus={this.eventBus} loginManager={this.loginManager} params={props.location.search} />} />
           {components.map((component, idx) => <Route key={component.id} path={component.path} render={(props) => this.loginManager.isLoggedIn() ? this.selectComponent(components, component) : <Redirect to={"/login?redirect=" + encodeURIComponent(component.path)} />} />)}
           <Route path="/privacy" render={(props) => <DataPrivacyPage />} />
-          <Route path="/" render={(props) => <LandingPage />} />
+          <Route path="/" render={(props) => <LandingPage eventBus={this.eventBus} loginManager={this.loginManager} params="overview"/>} />
         </Switch>
       </BrowserRouter>
     );

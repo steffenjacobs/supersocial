@@ -1,5 +1,6 @@
 import { EventBus, EventBusEventType } from "../misc/EventBus";
 import { DeploymentManager } from "../misc/DeploymentManager";
+import { ToastManager } from "../misc/ToastManager";
 
 export interface LoginStatus {
     loggedIn: boolean
@@ -67,6 +68,7 @@ export class LoginManager {
                         });
                     } else {
                         this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
+                        ToastManager.showErrorToastMsg("Invalid credentials.");
                     }
                 });
         } else {
@@ -104,9 +106,11 @@ export class LoginManager {
                 if (response.ok) {
                     response.json().then(data => {
                         this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
+                        ToastManager.showSuccessToast("Logged out.");
                     });
                 } else {
                     this.updateLoginStatus({ loggedIn: false, username: "Not logged in", config: [] });
+                    ToastManager.showErrorToast(response);
                 }
             });
     }

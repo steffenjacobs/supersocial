@@ -2,14 +2,27 @@ import React from "react";
 import './LandingPage.css';
 import './UiElements.css';
 import { Footer } from "./Footer";
+import { InlineLogin } from "./login/InlineLogin";
+import { EventBus } from "./misc/EventBus";
+import { LoginManager } from "./login/LoginManager";
+import { ToastContainer, toast } from 'react-toastify';
 
+interface LandingPagePros{
+    eventBus: EventBus
+    loginManager: LoginManager
+    params: string
+}
 
-export class LandingPage extends React.Component<any, any>{
+export class LandingPage extends React.Component<LandingPagePros, any>{
 
     public render() {
         return <div className="landing-site">
+        <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500} />
             <div className="landing-site-inner">
-                <h1 className="landing-h1">Welcome to Supersocial</h1>
+                <span className="landing-header">
+                    <h1 className="landing-h1">Welcome to Supersocial</h1>
+                    <InlineLogin eventBus={this.props.eventBus} loginManager={this.props.loginManager} params={this.props.params}/>
+                </span>
                 <h2 className="landing-h2">Social Media Marketing on a new level.</h2>
                 <div className="landing-box landing-flex">
                     <img alt="Logo" className="landing-header-elem" src="logo512.png" />
