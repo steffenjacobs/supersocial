@@ -7,6 +7,10 @@ export interface InterfaceWithError {
 /**Shows different kinds of standardized toasts. */
 export class ToastManager {
     static showErrorToast(response: Response) {
+        if(response.url.endsWith("/api/login")){
+            console.log("User not logged in.");
+            return;
+        }
         response.json().then(json => {
             toast.error(json.error, {
                 position: toast.POSITION.TOP_RIGHT
