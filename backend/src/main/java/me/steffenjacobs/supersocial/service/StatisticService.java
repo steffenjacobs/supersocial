@@ -77,9 +77,14 @@ public class StatisticService {
 		JSONArray accounts = new JSONArray();
 		accountStream.forEach(acc -> {
 			CompletableFuture<JSONArray> f = new CompletableFuture<>();
-			elasticSearchConnector.find(query, String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()), false, createFutureCallback(f));
-			futures.add(f);
-			appendAccountToJson(accounts, acc);
+			try {
+				elasticSearchConnector.find(query, String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()), false, createFutureCallback(f));
+				futures.add(f);
+				appendAccountToJson(accounts, acc);
+			} catch(Exception e) {
+				LOG.error("Could not fetch statistics for account {}", acc.getId(), e);
+				f.completeExceptionally(e);
+			}
 		});
 		return aggregateFutures(futures, accounts, filteredAccounts);
 	}
