@@ -172,7 +172,7 @@ public class SecurityService {
 	 */
 	@Transactional
 	public void appendCurrentUserAcl(Secured securedObject) {
-		appendAclForUserGroup(securedObject, getCurrentUser().getDefaultUserGroup());
+		appendAclForUserGroups(securedObject, getCurrentUser().getDefaultUserGroup());
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class SecurityService {
 	 */
 	@Transactional
 	public void appendSystemAcl(Secured securedObject) {
-		appendAclForUserGroup(securedObject, systemConfigurationManager.getSystemUser().getDefaultUserGroup());
+		appendAclForUserGroups(securedObject, systemConfigurationManager.getSystemUser().getDefaultUserGroup());
 	}
 
 	/**
@@ -191,7 +191,12 @@ public class SecurityService {
 	 * permissions for this object.
 	 */
 	@Transactional
-	public void appendAclForUserGroup(Secured securedObject, UserGroup userGroup) {
+	public void appendAclForUserGroups(Secured securedObject, UserGroup... userGroups) {
+		
+		if(userGroups.length == 0) {
+			throw new IllegalArgumentException("You need to append at least one user group.");
+		}
+		
 		// retrieve or create ACL
 		AccessControlList acl = securedObject.getAccessControlList();
 		if (acl == null) {
@@ -203,7 +208,9 @@ public class SecurityService {
 		if (permittedActions == null) {
 			permittedActions = new HashMap<>();
 		}
-		permittedActions.put(userGroup, SecuredAction.ALL);
+		for(UserGroup userGroup : userGroups) {
+			permittedActions.put(userGroup, SecuredAction.ALL);
+		}
 		acl.setPermittedActions(permittedActions);
 		accessControlListRepository.save(acl);
 
