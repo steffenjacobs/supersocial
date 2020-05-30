@@ -33,18 +33,23 @@ import me.steffenjacobs.supersocial.util.Pair;
 public class ApiInfoController {
 	private static final Logger LOG = LoggerFactory.getLogger(ApiInfoController.class);
 
+	private static final String VERSION_TEMPLATE = "{\"version\": \"%s\", \"commit\": \"%s\"}";
+
 	@Autowired
 	private SystemConfigurationManager systemConfigurationManager;
 
 	@Value("${app.version:unknown}")
 	private String version;
 
+	@Value("${app.commit:unknown}")
+	private String commitId;
+
 	/**
 	 * @return the current version of the software, read from the maven pom.xml.
 	 */
 	@GetMapping(path = "/api/version", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getVersion() {
-		return "{\"version\": \"" + version + "\"}";
+		return String.format(VERSION_TEMPLATE, version, commitId);
 	}
 
 	/**

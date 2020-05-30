@@ -6,12 +6,13 @@ import { ToastManager } from "../../misc/ToastManager";
 
 interface AboutState {
     version: string
+    commit: string
 }
 
 export class AboutPage extends React.Component<any, AboutState> {
     constructor(props: any) {
         super(props);
-        this.state = { version: "unknown" };
+        this.state = { version: "unknown", commit: "unknown" };
         this.fetchVersionInfo();
     }
 
@@ -25,7 +26,7 @@ export class AboutPage extends React.Component<any, AboutState> {
                 if (!response.ok) {
                     ToastManager.showErrorToast(response);
                 } else {
-                    response.json().then(json => this.setState({ version: json.version }));
+                    response.json().then(json => this.setState({ version: json.version, commit: json.commit }));
                 }
             });
     }
@@ -38,7 +39,7 @@ export class AboutPage extends React.Component<any, AboutState> {
                 <AboutTile name="Sebastian Hädrich" role="Frontend Developer" description="This is me!" imageUrl="team/placeholder.svg" />
                 <AboutTile name="Thomas Kruse" role="Developer" description="This is me!" imageUrl="team/placeholder.svg" />
                 <button onClick={e=>window.location.href="/privacy"} className="btn btn-primary landing-btn-header">Data Privacy &nbsp;&#9654;</button>
-                <div className="about-version">Product version: Supersocial v{this.state.version}</div>
+                <div className="about-version">Product version: Supersocial v{this.state.version} ({this.state.commit})</div>
             </div>
         );
     } 
