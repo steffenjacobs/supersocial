@@ -1,5 +1,8 @@
 package me.steffenjacobs.supersocial.service;
 
+import java.util.List;
+
+import me.steffenjacobs.supersocial.domain.dto.ImportedPostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
 import net.minidev.json.JSONObject;
@@ -41,5 +44,13 @@ public interface TwitterService {
 	 * API to later e.g. localize trends.
 	 */
 	String fetchTwitterRegionForLatLng(double latitude, double longitude, SocialMediaAccount account);
+
+	/**
+	 * Fetch all tweets for the user associated to the given
+	 * {@link SocialMediaAccount}.
+	 * 
+	 * @return a list of imported posts.
+	 */
+	List<ImportedPostDTO> fetchAllTweetsForUser(SocialMediaAccount account);
 
 }

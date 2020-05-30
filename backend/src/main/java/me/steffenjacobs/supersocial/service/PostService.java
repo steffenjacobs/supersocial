@@ -1,16 +1,20 @@
 package me.steffenjacobs.supersocial.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
+import me.steffenjacobs.supersocial.domain.dto.ImportedPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
@@ -33,6 +37,9 @@ import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFound
  */
 @Component
 public class PostService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PostService.class);
+
 	@Autowired
 	private PostPersistenceManager postPersistenceManager;
 	@Autowired
@@ -185,5 +192,16 @@ public class PostService {
 			postPersistenceManager.deletePostById(p.getId());
 
 		}
+	}
+
+	/**
+	 * Find out which of the given imported posts are already known and create
+	 * {@link Post} objects for the remainder.
+	 */
+	public void importPostsIfNecessary(List<ImportedPostDTO> importedPosts, SocialMediaAccount account) {
+		List<Post> existingPosts = postPersistenceManager.findByExternalIdIn(importedPosts.stream().map(ImportedPostDTO::getExternalId).collect(Collectors.toSet()));
+		Set<String> existingPostIds = existingPosts.stream().map(Post::getExternalId).collect(Collectors.toSet());
+		importedPosts.stream().filter(p -> !existingPostIds.contains(p.getExternalId())).forEach(postPersistenceManager::storePost);
+		LOG.info("Imported {} posts for account {}.", importedPosts.size() - existingPosts.size(), account.getId());
 	}
 }

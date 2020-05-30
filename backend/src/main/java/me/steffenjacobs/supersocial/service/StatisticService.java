@@ -82,7 +82,7 @@ public class StatisticService {
 				futures.add(f);
 				appendAccountToJson(accounts, acc);
 			} else {
-				LOG.info("Attempted to retrieve statistics for account {} with not statistics associated.", acc.getId());
+				LOG.info("Attempted to retrieve statistics for account {} with no statistics associated.", acc.getId());
 			}
 		});
 		return aggregateFutures(futures, accounts, filteredAccounts);
@@ -129,7 +129,7 @@ public class StatisticService {
 				futures.add(f);
 				appendPostToJson(posts, post);
 			} else {
-				LOG.info("Attempted to retrieve statistics for post {} with not statistics associated.", post.getId());
+				LOG.info("Attempted to retrieve statistics for post {} with no statistics associated.", post.getId());
 			}
 		});
 		return aggregateFutures(futures, posts, filteredPosts);
@@ -191,6 +191,7 @@ public class StatisticService {
 		src.appendField("filtered", filteredEntities);
 		json.add(src);
 
+		LOG.info("Aggregated {} results.", futures.size());
 		return json.toString();
 	}
 
@@ -260,6 +261,7 @@ public class StatisticService {
 		switch (account.getPlatform()) {
 		case TWITTER:
 			elasticSearchConnector.insert(twitterService.fetchAccountStatistics(account).toString(), String.format(ACCOUNT_INDEX_TEMPLATE, account.getId()), UUID.randomUUID());
+			postService.importPostsIfNecessary(twitterService.fetchAllTweetsForUser(account), account);
 			break;
 		case FACEBOOK:
 			elasticSearchConnector.insert(facebookService.fetchAccountStatistics(account).toString(), String.format(ACCOUNT_INDEX_TEMPLATE, account.getId()), UUID.randomUUID());

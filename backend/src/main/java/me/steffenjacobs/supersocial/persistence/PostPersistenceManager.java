@@ -1,6 +1,8 @@
 package me.steffenjacobs.supersocial.persistence;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -11,9 +13,11 @@ import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.Platform;
 import me.steffenjacobs.supersocial.domain.PostRepository;
+import me.steffenjacobs.supersocial.domain.dto.ImportedPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
 import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
+import me.steffenjacobs.supersocial.domain.entity.UserGroup;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
 
@@ -31,6 +35,9 @@ public class PostPersistenceManager {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private SystemConfigurationManager systemConfigurationManager;
 
 	/**
 	 * Create a new post for a given social media account.
@@ -115,6 +122,31 @@ public class PostPersistenceManager {
 	/** Deletes a post by its unique identifier. */
 	public void deletePostById(UUID id) {
 		postRepository.deleteById(id);
+	}
+
+	/**
+	 * Find the {@link Post posts} with any of the given external identifiers.
+	 */
+	public List<Post> findByExternalIdIn(Set<String> externalIds) {
+		return postRepository.findByExternalIdIn(externalIds);
+
+	}
+
+	/**
+	 * Create a social media post for the given post imported from a social
+	 * network.
+	 */
+	public Post storePost(ImportedPostDTO importedPost) {
+		Post p = new Post();
+		p.setText(importedPost.getText());
+		p.setCreator(systemConfigurationManager.getSystemUser());
+		p.setSocialMediaAccountToPostWith(importedPost.getAssociatedAccount());
+		p.setExternalId(importedPost.getExternalId());
+		p.setPublished(Date.from(importedPost.getPublished()));
+		// TODO: introduce SocialMediaAccount:readImportedPosts permission and
+		// filter by it here
+		securityService.appendAclForUserGroups(p, importedPost.getAssociatedAccount().getAccessControlList().getPermittedActions().keySet().toArray(new UserGroup[0]));
+		return postRepository.save(p);
 	}
 
 }

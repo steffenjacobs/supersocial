@@ -17,6 +17,7 @@ import me.steffenjacobs.supersocial.persistence.PostPersistenceManager;
 import me.steffenjacobs.supersocial.service.exception.CredentialMissingException;
 import me.steffenjacobs.supersocial.service.exception.FacebookException;
 import me.steffenjacobs.supersocial.service.exception.FacebookPostNotFoundException;
+import me.steffenjacobs.supersocial.service.exception.TwitterPostNotFoundException;
 
 /**
  * Automatically fetches analytics data for all published posts and social media
@@ -46,6 +47,7 @@ public class ScheduledAnalyticsService {
 		// TODO: restrict statistics to track
 		// TODO: make it possible to change the refresh interval, probably
 		// dependent on creation date or change rate.
+		long now = System.currentTimeMillis();
 		LOG.info("Running analytics job...");
 		AtomicInteger postCounter = new AtomicInteger();
 		AtomicInteger accountCounter = new AtomicInteger();
@@ -53,7 +55,8 @@ public class ScheduledAnalyticsService {
 		fetchPostAnalytics(postCounter);
 		fetchSocialMediaAccountAnalytics(accountCounter);
 
-		LOG.info("Finished analytics job. Fetched analytics for {} posts and {} social media accounts.", postCounter.get(), accountCounter.get());
+		LOG.info("Finished analytics job. Fetched analytics for {} posts and {} social media accounts. Took {}ms.", postCounter.get(), accountCounter.get(),
+				System.currentTimeMillis() - now);
 	}
 
 	/**
@@ -89,7 +92,7 @@ public class ScheduledAnalyticsService {
 				statisticService.fetchAll(p);
 				postCounter.incrementAndGet();
 				LOG.info("Fetched statistics for post '{}'", p.getId());
-			} catch (FacebookPostNotFoundException e) {
+			} catch (FacebookPostNotFoundException | TwitterPostNotFoundException e) {
 				LOG.error("Could not fetch statistics for post {}: Post does not exist anymore.", p.getId());
 			} catch (FacebookException | CredentialMissingException e) {
 				LOG.error("Could not fetch statistics for post {}: {}", p.getId(), e.getMessage());
