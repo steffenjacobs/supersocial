@@ -76,14 +76,13 @@ public class StatisticService {
 		}
 		JSONArray accounts = new JSONArray();
 		accountStream.forEach(acc -> {
-			CompletableFuture<JSONArray> f = new CompletableFuture<>();
-			try {
+			if (elasticSearchConnector.hasIndex(String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()))) {
+				CompletableFuture<JSONArray> f = new CompletableFuture<>();
 				elasticSearchConnector.find(query, String.format(ACCOUNT_INDEX_TEMPLATE, acc.getId()), false, createFutureCallback(f));
 				futures.add(f);
 				appendAccountToJson(accounts, acc);
-			} catch(Exception e) {
-				LOG.error("Could not fetch statistics for account {}", acc.getId(), e);
-				f.completeExceptionally(e);
+			} else {
+				LOG.info("Attempted to retrieve statistics for account {} with not statistics associated.", acc.getId());
 			}
 		});
 		return aggregateFutures(futures, accounts, filteredAccounts);
@@ -124,10 +123,14 @@ public class StatisticService {
 
 		JSONArray posts = new JSONArray();
 		postStream.forEach(post -> {
-			CompletableFuture<JSONArray> f = new CompletableFuture<>();
-			elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, post.getId()), false, createFutureCallback(f));
-			futures.add(f);
-			appendPostToJson(posts, post);
+			if (elasticSearchConnector.hasIndex(String.format(POST_INDEX_TEMPLATE, post.getId()))) {
+				CompletableFuture<JSONArray> f = new CompletableFuture<>();
+				elasticSearchConnector.find(query, String.format(POST_INDEX_TEMPLATE, post.getId()), false, createFutureCallback(f));
+				futures.add(f);
+				appendPostToJson(posts, post);
+			} else {
+				LOG.info("Attempted to retrieve statistics for post {} with not statistics associated.", post.getId());
+			}
 		});
 		return aggregateFutures(futures, posts, filteredPosts);
 	}
