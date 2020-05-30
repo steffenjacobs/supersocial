@@ -230,6 +230,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     </div>
                 </div>
                 <div className="box-content">
+                    <div className="tableFixHead">
                     <table className="table">
                         <thead>
                             <tr>
@@ -246,6 +247,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                         </tbody>
 
                     </table>
+                    </div>
                 </div>
             </div >
         );

@@ -144,7 +144,7 @@ table tr:nth-child(odd) {
     border-radius: 6px;
     /* Position the tooltip text */
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     bottom: 125%;
     left: 50%;
     margin-left: -60px;
@@ -239,4 +239,20 @@ table tr:nth-child(odd) {
 .fontsize6{
     font-size: .6em;
     font-weight: 400;
+}
+
+.tableFixHead {
+    overflow-y: auto;
+    height: 50em;
+    background-color: white;
+}
+
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1; /*necessary to get on top of tooltip icons but not on top of tooltips*/
+}
+
+.tableFixHead thead {
+    z-index: 100;
 }
