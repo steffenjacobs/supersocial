@@ -61,6 +61,8 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     response.json().then(data => this.setState({
                         posts: data.map((d: PublishedPost) => {
                             d.created = new Date(d.created);
+                            d.published = new Date(d.published);
+                            d.scheduled = d.scheduled ? new Date(d.scheduled) : d.scheduled;
                             return d;
                         }), updating: false
                     }));
@@ -142,7 +144,16 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
     public render() {
         //rows with posts
         const posts = this.state.posts.sort(
-            (p1: PublishedPost, p2: PublishedPost) => p2.created.getTime() - p1.created.getTime())
+            (p1: PublishedPost, p2: PublishedPost) => {
+                if (p1.published.getTime() === 0) {
+                    return -1;
+                }
+                if (p2.published.getTime() === 0) {
+                    return 1;
+                }
+
+                return p2.published.getTime() - p1.published.getTime();
+            })
             .map(elem => {
                 //status: first column with checkmark or error with error description.
                 var status;
@@ -186,7 +197,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
                     </div>);
 
                 //Publication date if present
-                const published = elem.published ? <Moment format="YYYY-MM-DD">{elem.published}</Moment> : "";
+                const published = elem.published && elem.published.getTime() !== 0 ? <Moment format="YYYY-MM-DD">{elem.published}</Moment> : "";
                 return (
                     <tr key={elem.id}>
                         {status}
@@ -210,7 +221,7 @@ export class PublishedPostsTile extends React.Component<PublishedPostsProps, Pub
         return (
             <div className="container dynamic-container inline-block">
                 <div className="box-header box-header-with-icon">
-                    <div className="inline-block">All Posts</div>
+                    <div className="inline-block">All Posts ({posts.length})</div>
                     <div
                         className={classUpdating.join(" ")}
                         onClick={e => this.refreshPosts()}

@@ -96,7 +96,7 @@ export class PublishMessageTile extends React.Component<PublishMessageTileProps,
                         ToastManager.showErrorToast(response);
                         this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                     } else {
-                        ToastManager.showSuccessToast("Created unpublished toast.");
+                        ToastManager.showSuccessToast("Created unpublished post.");
                         response.json().then(data => {
                             this.props.eventBus.fireEvent(EventBusEventType.REFRESH_POSTS);
                             if (callback) {
