@@ -21,6 +21,7 @@ import me.steffenjacobs.supersocial.domain.dto.UserRegistrationDTO;
 import me.steffenjacobs.supersocial.persistence.exception.SystemConfigurationNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.security.UserService;
+import me.steffenjacobs.supersocial.security.exception.InvalidEmailException;
 import me.steffenjacobs.supersocial.security.exception.UserAlreadyExistsException;
 import me.steffenjacobs.supersocial.service.UserConfigurationService;
 import me.steffenjacobs.supersocial.service.exception.TwitterException;
@@ -52,7 +53,10 @@ public class UserController {
 		try {
 			return new ResponseEntity<>(userService.registerNewUser(userRegistration.getDisplayName(), userRegistration.getPassword(), userRegistration.getEmail()),
 					HttpStatus.ACCEPTED);
-		} catch (UserAlreadyExistsException e) {
+		} catch (InvalidEmailException e) {
+			return new ResponseEntity<>(new CurrentUserDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+		catch (UserAlreadyExistsException e) {
 			return new ResponseEntity<>(new CurrentUserDTO(e.getMessage()), HttpStatus.CONFLICT);
 		}
 	}
