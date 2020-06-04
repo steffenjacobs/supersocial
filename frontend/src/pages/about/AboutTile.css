@@ -1,0 +1,57 @@
+.about-container {
+    color: rgb(50, 56, 59);
+    margin-left: 1em;
+}
+
+.about-entry {
+    margin-bottom: 1em;
+}
+
+.about-version {
+    margin-top: 1em;
+}
+
+.about-entry-image {
+    width: 10em;
+    height: 10em;
+}
+
+.about-entry-description {
+    margin-bottom: 1em;
+}
+
+.about-entry-socialmedia-icon {
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-block;
+    margin-left: .5em;
+    vertical-align: middle;
+}
+
+.about-entry-socialmediatext {
+    vertical-align: middle;
+}
+
+.about-entry-left {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 1em;
+    width: 35em;
+}
+
+.about-entry-left-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 10em;
+}
+
+.about-icon{
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.about-icon>svg{
+    width: 1.5em;
+    height: 1.5em;
+}

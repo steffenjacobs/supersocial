@@ -9,9 +9,6 @@ public class MessagePublishingDTO {
 
 	private UUID accountId;
 
-	public MessagePublishingDTO() {
-	}
-
 	public String getMessage() {
 		return message;
 	}

@@ -22,7 +22,11 @@ import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundE
 import me.steffenjacobs.supersocial.security.SecurityService;
 import me.steffenjacobs.supersocial.service.exception.PlatformNotFoundException;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles publishing of newly created, previously created an scheduled posts.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class PostPublishingService {
 
@@ -46,11 +50,26 @@ public class PostPublishingService {
 	@Autowired
 	private ScheduledPostPersistenceManager scheduledPostPersistenceManager;
 
+	/**
+	 * Publish a given {@link Post} to the associated social network immediately
+	 * and return the resulting {@link PostDTO}. If the publishing failed, this
+	 * will be saved and the resulting {@link PostDTO} will contain an
+	 * error.<br/>
+	 * There are <b>no security checks</b> to be performed here!
+	 * 
+	 * @throws PlatformNotFoundException
+	 *             if the associated
+	 *             {@link me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount}
+	 *             has no valid {@link Platform} specified.
+	 * 
+	 * 
+	 */
 	@SuppressWarnings("unchecked")
 	public PostDTO publish(Post post) {
 		post.setErrorMessage("");
 		if (post.getSocialMediaAccountToPostWith().getPlatform() == Platform.FACEBOOK) {
 			String result = facebookService.postMessage(post);
+			// TODO: use JsonPath
 			Map<String, Object> json = JsonParserFactory.getJsonParser().parseMap(result);
 			if (json.containsKey("error")) {
 				Map<String, ?> error = (Map<String, ?>) json.get("error");
@@ -79,6 +98,22 @@ public class PostPublishingService {
 		}
 	}
 
+	/**
+	 * Publish a given {@link Post} to the associated social network immediately
+	 * and return the resulting {@link PostDTO}. If the publishing failed, this
+	 * will be saved and the resulting {@link PostDTO} will contain an error.
+	 * Also unschedules the post if it was scheduled before.<br/>
+	 * All procedures include security checks.
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the given {@code postId} does not have a post associated
+	 *             to it or the current user is not permitted to see it.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to publish this
+	 *             {@link Post} with the associated
+	 *             {@link me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount}.
+	 */
 	public PostDTO publishNow(UUID postId) {
 		try {
 			final Post p = postService.findOriginalPostById(postId);

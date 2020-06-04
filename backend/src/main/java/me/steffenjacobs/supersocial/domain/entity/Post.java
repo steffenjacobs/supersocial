@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -49,11 +50,8 @@ public class Post implements Secured {
 	@OneToOne
 	private AccessControlList accessControlList;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	private SocialMediaAccount socialMediaAccountToPostWith;
-
-	public Post() {
-	}
 
 	public String getText() {
 		return text;
@@ -105,7 +103,7 @@ public class Post implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.Post;
+		return SecuredType.POST;
 	}
 
 	@Override

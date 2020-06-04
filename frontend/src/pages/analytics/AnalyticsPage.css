@@ -1,0 +1,15 @@
+.chip {
+    border-radius: 5px !important;
+    padding: 4px 4px 4px 10px !important;
+    background: #3498db !important;
+    font-size: .8em !important;
+    margin-bottom: 0 !important;
+}
+
+.filter-area {
+    margin-bottom: 1em;
+    margin-left: .5em;
+}
+.hint {
+    font-size: .75em;
+}

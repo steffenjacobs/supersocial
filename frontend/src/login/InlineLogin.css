@@ -1,0 +1,12 @@
+.sign-in-button{
+    width: 5em;
+}
+.inline-login > *{
+    margin-right: .5em;
+}
+.register-text{
+    font-size: .75em;
+}
+.inline-login {
+    display:inline;
+}

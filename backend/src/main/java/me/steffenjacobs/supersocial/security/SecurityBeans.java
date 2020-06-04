@@ -4,14 +4,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/** @author Steffen Jacobs */
+/**
+ * Holds security object beans like the password encoder.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class SecurityBeans {
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
-		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-		return bCryptPasswordEncoder;
+		return new BCryptPasswordEncoder();
 	}
 
 }

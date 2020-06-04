@@ -2,22 +2,28 @@ import React from "react";
 
 export class ImageProvider {
 
-    
-
     /** @returns a social media icon for a given platform identifier. */
     static getSocialmediaIcon(platformId: number) {
         if (platformId === 1) {
-            return ImageProvider.getImage("facebook-logo");
-        }
-        else if (platformId === 2) {
-            return ImageProvider.getImage("twitter-logo");
-        }
-        else {
+            return ImageProvider.getImage("facebook");
+        } else if (platformId === 2) {
+            return ImageProvider.getImage("twitter");
+        } else if (platformId === 3) {
+            return ImageProvider.getImage("linkedin");
+        } else if (platformId === 4) {
+            return ImageProvider.getImage("xing");
+        } else if (platformId === 5) {
+            return ImageProvider.getImage("instagram");
+        } else if (platformId === 6) {
+            return ImageProvider.getImage("tiktok");
+        } else if (platformId === 1001) {
+            return ImageProvider.getImage("github");
+        } else {
             return ImageProvider.getImage("none-logo");
         }
     }
 
-    static getGroupedImage(idOfPrimary: string, idOfSecondary: string){
+    static getGroupedImage(idOfPrimary: string, idOfSecondary: string) {
         return (<svg>
             {this.getImage(idOfPrimary)}
             {this.getImage(idOfSecondary)}
@@ -28,7 +34,7 @@ export class ImageProvider {
         switch (id) {
 
             //Facebook Logo
-            case "facebook-logo":
+            case "facebook":
                 return <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                     viewBox="0 0 266.893 266.895">
                     <path id="Blue_1_" fill="#3C5A99" d="M248.082,262.307c7.854,0,14.223-6.369,14.223-14.225V18.812
@@ -40,14 +46,28 @@ export class ImageProvider {
                 </svg>;
 
             //Twitter Logo
-            case "twitter-logo": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED"
+            case "twitter": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED"
                 data-name="Logo — FIXED" viewBox="90 90 240 240">
                 <path fill="#1da1f2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23" />
             </svg>;
 
+            //Github logo
+            case "github": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z" /></svg>;
+
+            //Linkedin logo
+            case "linkedin": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#0275b4" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z" /></svg>;
+
+            //Xing logo
+            case "xing": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#005a5f" d="M162.7 210c-1.8 3.3-25.2 44.4-70.1 123.5-4.9 8.3-10.8 12.5-17.7 12.5H9.8c-7.7 0-12.1-7.5-8.5-14.4l69-121.3c.2 0 .2-.1 0-.3l-43.9-75.6c-4.3-7.8.3-14.1 8.5-14.1H100c7.3 0 13.3 4.1 18 12.2l44.7 77.5zM382.6 46.1l-144 253v.3L330.2 466c3.9 7.1.2 14.1-8.5 14.1h-65.2c-7.6 0-13.6-4-18-12.2l-92.4-168.5c3.3-5.8 51.5-90.8 144.8-255.2 4.6-8.1 10.4-12.2 17.5-12.2h65.7c8 0 12.3 6.7 8.5 14.1z" /></svg>;
+
+            //Instagram logo
+            case "instagram": return <img className="about-icon" src="icons/instagram.svg" alt="Instagram Logo" />;
+
+            //TikTok logo
+            case "tiktok": return <svg viewBox="0 0 291.72499821636245 291.1" xmlns="http://www.w3.org/2000/svg"><path d="M219.51 291.1H71.58C32.05 291.1 0 259.05 0 219.51V71.58C0 32.05 32.05 0 71.58 0h147.93c39.53 0 71.58 32.05 71.58 71.58v147.93c.01 39.54-32.04 71.59-71.58 71.59z"/><g fill="#25f4ee"><path d="M120.96 123.89v-8.8a64.83 64.83 0 0 0-9.23-.79c-29.93-.06-56.42 19.33-65.41 47.87s1.62 59.62 26.18 76.71c-25.77-27.58-24.3-70.83 3.28-96.6a68.425 68.425 0 0 1 45.18-18.39z"/><path d="M122.62 223.53c16.73-.02 30.48-13.2 31.22-29.92V44.44h27.25a50.7 50.7 0 0 1-.79-9.44h-37.27v149.02c-.62 16.8-14.41 30.11-31.22 30.14-5.02-.04-9.97-1.28-14.42-3.6a31.276 31.276 0 0 0 25.23 12.97zM231.98 95.05v-8.29c-10.03 0-19.84-2.96-28.19-8.51a51.63 51.63 0 0 0 28.19 16.8z"/></g><path d="M203.8 78.26a51.301 51.301 0 0 1-12.76-33.89h-9.95a51.564 51.564 0 0 0 22.71 33.89zM111.73 151.58c-17.28.09-31.22 14.17-31.13 31.45a31.293 31.293 0 0 0 16.71 27.53c-10.11-13.96-6.99-33.48 6.97-43.6a31.191 31.191 0 0 1 18.34-5.93c3.13.04 6.24.53 9.23 1.45v-37.93c-3.05-.46-6.14-.7-9.23-.72h-1.66v28.84c-3.01-.82-6.12-1.18-9.23-1.09z" fill="#fe2c55"/><path d="M231.98 95.05v28.84a88.442 88.442 0 0 1-51.69-16.8v75.77c-.08 37.81-30.75 68.42-68.56 68.42a67.816 67.816 0 0 1-39.22-12.4c25.73 27.67 69.02 29.25 96.7 3.52a68.397 68.397 0 0 0 21.83-50.09v-75.56a88.646 88.646 0 0 0 51.76 16.58V96.21c-3.64-.02-7.26-.4-10.82-1.16z" fill="#fe2c55"/><path d="M180.29 182.87V107.1a88.505 88.505 0 0 0 51.76 16.58V94.84a51.73 51.73 0 0 1-28.26-16.58 51.634 51.634 0 0 1-22.71-33.89h-27.25v149.24c-.71 17.27-15.27 30.69-32.54 29.99a31.278 31.278 0 0 1-24.06-12.9c-15.29-8.05-21.16-26.97-13.11-42.26a31.274 31.274 0 0 1 27.53-16.71c3.13.03 6.24.51 9.23 1.44V123.9c-37.74.64-67.82 32.19-67.18 69.93a68.353 68.353 0 0 0 18.73 45.86 67.834 67.834 0 0 0 39.29 11.61c37.82-.01 68.49-30.62 68.57-68.43z" fill="#fff"/></svg>;
             //X Logo
             case "none-logo": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-               viewBox="0 0 1280.000000 1280.000000">
+                viewBox="0 0 1280.000000 1280.000000">
                 <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"
                     fill="#d94f4f">
                     <path d="M1327 11473 l-1327 -1328 1872 -1872 1873 -1873 -1873 -1873 -1872
@@ -92,7 +112,7 @@ export class ImageProvider {
             </svg>;
 
             //Home Icon
-            case "home-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "home": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1em" height="1em" viewBox="0 0 1280.000000 1206.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -118,7 +138,7 @@ export class ImageProvider {
             </svg>;
 
             //Info Icon
-            case "info-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "info": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1em" height="1em" viewBox="0 0 1280.000000 1280.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -145,8 +165,13 @@ export class ImageProvider {
                 </g>
             </svg>;
 
+            //Info Icon in text
+            case "info-text": return <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 256 256" width="1em" height="1em">
+                <path d="m128 22.158a105.84 105.84 0 0 0 -105.84 105.84 105.84 105.84 0 0 0 105.84 105.84 105.84 105.84 0 0 0 105.84 -105.84 105.84 105.84 0 0 0 -105.84 -105.84zm0 32.76c5.16 0.117 9.55 1.875 13.18 5.273 3.34 3.575 5.07 7.94 5.19 13.096-0.12 5.156-1.85 9.404-5.19 12.744-3.63 3.75-8.02 5.625-13.18 5.625s-9.4-1.875-12.74-5.625c-3.75-3.34-5.63-7.588-5.63-12.744s1.88-9.521 5.63-13.096c3.34-3.398 7.58-5.156 12.74-5.273zm-16.35 53.792h32.79v92.37h-32.79v-92.37z" fillRule="evenodd" fill="#72a7cf" />
+            </svg>;
+
             //Settings Icon
-            case "settings-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "settings": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1em" height="1em" viewBox="0 0 1280.000000 1280.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -203,8 +228,11 @@ export class ImageProvider {
                 </g>
             </svg>;
 
+            //Teams Icon
+            case "teams": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="1em" height="1em"><path d="M96 224c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm448 0c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm32 32h-64c-17.6 0-33.5 7.1-45.1 18.6 40.3 22.1 68.9 62 75.1 109.4h66c17.7 0 32-14.3 32-32v-32c0-35.3-28.7-64-64-64zm-256 0c61.9 0 112-50.1 112-112S381.9 32 320 32 208 82.1 208 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C179.6 288 128 339.6 128 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zm-223.7-13.4C161.5 263.1 145.6 256 128 256H64c-35.3 0-64 28.7-64 64v32c0 17.7 14.3 32 32 32h65.9c6.3-47.4 34.9-87.3 75.2-109.4z"/></svg>;
+
             //Save Icon
-            case "save-icon": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 17 17" width="1.5em" height="1.5em">
+            case "save": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 17 17" width="1.5em" height="1.5em">
                 <defs><clipPath><rect width="1.5em" height="1.5em" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><path d="m0 706.47h1490.93v-706.47h-1490.93v706.47" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><path d="m22.2 686.12h1447.73v-667.19h-1447.73v667.19" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="392.57" y="507.8" fill="none" rx="16" /></clipPath><clipPath><rect width="32" height="32" x="8" y="8" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="507.8" x="392.57" height="32" width="32" fill="none" rx="16" /></clipPath><clipPath><rect y="8" x="8" height="32" width="32" fill="none" rx="16" /></clipPath></defs>
                 <g transform="matrix(.0393 0 0 .0393 3 2.998)">
                     <path d="m402.12 84.01l-79.03-79.03c-3.189-3.189-7.514-4.981-12.03-4.981h-294.06c-9.392 0-17 7.614-17 17v373.09c0 9.392 7.613 17 17 17h373.09c9.392 0 17-7.613 17-17v-294.06c0-4.509-1.791-8.835-4.981-12.02m-101.45 79.56h-233.53v-124.7h233.53v124.7" /><path d="m214.05 148.16h43.08c3.131 0 5.668-2.538 5.668-5.669v-82.907c0-3.13-2.537-5.668-5.668-5.668h-43.08c-3.131 0-5.668 2.538-5.668 5.668v82.907c0 3.131 2.537 5.669 5.668 5.669" />
@@ -212,7 +240,7 @@ export class ImageProvider {
             </svg>
 
             //Add Icon
-            case "add-icon": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            case "add": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1.5em" height="1.5em" viewBox="0 0 1267.000000 1280.000000"
                 preserveAspectRatio="xMidYMid meet">
                 <metadata>
@@ -234,8 +262,8 @@ export class ImageProvider {
                 </g>
             </svg>;
 
-            //Link Icon
-            case "link": return <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+            //Linked Icon
+            case "linked": return <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                 width=".75em" height=".75em" viewBox="0 0 457.03 457.03" fill="#111">
                 <g>
                     <path d="M421.512,207.074l-85.795,85.767c-47.352,47.38-124.169,47.38-171.529,0c-7.46-7.439-13.296-15.821-18.421-24.465
@@ -250,6 +278,10 @@ export class ImageProvider {
               C246.109,360.336,219.437,357.723,194.708,348.104z"/>
                 </g>
             </svg>;
+
+            //Link Icon
+            case "link": return <svg width="1.5em" height="1.5em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z" /></svg>;
+
 
             //Clock Icon (small)
             case "clock-small": return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width=".75em" height=".75em" fill="#111">
@@ -266,21 +298,62 @@ export class ImageProvider {
             </svg>
 
             //Edit Icon
-            case "edit": return <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 576 512"><path d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/></svg>;
+            case "edit": return <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 576 512"><path d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z" /></svg>;
 
             //Play Icon
             case "play": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-             width="1.5em" height="1.5em" viewBox="0 0 1280.000000 1280.000000"
-             preserveAspectRatio="xMidYMid meet">
-            <metadata>
-            Created by potrace 1.15, written by Peter Selinger 2001-2017
+                width="1.5em" height="1.5em" viewBox="0 0 1280.000000 1280.000000"
+                preserveAspectRatio="xMidYMid meet">
+                <metadata>
+                    Created by potrace 1.15, written by Peter Selinger 2001-2017
             </metadata>
-            <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)" stroke="none">
-            <path d="M1607 6572 c2 -3100 3 -5639 3 -5641 0 -3 6 2 13 11 6 9 2305 1277
+                <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)" stroke="none">
+                    <path d="M1607 6572 c2 -3100 3 -5639 3 -5641 0 -3 6 2 13 11 6 9 2305 1277
             5107 2818 2802 1541 5098 2805 5103 2809 4 4 -2282 1267 -5080 2806 -2799
             1540 -5101 2807 -5118 2817 l-30 17 2 -5637z"/>
-            </g>
-            </svg>;            
+                </g>
+            </svg>;
+
+            //Analytics Icon
+            case "analytics": return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                width="1em" height="1em" viewBox="0 0 1280.000000 853.000000"
+                preserveAspectRatio="xMidYMid meet">
+                <metadata>
+                    Created by potrace 1.15, written by Peter Selinger 2001-2017
+           </metadata>
+                <g transform="translate(0.000000,853.000000) scale(0.100000,-0.100000)"
+                    stroke="none">
+                    <path d="M9480 7618 c-784 -88 -1426 -161 -1427 -162 -1 -1 40 -110 91 -241
+           51 -132 96 -249 100 -261 6 -19 -1 -24 -56 -44 -86 -31 -270 -119 -381 -181
+           -184 -105 -380 -245 -637 -455 -319 -261 -586 -384 -939 -434 -39 -5 -180 -17
+           -313 -25 -498 -32 -821 -100 -1218 -257 -357 -140 -673 -333 -1035 -631 -229
+           -188 -438 -313 -620 -370 -164 -52 -297 -71 -595 -87 -318 -17 -529 -47 -785
+           -111 -98 -25 -352 -104 -363 -114 -1 -1 27 -76 62 -166 44 -112 69 -163 78
+           -160 7 2 54 16 104 32 140 42 317 68 579 84 384 24 621 60 864 130 443 128
+           768 306 1217 667 215 173 335 253 497 333 272 135 520 194 897 215 478 27 840
+           101 1190 242 336 136 595 295 964 590 114 92 247 193 294 224 91 61 272 152
+           311 156 23 3 30 -12 124 -254 65 -167 104 -255 111 -251 24 15 2302 1666 2316
+           1679 8 8 10 13 5 13 -6 -1 -651 -74 -1435 -161z"/>
+                    <path d="M9587 6393 c-78 -29 -166 -103 -197 -164 -53 -103 -50 78 -50 -2651
+           l0 -2528 635 0 635 0 0 2535 c0 2523 0 2534 -20 2586 -45 113 -105 173 -223
+           221 l-69 28 -322 -1 c-320 0 -321 0 -389 -26z"/>
+                    <path d="M8109 5915 c-115 -42 -201 -122 -237 -222 l-22 -60 0 -2292 0 -2291
+           635 0 635 0 0 2287 0 2288 -26 67 c-41 108 -113 177 -227 219 -47 17 -81 19
+           -387 18 -250 0 -344 -4 -371 -14z"/>
+                    <path d="M6630 5441 c-8 -4 -41 -20 -73 -36 -73 -35 -148 -116 -179 -193 l-23
+           -57 -3 -2052 -2 -2053 640 0 640 0 -2 2053 -3 2052 -23 57 c-31 77 -106 158
+           -179 193 -32 16 -66 32 -75 37 -22 10 -698 10 -718 -1z"/>
+                    <path d="M5090 4722 c-92 -36 -167 -113 -203 -207 l-27 -70 0 -1698 0 -1697
+           635 0 635 0 0 1701 0 1702 -22 60 c-30 82 -107 165 -190 203 l-63 29 -350 2
+           -350 2 -65 -27z"/>
+                    <path d="M3608 3960 c-109 -44 -176 -113 -217 -220 -21 -55 -21 -62 -21 -1372
+           l0 -1318 635 0 635 0 0 1313 c0 1411 2 1334 -50 1436 -28 56 -119 134 -185
+           159 -55 21 -70 22 -403 21 -319 0 -351 -2 -394 -19z"/>
+                    <path d="M2123 3280 c-95 -34 -163 -92 -207 -179 -47 -89 -46 -70 -46 -1088
+           l0 -963 640 0 640 0 0 963 c0 799 -3 970 -14 1008 -41 135 -118 217 -243 260
+           -51 17 -84 19 -387 18 -296 0 -337 -2 -383 -19z"/>
+                </g>
+            </svg>
 
             default: return <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1.5em" height="1.5em" viewBox="0 0 1280.000000 1280.000000">

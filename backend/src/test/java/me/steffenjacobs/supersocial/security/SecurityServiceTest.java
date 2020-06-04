@@ -28,24 +28,24 @@ class SecurityServiceTest {
 	private static void setupAllowedImplications() {
 		allowedImplications = new HashSet<>();
 		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.CREATE));
-		allowedImplications.add(new Pair<>(SecuredAction.ALLNoACL, SecuredAction.CREATE));
+		allowedImplications.add(new Pair<>(SecuredAction.ALL_NO_ACL, SecuredAction.CREATE));
 
 		allowedImplications.add(new Pair<>(SecuredAction.UPDATE, SecuredAction.READ));
 		allowedImplications.add(new Pair<>(SecuredAction.DELETE, SecuredAction.READ));
 		allowedImplications.add(new Pair<>(SecuredAction.UPDATE_ACL, SecuredAction.READ));
 		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.READ));
-		allowedImplications.add(new Pair<>(SecuredAction.ALLNoACL, SecuredAction.READ));
+		allowedImplications.add(new Pair<>(SecuredAction.ALL_NO_ACL, SecuredAction.READ));
 
 		allowedImplications.add(new Pair<>(SecuredAction.DELETE, SecuredAction.UPDATE));
 		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.UPDATE));
-		allowedImplications.add(new Pair<>(SecuredAction.ALLNoACL, SecuredAction.UPDATE));
+		allowedImplications.add(new Pair<>(SecuredAction.ALL_NO_ACL, SecuredAction.UPDATE));
 
 		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.DELETE));
-		allowedImplications.add(new Pair<>(SecuredAction.ALLNoACL, SecuredAction.DELETE));
+		allowedImplications.add(new Pair<>(SecuredAction.ALL_NO_ACL, SecuredAction.DELETE));
 
 		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.UPDATE_ACL));
 
-		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.ALLNoACL));
+		allowedImplications.add(new Pair<>(SecuredAction.ALL, SecuredAction.ALL_NO_ACL));
 	}
 
 	@Test
@@ -83,9 +83,9 @@ class SecurityServiceTest {
 		SecurityService securityService = new SecurityService();
 		for (SecuredAction sa : SecuredAction.values()) {
 			if (sa == SecuredAction.ALL || sa == SecuredAction.UPDATE_ACL) {
-				assertFalse(securityService.implies(SecuredAction.ALLNoACL, sa));
+				assertFalse(securityService.implies(SecuredAction.ALL_NO_ACL, sa));
 			} else {
-				assertTrue(securityService.implies(SecuredAction.ALLNoACL, sa));
+				assertTrue(securityService.implies(SecuredAction.ALL_NO_ACL, sa));
 			}
 		}
 	}
@@ -138,7 +138,7 @@ class SecurityServiceTest {
 		
 		AccessControlList acl = new AccessControlList();
 		Map<UserGroup, SecuredAction> permittedActions = new HashMap<>();
-		permittedActions.put(userGroup, SecuredAction.ALLNoACL);
+		permittedActions.put(userGroup, SecuredAction.ALL_NO_ACL);
 		acl.setPermittedActions(permittedActions);
 		
 		Secured securedObject = createSecuredObject(acl);
@@ -172,7 +172,7 @@ class SecurityServiceTest {
 
 			@Override
 			public SecuredType getSecuredType() {
-				return SecuredType.Unknown;
+				return SecuredType.UNKNOWN;
 			}
 
 			@Override

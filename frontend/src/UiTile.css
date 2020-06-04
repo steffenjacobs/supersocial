@@ -4,10 +4,15 @@
     background-color: #eef8ff;
     width: 20.5em;
     position: relative;
+    vertical-align: top;
 }
 
 .double-container {
     width: 42em;
+}
+
+.container-two-thirds{
+    width: 15.375em;
 }
 
 .dynamic-container {
@@ -15,6 +20,11 @@
 }
 .container-top-margin {
     margin-top: .5em;
+}
+
+.container-margins {
+    margin-right: .5em;
+    margin-bottom: .5em;
 }
 
 .inline {
@@ -77,4 +87,8 @@
 .vspacer, .hspacer {
     height: 1em;
     width: 1em;
+}
+
+.header-icon-margin-left{
+    margin-left: .5em;
 }

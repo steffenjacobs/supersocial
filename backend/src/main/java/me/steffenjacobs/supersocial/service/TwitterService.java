@@ -1,69 +1,56 @@
 package me.steffenjacobs.supersocial.service;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import me.steffenjacobs.supersocial.domain.dto.ImportedPostDTO;
 import me.steffenjacobs.supersocial.domain.entity.Post;
-import me.steffenjacobs.supersocial.persistence.CredentialPersistenceManager.CredentialType;
-import me.steffenjacobs.supersocial.service.exception.TwitterException;
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
+import me.steffenjacobs.supersocial.domain.entity.SocialMediaAccount;
+import net.minidev.json.JSONObject;
 
 /** @author Steffen Jacobs */
-
-@Component
-public class TwitterService {
-	private static final Logger LOG = LoggerFactory.getLogger(TwitterService.class);
-
-	private static final String TWITTER_STATUS_ENDPOINT = "https://api.twitter.com/1.1/statuses/update.json?status=";
-
-	@Autowired
-	private CredentialLookupService credentialLookupService;
+public interface TwitterService {
 
 	/**
-	 * Tweets {@code tweetText} with the credentials given in the
-	 * credentials.properties file.
+	 * Tweets the given {@link Post} with the credentials associated to the
+	 * {@link SocialMediaAccount} associated to the given {@link Post}.
 	 */
-	public String tweet(Post post) {
-		try {
-			return attemptTweet(post, credentialLookupService.getCredential(post, CredentialType.TWITTER_ACCESS_TOKEN),
-					credentialLookupService.getCredential(post, CredentialType.TWITTER_ACCESS_TOKEN_SECRET));
-		} catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
-			LOG.error("Could not send tweet");
-			throw new TwitterException("Could not send tweet.", e);
-		}
-	}
+	String tweet(Post post);
 
 	/**
-	 * Attempt to tweet {@code tweetText} with the given {@code accessToken} and
-	 * {@code accessTokenSecret}.
+	 * Fetch the trending topics from Twitter for the given {@code region} with
+	 * the given {@link SocialMediaAccount}.
 	 */
-	private String attemptTweet(Post post, String accessToken, String accessTokenSecret)
-			throws ClientProtocolException, IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-		final OAuthConsumer oAuthConsumer = new CommonsHttpOAuthConsumer(credentialLookupService.getCredential(post, CredentialType.TWITTER_API_KEY),
-				credentialLookupService.getCredential(post, CredentialType.TWITTER_API_KEY_SECRET));
-		oAuthConsumer.setTokenWithSecret(accessToken, accessTokenSecret);
-		final HttpPost httpPost = new HttpPost(TWITTER_STATUS_ENDPOINT + URLEncoder.encode(post.getText(), StandardCharsets.UTF_16));
-		oAuthConsumer.sign(httpPost);
-		try (final CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-			final HttpResponse httpResponse = httpClient.execute(httpPost);
-			return IOUtils.toString(httpResponse.getEntity().getContent(), Charset.forName("UTF-8"));
-		}
-	}
+	String fetchTrendingTopics(long regionId, SocialMediaAccount account);
+
+	/**
+	 * Fetch the statistics for the given {@link Post} from the Twitter API.
+	 * 
+	 * @return a cleaned-up JSON object with the retrieved
+	 *         {@link TrackedStatistic tracked statistics} in it.
+	 */
+	JSONObject fetchPostStatistics(Post post);
+
+	/**
+	 * Fetch the statistics for the given {@link SocialMediaAccount} from the
+	 * Twitter API.
+	 * 
+	 * @return a cleaned-up JSON object with the retrieved
+	 *         {@link TrackedStatistic tracked statistics} in it.
+	 */
+	JSONObject fetchAccountStatistics(SocialMediaAccount account);
+
+	/**
+	 * Fetch region information based on longitude and latitude from the Twitter
+	 * API to later e.g. localize trends.
+	 */
+	String fetchTwitterRegionForLatLng(double latitude, double longitude, SocialMediaAccount account);
+
+	/**
+	 * Fetch all tweets for the user associated to the given
+	 * {@link SocialMediaAccount}.
+	 * 
+	 * @return a list of imported posts.
+	 */
+	List<ImportedPostDTO> fetchAllTweetsForUser(SocialMediaAccount account);
+
 }

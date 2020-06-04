@@ -9,7 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-/** @author Steffen Jacobs */
+/**
+ * Contains the HTTP security config for the application as well as the user
+ * service link to the spring security module.
+ * 
+ * @author Steffen Jacobs
+ */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -18,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
@@ -27,14 +32,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()//
 				.antMatchers("/login/discourse/success").permitAll()//
 				.antMatchers(HttpMethod.POST, "/api/register").permitAll()//
-				.antMatchers(HttpMethod.OPTIONS,"/api/**").permitAll()//
+				.antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()//
 				.anyRequest().authenticated();//
-		if("true".equals(env.getProperty("security.standalone"))) {
-			http.httpBasic();
-			http.logout().logoutUrl("/logout");
+		if ("true".equals(env.getProperty("security.standalone"))) {
+			http.formLogin().loginPage("/api/login").loginProcessingUrl("/api/perform_login").defaultSuccessUrl("/api/loginstatus").permitAll();
+			http.logout().logoutUrl("/api/perform_logout").deleteCookies("JSESSIONID");
 			http.csrf().disable();
-		}
-		else {
+		} else {
 			http.formLogin().loginPage("/login").permitAll();
 		}
 	}

@@ -44,9 +44,6 @@ public class Credential implements Secured {
 	@ManyToOne
 	private SocialMediaAccount account;
 
-	public Credential() {
-	}
-
 	private void setId(UUID id) {
 		this.id = id;
 	}
@@ -87,11 +84,11 @@ public class Credential implements Secured {
 		return c;
 	}
 
-	public CredentialDTO toDTO() {
+	public CredentialDTO toDTO(boolean show) {
 		CredentialDTO dto = new CredentialDTO();
-		dto.setDescriptor(this.descriptor);
-		dto.setValue("(omitted)");
-		dto.setId(this.id);
+		dto.setDescriptor(this.getDescriptor());
+		dto.setValue(show ? this.getValue() : "(omitted)");
+		dto.setId(this.getId());
 		dto.setOmitted(true);
 		dto.setAccountId(this.getAccount() != null ? this.getAccount().getId() : null);
 		dto.setCreated(this.getCreated());
@@ -100,7 +97,7 @@ public class Credential implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.Credential;
+		return SecuredType.CREDENTIAL;
 	}
 
 	@Override

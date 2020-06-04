@@ -4,7 +4,12 @@ import org.springframework.security.access.AccessDeniedException;
 
 import me.steffenjacobs.supersocial.domain.entity.SecuredAction;
 
-/** @author Steffen Jacobs */
+/**
+ * Should be thrown if a user attempts to perform an action which is not
+ * permitted for the current user.
+ * 
+ * @author Steffen Jacobs
+ */
 public class AuthorizationException extends AccessDeniedException {
 	private static final long serialVersionUID = 5275432558926145865L;
 

@@ -1,6 +1,10 @@
 package me.steffenjacobs.supersocial.util;
 
-/** @author Steffen Jacobs */
+/**
+ * A simple pair with two generic values.
+ * 
+ * @author Steffen Jacobs
+ */
 public class Pair<A, B> {
 	private final A a;
 	private final B b;
@@ -35,17 +39,19 @@ public class Pair<A, B> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Pair<?,?> other = (Pair<?,?>) obj;
+		Pair<?, ?> other = (Pair<?, ?>) obj;
 		if (a == null) {
 			if (other.a != null)
 				return false;
-		} else if (!a.equals(other.a))
+		} else if (!a.equals(other.a)) {
 			return false;
+		}
 		if (b == null) {
 			if (other.b != null)
 				return false;
-		} else if (!b.equals(other.b))
+		} else if (!b.equals(other.b)) {
 			return false;
+		}
 		return true;
 	}
 

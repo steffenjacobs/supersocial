@@ -62,6 +62,21 @@
     fill: #111;
 }
 
+.btn-header {
+    font-size: .5em;
+    display: inline-block;
+    margin-right: 1.5em;
+    width: 12em;
+    vertical-align: middle;
+}
+
+.btn-header-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    vertical-align: top;
+    margin-left: .4em;
+}
+
 .monospace-font {
     font-family: "Courier New", Courier, monospace;
 }
@@ -129,7 +144,7 @@ table tr:nth-child(odd) {
     border-radius: 6px;
     /* Position the tooltip text */
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     bottom: 125%;
     left: 50%;
     margin-left: -60px;
@@ -185,13 +200,13 @@ table tr:nth-child(odd) {
     cursor: pointer;
     font-size: .9em;
     fill: #555;
+    transition: 200ms;
 }
 .table-icon > span :hover{
     fill: #111;
 }
 .table-icon-del > span > svg{
     fill: rgb(185, 139, 139);
-    transition: 200ms;
 }
 .table-icon-del > span :hover{
     fill: #d94f4f;
@@ -214,4 +229,30 @@ table tr:nth-child(odd) {
 
 .table-colum-actions{
     min-width: 8em;
+}
+
+.info-label {
+    display: block;
+    padding-left: .25em;
+}
+
+.fontsize6{
+    font-size: .6em;
+    font-weight: 400;
+}
+
+.tableFixHead {
+    overflow-y: auto;
+    height: 50em;
+    background-color: white;
+}
+
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1; /*necessary to get on top of tooltip icons but not on top of tooltips*/
+}
+
+.tableFixHead thead {
+    z-index: 100;
 }

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -34,8 +35,8 @@ public class SocialMediaAccount implements Secured {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
 
-	@OneToMany(mappedBy="account")
-	private Set<Credential> credentials = new HashSet<Credential>();
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+	private Set<Credential> credentials = new HashSet<>();
 
 	@OneToOne
 	private AccessControlList accessControlList;
@@ -74,7 +75,7 @@ public class SocialMediaAccount implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.SocialMediaAccount;
+		return SecuredType.SOCIAL_MEDIA_ACCOUNT;
 	}
 
 	public Platform getPlatform() {

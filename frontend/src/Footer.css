@@ -1,0 +1,11 @@
+.footer {
+    width: 100%;
+    text-align: center;
+    color: rgb(50, 56, 59);
+    font-size: .75em;
+    padding:.5em;
+}
+.footer > span > a {
+    color: rgb(50, 56, 59);
+    text-decoration: none;
+}

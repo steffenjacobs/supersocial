@@ -1,16 +1,20 @@
 package me.steffenjacobs.supersocial.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import me.steffenjacobs.supersocial.domain.SocialMediaAccountRepository;
+import me.steffenjacobs.supersocial.domain.dto.ImportedPostDTO;
 import me.steffenjacobs.supersocial.domain.dto.MessagePublishingDTO;
 import me.steffenjacobs.supersocial.domain.dto.PostDTO;
 import me.steffenjacobs.supersocial.domain.dto.ScheduledPostDTO;
@@ -23,12 +27,19 @@ import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
 import me.steffenjacobs.supersocial.persistence.exception.PostNotFoundException;
 import me.steffenjacobs.supersocial.persistence.exception.ScheduledPostNotFoundException;
 import me.steffenjacobs.supersocial.security.SecurityService;
-import me.steffenjacobs.supersocial.security.exception.AuthorizationException;
 import me.steffenjacobs.supersocial.service.exception.SocialMediaAccountNotFoundException;
 
-/** @author Steffen Jacobs */
+/**
+ * Handles management of Posts. Relies on the {@link PostPublishingService} to
+ * actually publish posts.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class PostService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PostService.class);
+
 	@Autowired
 	private PostPersistenceManager postPersistenceManager;
 	@Autowired
@@ -43,14 +54,31 @@ public class PostService {
 	@Autowired
 	private PostPublishingService postPublishingService;
 
+	/**
+	 * Create and publish a post from the newly created
+	 * {@link MessagePublishingDTO}.
+	 */
 	public PostDTO createAndPublishPost(MessagePublishingDTO messagePublishingDTO) {
 		return postPublishingService.publish(createPost(messagePublishingDTO));
 	}
 
+	/**
+	 * Create a post from the newly created {@link MessagePublishingDTO} without
+	 * publishing.
+	 */
 	public PostDTO createUnpublishedPost(MessagePublishingDTO messagePublishingDto) {
 		return postPersistenceManager.toDto(createPost(messagePublishingDto));
 	}
 
+	/**
+	 * Create a post from the newly created {@link MessagePublishingDTO}, do
+	 * permission checks and store it to the database.
+	 * 
+	 * @throws SocialMediaAccountNotFoundException
+	 *             if the associated {@link SocialMediaAccount} could not be
+	 *             found or the current user is not permitted to see it.
+	 * 
+	 */
 	private Post createPost(MessagePublishingDTO messagePublishingDto) {
 		if (messagePublishingDto.getAccountId() == null) {
 			throw new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId());
@@ -59,15 +87,23 @@ public class PostService {
 				.orElseThrow(() -> new SocialMediaAccountNotFoundException(messagePublishingDto.getAccountId()));
 		securityService.checkIfCurrentUserIsPermitted(account, SecuredAction.READ);
 		Post post = postPersistenceManager.storePost(messagePublishingDto.getMessage(), account);
-		securityService.appendAcl(post);
+		securityService.appendCurrentUserAcl(post);
 		return post;
 	}
 
+	/**
+	 * Retrieve all scheduled, non-scheduled, published and unpublished posts
+	 * filtered by the current user's READ permission.
+	 */
 	public Set<PostDTO> getAllPosts() {
 		return securityService.filterForCurrentUser(postPersistenceManager.getAllPosts(), SecuredAction.READ).map(postPersistenceManager::toDto)
 				.map(this::addSchedulingInformationIfAvailable).collect(Collectors.toSet());
 	}
 
+	/**
+	 * Enrich the given {@link PostDTO} with scheduling information if this post
+	 * is scheduled.
+	 */
 	private PostDTO addSchedulingInformationIfAvailable(PostDTO post) {
 		if (post.getPublished() != null || !StringUtils.isEmpty(post.getErrorMessage())) {
 			return post;
@@ -81,21 +117,49 @@ public class PostService {
 		return post;
 	}
 
+	/**
+	 * Find the post by ID.
+	 * 
+	 * @return a {@link PostDTO} with the given ID
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the post does not exist.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to view the post.
+	 */
 	public PostDTO findPostById(UUID id) {
 		return postPersistenceManager.toDto(this.findOriginalPostById(id));
 	}
-	
+
+	/**
+	 * Find the post by ID but return a {@link Post} instead of a
+	 * {@link PostDTO}.
+	 * 
+	 * @return a {@link Post} with the given ID
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the post does not exist.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to view the post.
+	 */
 	public Post findOriginalPostById(UUID id) {
 		final Post post = postPersistenceManager.findPostById(id);
-		if (securityService.isCurrentUserPermitted(post, SecuredAction.READ)) {
-			return post;
-		} else {
-			throw new AuthorizationException("post", SecuredAction.READ);
-		}
+		securityService.checkIfCurrentUserIsPermitted(post, SecuredAction.READ);
+		return post;
 	}
 
+	/**
+	 * Delete the {@link Post} by the given id.
+	 * 
+	 * @throws PostNotFoundException
+	 *             if the post does not exist.
+	 * 
+	 * @throws me.steffenjacobs.supersocial.security.exception.AuthorizationException
+	 *             if the current user is not allowed to delete the post.
+	 */
 	public void deletePostById(UUID id) {
-
 		try {
 			// check the post itself
 			Post p = postPersistenceManager.findPostById(id);
@@ -123,10 +187,21 @@ public class PostService {
 
 			Post p = sp.getPost();
 			securityService.checkIfCurrentUserIsPermitted(p, SecuredAction.DELETE);
-			
+
 			scheduledPostPersistenceManager.deleteScheduledPost(sp.getId());
 			postPersistenceManager.deletePostById(p.getId());
-			
+
 		}
+	}
+
+	/**
+	 * Find out which of the given imported posts are already known and create
+	 * {@link Post} objects for the remainder.
+	 */
+	public void importPostsIfNecessary(List<ImportedPostDTO> importedPosts, SocialMediaAccount account) {
+		List<Post> existingPosts = postPersistenceManager.findByExternalIdIn(importedPosts.stream().map(ImportedPostDTO::getExternalId).collect(Collectors.toSet()));
+		Set<String> existingPostIds = existingPosts.stream().map(Post::getExternalId).collect(Collectors.toSet());
+		importedPosts.stream().filter(p -> !existingPostIds.contains(p.getExternalId())).forEach(postPersistenceManager::storePost);
+		LOG.info("Imported {} posts for account {}.", importedPosts.size() - existingPosts.size(), account.getId());
 	}
 }

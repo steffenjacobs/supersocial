@@ -1,13 +1,14 @@
 import React from "react";
 import './Sidebar.css';
-import { LoginManager } from "./LoginManager";
+import { LoginManager } from "./login/LoginManager";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Footer } from "./Footer";
 
 export interface PageComponents {
     components: PageComponent[]
     loginManager: LoginManager
-    selected: number
+    selected: PageComponent
 }
 
 export interface PageComponent {
@@ -24,26 +25,28 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
     constructor(props: PageComponents, state: PageComponents) {
         super(props);
         this.state = { components: props.components, loginManager: props.loginManager, selected: props.selected };
-        this.setActivePage(this.state.selected);
+        this.setActivePage(props.selected, true);
     }
 
     /** Set this page active. Remove the old page and select the new one to be rendered. */
-    private setActivePage(pageId: number) {
+    private setActivePage(elem: PageComponent, notMounted?: boolean) {
         var newComponents: PageComponent[] = [];
         for (let c = 0; c < this.state.components.length; c++) {
             let comp = this.state.components[c];
-            if (comp.selected && comp.id !== pageId) {
+            if (comp.selected && comp.id !== elem.id) {
                 newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, path: comp.path })
             }
-            else if (comp.id === pageId) {
+            else if (comp.id === elem.id) {
                 newComponents.push({ id: comp.id, title: comp.title, page: comp.page, icon: comp.icon, selected: true, path: comp.path })
             } else {
                 newComponents.push(comp);
             }
         }
 
-        this.setState({ components: newComponents, loginManager: this.state.loginManager, selected: pageId });
-        //TODO: set title and url in browser window
+        if (!notMounted) {
+            this.setState({ components: newComponents, selected: elem });
+        }
+        window.history.pushState('', 'Supersocial - ', elem.path);
     }
 
     /** @return the header component with the titleo f the page. */
@@ -56,6 +59,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         </div>);
     }
 
+    /**Log out the user. */
     private performLogout() {
         this.state.loginManager.logOut();
     }
@@ -65,7 +69,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         const components = this.state.components.map((elem) => {
             const clazz = elem.selected ? 'navbar-menuItem navbar-menuItem-active' : 'navbar-menuItem';
             return (
-                <a key={elem.id} onClick={() => this.setActivePage(elem.id)} /*href={elem.path}*/>
+                <a key={elem.id} onClick={c=>this.setActivePage(elem)}>
                     <div className={clazz}>
                         {elem.icon}
                         <div className="navbar-text">{elem.title}</div>
@@ -80,10 +84,10 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
         //3. add the page
         return (
             <div>
-            <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500}/>
+                <ToastContainer position={toast.POSITION.TOP_RIGHT} autoClose={5500} />
                 <div className="navbar">
                     <div className="navbar-logo">
-                        <img src="/logo192.png" alt="Logo" />
+                        <a href="/"><img src="/logo192.png" alt="Logo" /></a>
                         <div className="navbar-brandname"> Supersocial</div>
                     </div>
                     {components}
@@ -96,7 +100,7 @@ export class Sidebar extends React.Component<PageComponents, PageComponents>{
                         Hello {this.state.loginManager.getLoginStatus().username}!
                     </div>
                 </div>
-                <div className="navbar-page">{selectedComponent?.page}</div>
+                <div className="navbar-page">{selectedComponent?.page}<div className="navbar-footer-container"><Footer/></div></div>
             </div>
         );
     }

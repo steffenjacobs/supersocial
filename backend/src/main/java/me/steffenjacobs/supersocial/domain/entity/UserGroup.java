@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -35,7 +36,7 @@ public class UserGroup implements Secured {
 	@Column
 	private String name;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	private Set<SupersocialUser> users = new HashSet<>();
 
 	@OneToOne
@@ -55,7 +56,7 @@ public class UserGroup implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.UserGroup;
+		return SecuredType.USER_GROUP;
 	}
 
 	@Override
@@ -100,8 +101,9 @@ public class UserGroup implements Secured {
 		if (id == null) {
 			if (other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

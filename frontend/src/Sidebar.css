@@ -33,6 +33,7 @@
     display: table;
     margin: 0 auto;
     margin-bottom: 1em;
+    padding-top: 1em;
 }
 
 .navbar-text {    
@@ -66,4 +67,7 @@
     right: 0;
     padding: 1em;
     padding-top: 1.2em;
+}
+.navbar-footer-container{
+    margin-top: 1em;
 }

@@ -46,9 +46,6 @@ public class StandaloneUser implements Secured {
 	@Column(name = "active")
 	private int active;
 
-	@Column(name = "creation_date")
-	private Date creation;
-
 	@OneToOne
 	private AccessControlList accessControlList;
 
@@ -81,14 +78,6 @@ public class StandaloneUser implements Secured {
 		this.active = active;
 	}
 
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
-	}
-
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -103,7 +92,7 @@ public class StandaloneUser implements Secured {
 
 	@Override
 	public SecuredType getSecuredType() {
-		return SecuredType.User;
+		return SecuredType.USER;
 	}
 
 	@Override

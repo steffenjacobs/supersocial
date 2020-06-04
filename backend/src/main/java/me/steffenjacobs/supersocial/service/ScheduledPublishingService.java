@@ -14,7 +14,12 @@ import org.springframework.stereotype.Component;
 
 import me.steffenjacobs.supersocial.persistence.ScheduledPostPersistenceManager;
 
-/** @author Steffen Jacobs */
+/**
+ * Automatically publishes scheduled posts. Checks very minute whether there are
+ * some posts to be published and publishes them subsequently.
+ * 
+ * @author Steffen Jacobs
+ */
 @Component
 public class ScheduledPublishingService {
 
